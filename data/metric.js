@@ -10,7 +10,8 @@ class Metric {
     this.type = data.type || "";
     this.parent = data.parent || "";
     this.order = data.order || null;
-    this.pointer = "";
+    this.pointer = data.pointer || "";
+    this.metrics = data.metrics || {};
     this.history = [
       {
         value: data.value || 0,
@@ -57,6 +58,42 @@ class Metric {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  // function rep(obj) {
+  //   for (var ob in obj.metrics) {
+  //     console.log("ob", ob);
+  //     obj.metrics[ob].parent = obj;
+  //     console.log(new Metric(obj.metrics[ob]));
+  //     test.push(new Metric(obj.metrics[ob]));
+  //     // console.log("obj.metrics[ob]", obj.metrics[ob]);
+  //     if (obj.metrics[ob].metrics) {
+  //       //   console.log("obj.metrics[ob].metrics", obj.metrics[ob]);
+  //       rep(obj.metrics[ob]);
+  //     }
+  //   }
+  // }
+
+  addParentObject(obj) {
+    for (var ob in obj.metrics) {
+      console.log("ob", ob);
+      obj.metrics[ob].parent = obj;
+      console.log(new Metric(obj.metrics[ob]));
+    }
+  }
+
+  // setTimeout(() => {
+  //   console.log("testt", test);
+  //   console.log("that is it", getPointer(test[0]));
+  // }, 5000);
+
+  getNodeSelector(obj) {
+    console.log("obj.parent", obj.parent.parent);
+    if (obj.parent.parent) {
+      return getPointer(obj.parent) + ".metrics." + obj.id;
+    } else {
+      return "metrics." + obj.id;
+    }
   }
 }
 

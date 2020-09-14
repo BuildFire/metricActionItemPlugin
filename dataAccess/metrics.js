@@ -127,14 +127,15 @@ class MetricsDAO {
 }
 
 const metric = new Metric({
-  title: "ggg",
-  icon: "ggg",
-  pointer: "metrics.5f5fbaca70805ba300168eb3.metrics",
-  min: 45,
-  max: 87,
-  value: 78,
+  title: "ana",
+  icon: "amjad",
+  pointer:
+    "metrics.5f5fcc05251adf03a5d96a3e.metrics.5f5fd61dfe04456dd93f4073.metrics",
+  min: 9,
+  max: 2,
+  value: 6,
   action_item: {},
-  type: "parent",
+  type: "metric",
   history: [
     {
       value: 50,
@@ -154,10 +155,11 @@ MetricsDAO.getMetrics().then((data) => {
   //   });
   // });
 
-  // MetricsDAO.save(metric).then((data) => {
-  //   console.log("saved DATA", data);
+  // MetricsDAO.save(metric).then((data2) => {
+  //   console.log("saved DATA", data2);
   // });
-  console.log("ALL DATA", data.data);
+  rep(data.data);
+  console.log("ALL DATA", data);
 });
 
 // MetricsDAO.addMetricHistory("metrics.5f5fbaca70805ba300168eb3.history", 88)
@@ -168,15 +170,20 @@ MetricsDAO.getMetrics().then((data) => {
 //     console.log("addMetricHistory ERROR", err);
 //   });
 
-// function rep(obj) {
-//   for (var ob in obj.metrics) {
-//     console.log("ob", ob);
-//     obj.metrics[ob].parent = obj;
-//     console.log(new Metric(obj.metrics[ob]));
-//     // console.log("obj.metrics[ob]", obj.metrics[ob]);
-//     if (obj.metrics[ob].metrics) {
-//       //   console.log("obj.metrics[ob].metrics", obj.metrics[ob]);
-//       rep(obj.metrics[ob]);
-//     }
-//   }
+// function del() {
+//   return new Promise((resolve, reject) => {
+//     buildfire.publicData.delete(
+//       "5f5faecc72fd48066a251b99",
+//       "metrics",
+//       (err, data) => {
+//         if (err) reject(err);
+//         else resolve(data);
+//       }
+//     );
+//   });
 // }
+// del().then(() => {
+//   MetricsDAO.getMetrics().then((data) => {
+//     console.log("ALL DATA", data);
+//   });
+// });
