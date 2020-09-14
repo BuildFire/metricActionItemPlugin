@@ -80,21 +80,56 @@ class MetricsDAO {
     });
   }
 
-  static addMetricHistory(pointer, value) {
-    const currentDate = helpers.getAbsoluteDate();
+  // This will add/update metric history
+  static updateMetricHistory(pointer, value) {
+    const absoluteDate = helpers.getAbsoluteDate();
+
     return new Promise((resolve, reject) => {
-      console.log("pointer", pointer);
-      console.log("value", value);
-      resolve(true);
+      buildfire.publicData.searchAndUpdate(
+        { [`${pointer}.date`]: absoluteDate },
+        {
+          $set: {
+            [`${pointer}.$.value`]: value,
+            [`${pointer}.$.lastUpdatedOn`]: new Date(),
+            [`${pointer}.$.lastUpdatedBy`]: "currentUser.username",
+          },
+        },
+        "metrics",
+        (err, data) => {
+          if (err) reject(err);
+
+          if (data.nModified === 0) {
+            buildfire.publicData.update(
+              this.metrics.id,
+              {
+                $push: {
+                  [pointer]: {
+                    date: helpers.getAbsoluteDate(),
+                    createdOn: new Date(),
+                    createdBy: "currentUser.username",
+                    lastUpdatedOn: new Date(),
+                    lastUpdatedBy: "currentUser.username",
+                    value,
+                  },
+                },
+              },
+              "metrics",
+              (err, data) => {
+                if (err) reject(err);
+              }
+            );
+          }
+          resolve(data);
+        }
+      );
     });
   }
 }
 
 const metric = new Metric({
-  id: "5f5e38f564fb6d379babba90",
-  title: "tyu",
-  icon: "tyu",
-  pointer: "metrics.5f5e33894cd39ab4948c4914.metrics",
+  title: "ggg",
+  icon: "ggg",
+  pointer: "metrics.5f5fbaca70805ba300168eb3.metrics",
   min: 45,
   max: 87,
   value: 78,
@@ -103,9 +138,10 @@ const metric = new Metric({
   history: [
     {
       value: 50,
-      createdOn: helpers.getAbsoluteDate(),
+      date: helpers.getAbsoluteDate(),
+      createdOn: null,
       createdBy: null,
-      lastUpdatedOn: helpers.getAbsoluteDate(),
+      lastUpdatedOn: null,
       lastUpdatedBy: null,
     },
   ],
@@ -117,19 +153,30 @@ MetricsDAO.getMetrics().then((data) => {
   //     console.log("ALL DATA after Delete", data);
   //   });
   // });
-  rep(data.data);
+
+  // MetricsDAO.save(metric).then((data) => {
+  //   console.log("saved DATA", data);
+  // });
   console.log("ALL DATA", data.data);
 });
 
-function rep(obj) {
-  for (var ob in obj.metrics) {
-    console.log("ob", ob);
-    obj.metrics[ob].parent = obj;
-    console.log(new Metric(obj.metrics[ob]));
-    // console.log("obj.metrics[ob]", obj.metrics[ob]);
-    if (obj.metrics[ob].metrics) {
-      //   console.log("obj.metrics[ob].metrics", obj.metrics[ob]);
-      rep(obj.metrics[ob]);
-    }
-  }
-}
+// MetricsDAO.addMetricHistory("metrics.5f5fbaca70805ba300168eb3.history", 88)
+//   .then((data) => {
+//     console.log("addMetricHistory DATA", data);
+//   })
+//   .catch((err) => {
+//     console.log("addMetricHistory ERROR", err);
+//   });
+
+// function rep(obj) {
+//   for (var ob in obj.metrics) {
+//     console.log("ob", ob);
+//     obj.metrics[ob].parent = obj;
+//     console.log(new Metric(obj.metrics[ob]));
+//     // console.log("obj.metrics[ob]", obj.metrics[ob]);
+//     if (obj.metrics[ob].metrics) {
+//       //   console.log("obj.metrics[ob].metrics", obj.metrics[ob]);
+//       rep(obj.metrics[ob]);
+//     }
+//   }
+// }

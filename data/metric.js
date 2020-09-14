@@ -10,6 +10,7 @@ class Metric {
     this.type = data.type || "";
     this.parent = data.parent || "";
     this.order = data.order || null;
+    this.pointer = "";
     this.history = [
       {
         value: data.value || 0,
@@ -50,7 +51,8 @@ class Metric {
     MetricsDAO.addMetricHistory(historyPointer, value)
       .then(() => {
         // TODO: check if this step is needed
-        this.value = value;
+        // this.value = value;
+        // this.getValue(metric)
       })
       .catch((err) => {
         console.log(err);
