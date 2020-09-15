@@ -8,13 +8,12 @@ class Metric {
     this.value = 0;
     this.actionItem = data.actionItem || {};
     this.type = data.type || "";
-    this.parent = data.parent || "";
     this.order = data.order || null;
-    this.pointer = data.pointer || "";
     this.metrics = data.metrics || {};
-    this.history = [
+    this.history = data.history || [
       {
-        value: data.value || 0,
+        value: 0,
+        date: helpers.getAbsoluteDate(),
         createdOn: data.createdOn || null,
         createdBy: data.createdBy || null,
         lastUpdatedOn: data.lastUpdatedOn || null,
@@ -27,74 +26,10 @@ class Metric {
     this.lastUpdatedBy = data.lastUpdatedBy || null;
   }
 
-  getValue(metric) {
-    if (metric.type === "metric") {
-      let val = metric.history[metric.history.length - 1].value;
-      metric.value = val;
-      return val;
-    } else if (metric.type === "parent") {
-      if (metric.metrics) {
-        let sum = 0;
-        for (let key in metric.metrics) {
-          sum += getHistory(metric.metrics[key]);
-          console.log("sum", sum);
-        }
-        let avg = sum / Object.keys(metric.metrics).length;
-        console.log("avg", avg);
-        metric.value = avg;
-        return avg;
-      }
-    }
-  }
-
-  updateHistory(value) {
-    const historyPointer = `${this.pointer}.${this.id}.history`;
-    MetricsDAO.addMetricHistory(historyPointer, value)
-      .then(() => {
-        // TODO: check if this step is needed
-        // this.value = value;
-        // this.getValue(metric)
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  // function rep(obj) {
+  // renderObject(obj) {
   //   for (var ob in obj.metrics) {
-  //     console.log("ob", ob);
-  //     obj.metrics[ob].parent = obj;
-  //     console.log(new Metric(obj.metrics[ob]));
-  //     test.push(new Metric(obj.metrics[ob]));
-  //     // console.log("obj.metrics[ob]", obj.metrics[ob]);
-  //     if (obj.metrics[ob].metrics) {
-  //       //   console.log("obj.metrics[ob].metrics", obj.metrics[ob]);
-  //       rep(obj.metrics[ob]);
-  //     }
+  //     return new Metric(obj.metrics[ob]);
   //   }
-  // }
-
-  addParentObject(obj) {
-    for (var ob in obj.metrics) {
-      console.log("ob", ob);
-      obj.metrics[ob].parent = obj;
-      console.log(new Metric(obj.metrics[ob]));
-    }
-  }
-
-  // setTimeout(() => {
-  //   console.log("testt", test);
-  //   console.log("that is it", getPointer(test[0]));
-  // }, 5000);
-
-  getNodeSelector(obj) {
-    console.log("obj.parent", obj.parent.parent);
-    if (obj.parent.parent) {
-      return getPointer(obj.parent) + ".metrics." + obj.id;
-    } else {
-      return "metrics." + obj.id;
-    }
-  }
 }
 
 // setTimeout(() => {

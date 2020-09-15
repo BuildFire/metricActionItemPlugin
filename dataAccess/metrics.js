@@ -1,6 +1,7 @@
 class MetricsDAO {
-  constructor() {
+  constructor(currentNode = "metrics") {
     this.metrics = {};
+    this.currentNode = currentNode;
   }
 
   static getMetrics() {
@@ -24,6 +25,8 @@ class MetricsDAO {
             );
           } else {
             this.metrics = data;
+            // Calculates the average of each metric history
+            getHistoryValue(this.metrics);
             resolve(data);
           }
         }
@@ -31,6 +34,26 @@ class MetricsDAO {
     });
   }
 
+  // A recurcive function that calculates the average of each metric history
+  getHistoryValue() {
+    if (this.metrics.type === "metric") {
+      let val = this.metrics.history[this.metrics.history.length - 1].value;
+      this.metrics.value = val;
+      return val;
+    } else if (this.metrics.type === "parent" || !this.metrics.type) {
+      if (this.metrics.metrics) {
+        let sum = 0;
+        for (let key in this.metrics.metrics) {
+          sum += getHistoryValue(this.metrics.metrics[key]);
+        }
+        let avg = sum / Object.keys(this.metrics.metrics).length;
+        this.metrics.value = avg;
+        return avg;
+      }
+    }
+  }
+
+  // Control Panel Only
   static save(metric) {
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
@@ -38,60 +61,72 @@ class MetricsDAO {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
-        { $set: { [`${metric.pointer}.${metric.id}`]: metric } },
+        { $set: { [`${this.currentNode}.${metric.id}`]: metric } },
         "metrics",
         (err, data) => {
           if (err) reject(err);
-          else resolve(data);
+          else {
+            this.getMetrics();
+            resolve(data);
+          }
         }
       );
     });
   }
 
+  // Control Panel Only
   static update(updateObject) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
-        { $set: updateObject },
+        { $set: { [this.currentNode]: updateObject } },
         "metrics",
         (err, data) => {
           if (err) reject(err);
-          else resolve(data);
+          else {
+            this.getMetrics();
+            resolve(data);
+          }
         }
       );
     });
   }
 
-  static delete(metric) {
+  // Control Panel Only
+  static delete(id) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
         {
           $unset: {
-            [`${metric.pointer}.${metric.id}`]: "",
+            [`${this.currentNode}.${id}`]: "",
           },
         },
         "metrics",
         (err, data) => {
           if (err) reject(err);
-          else resolve(data);
+          else {
+            this.getMetrics();
+            resolve(data);
+          }
         }
       );
     });
   }
 
+  // Control Panel and Widget
   // This will add/update metric history
-  static updateMetricHistory(pointer, value) {
+  static updateMetricHistory(value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
-        { [`${pointer}.date`]: absoluteDate },
+        { [`${this.currentNode}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${pointer}.$.value`]: value,
-            [`${pointer}.$.lastUpdatedOn`]: new Date(),
-            [`${pointer}.$.lastUpdatedBy`]: "currentUser.username",
+            [`${this.currentNode}.history.$.value`]: value,
+            [`${this.currentNode}.history.$.lastUpdatedOn`]: new Date(),
+            [`${this.currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -103,7 +138,7 @@ class MetricsDAO {
               this.metrics.id,
               {
                 $push: {
-                  [pointer]: {
+                  [this.currentNode]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -119,6 +154,7 @@ class MetricsDAO {
               }
             );
           }
+          this.getMetrics();
           resolve(data);
         }
       );
@@ -129,8 +165,6 @@ class MetricsDAO {
 const metric = new Metric({
   title: "ana",
   icon: "amjad",
-  pointer:
-    "metrics.5f5fcc05251adf03a5d96a3e.metrics.5f5fd61dfe04456dd93f4073.metrics",
   min: 9,
   max: 2,
   value: 6,
@@ -158,7 +192,6 @@ MetricsDAO.getMetrics().then((data) => {
   // MetricsDAO.save(metric).then((data2) => {
   //   console.log("saved DATA", data2);
   // });
-  rep(data.data);
   console.log("ALL DATA", data);
 });
 
