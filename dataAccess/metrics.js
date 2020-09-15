@@ -26,7 +26,7 @@ class MetricsDAO {
           } else {
             this.metrics = data;
             // Calculates the average of each metric history
-            getHistoryValue(this.metrics);
+            MetricsDAO.getHistoryValue(this.metrics);
             resolve(data);
           }
         }
@@ -35,7 +35,7 @@ class MetricsDAO {
   }
 
   // A recurcive function that calculates the average of each metric history
-  getHistoryValue() {
+  static getHistoryValue() {
     if (this.metrics.type === "metric") {
       let val = this.metrics.history[this.metrics.history.length - 1].value;
       this.metrics.value = val;
@@ -44,7 +44,7 @@ class MetricsDAO {
       if (this.metrics.metrics) {
         let sum = 0;
         for (let key in this.metrics.metrics) {
-          sum += getHistoryValue(this.metrics.metrics[key]);
+          sum += MetricsDAO.getHistoryValue(this.metrics.metrics[key]);
         }
         let avg = sum / Object.keys(this.metrics.metrics).length;
         this.metrics.value = avg;
@@ -67,6 +67,11 @@ class MetricsDAO {
           if (err) reject(err);
           else {
             this.getMetrics();
+            registerEvent(
+              metric.title,
+              `metric_${metric.id}_view`,
+              "Number of times this metric was viewed"
+            );
             resolve(data);
           }
         }
@@ -159,6 +164,17 @@ class MetricsDAO {
         }
       );
     });
+  }
+
+  static registerEvent(title, key, description, silentNotification = true) {
+    buildfire.analytics.registerEvent(
+      {
+        title: title,
+        key: key,
+        description: description,
+      },
+      { silentNotification: silentNotification }
+    );
   }
 }
 
