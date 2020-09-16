@@ -62,75 +62,9 @@ class MetricsDAO {
     }
   }
 
-  // Control Panel Only
-  static save(metric) {
-    metric.createdOn = new Date();
-    metric.lastUpdatedOn = new Date();
-
-    return new Promise((resolve, reject) => {
-      buildfire.publicData.update(
-        this.metrics.id,
-        { $set: { [`${this.currentNode}.${metric.id}`]: metric } },
-        "metrics",
-        (err, data) => {
-          if (err) reject(err);
-          else {
-            this.getMetrics();
-            registerEvent(
-              metric.title,
-              `metric_${metric.id}_view`,
-              "Number of times this metric was viewed"
-            );
-            resolve(data);
-          }
-        }
-      );
-    });
-  }
-
-  // Control Panel Only
-  static update(updateObject) {
-    return new Promise((resolve, reject) => {
-      buildfire.publicData.update(
-        this.metrics.id,
-        { $set: { [this.currentNode]: updateObject } },
-        "metrics",
-        (err, data) => {
-          if (err) reject(err);
-          else {
-            this.getMetrics();
-            resolve(data);
-          }
-        }
-      );
-    });
-  }
-
-  // Control Panel Only
-  static delete(id) {
-    return new Promise((resolve, reject) => {
-      buildfire.publicData.update(
-        this.metrics.id,
-        {
-          $unset: {
-            [`${this.currentNode}.${id}`]: "",
-          },
-        },
-        "metrics",
-        (err, data) => {
-          if (err) reject(err);
-          else {
-            this.getMetrics();
-            resolve(data);
-          }
-        }
-      );
-    });
-  }
-
   // Control Panel and Widget
   // This will add/update metric history
-  static updateMetricHistory(value) {
+  static updateMetricHistory(value, metricId) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -152,7 +86,7 @@ class MetricsDAO {
               this.metrics.id,
               {
                 $push: {
-                  [this.currentNode]: {
+                  [`${this.currentNode}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -168,6 +102,9 @@ class MetricsDAO {
               }
             );
           }
+          // Track Action
+          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
+          // Update the metrics object
           this.getMetrics();
           resolve(data);
         }
@@ -175,64 +112,3 @@ class MetricsDAO {
     });
   }
 }
-
-const metric = new Metric({
-  title: "ana",
-  icon: "amjad",
-  min: 9,
-  max: 2,
-  value: 6,
-  action_item: {},
-  type: "metric",
-  history: [
-    {
-      value: 50,
-      date: helpers.getAbsoluteDate(),
-      createdOn: null,
-      createdBy: null,
-      lastUpdatedOn: null,
-      lastUpdatedBy: null,
-    },
-  ],
-});
-
-// MetricsDAO.getMetrics().then((data) => {
-// newMetric.update(metric, "value").then(() => {
-//   newMetric.getMetrics().then((data) => {
-//     console.log("ALL DATA after Delete", data);
-//   });
-// });
-
-// MetricsDAO.save(metric).then((data2) => {
-//   console.log("saved DATA", data2);
-// });
-//   console.log("ALL DATA", data);
-// });
-
-// MetricsDAO.addMetricHistory("metrics.5f5fbaca70805ba300168eb3.history", 88)
-//   .then((data) => {
-//     console.log("addMetricHistory DATA", data);
-//   })
-//   .catch((err) => {
-//     console.log("addMetricHistory ERROR", err);
-//   });
-
-// function del() {
-//   return new Promise((resolve, reject) => {
-//     buildfire.publicData.delete(
-//       "5f5faecc72fd48066a251b99",
-//       "metrics",
-//       (err, data) => {
-//         if (err) reject(err);
-//         else resolve(data);
-//       }
-//     );
-//   });
-// }
-// del().then(() => {
-//   MetricsDAO.getMetrics().then((data) => {
-//     console.log("ALL DATA", data);
-//   });
-// });
-
-MetricsDAO.c;

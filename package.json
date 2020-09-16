@@ -6,7 +6,7 @@
   "scripts": {
     "build": "gulp build && cd ../ && rm -rf gulpStarterKitPluginTemplate.zip && zip -r gulpStarterKitPluginTemplate.zip gulpStarterKitPluginTemplate_release && rm -rf gulpStarterKitPluginTemplate_release"
   },
-  "author": "Daniel Hindi",
+  "author": "Hamza & Amjad",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.7.2",

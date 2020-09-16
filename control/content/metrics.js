@@ -129,6 +129,7 @@ class MetricsDAO {
 
   // Control Panel and Widget
   // This will add/update metric history
+  // TODO: Check if this is required
   static updateMetricHistory(value, metricId) {
     const absoluteDate = helpers.getAbsoluteDate();
 
@@ -167,8 +168,9 @@ class MetricsDAO {
               }
             );
           }
+          // TODO: Check if this is required
           // Track Action
-          // Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
+          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
           // Update the metrics object
           this.getMetrics();
           resolve(data);

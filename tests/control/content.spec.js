@@ -23,7 +23,11 @@ describe("Test the Metric class", () => {
   });
 });
 
-xdescribe("Test the MetricsDAO class", () => {
+describe("Test the MetricsDAO class", () => {
+  beforeAll(async () => {
+    await MetricsDAO.getMetrics();
+  });
+
   it("Should return the metrics object without any errors", async () => {
     await expectAsync(MetricsDAO.getMetrics()).toBeResolved();
   });
@@ -52,8 +56,6 @@ xdescribe("Test the MetricsDAO class", () => {
     type: "metric",
     value: 50,
   });
-
-  MetricsDAO.metrics = { id: "5f627649376369065e7078cb" };
 
   it("Should save a metric without any errors", async () => {
     MetricsDAO.setCurrentNode("metrics");

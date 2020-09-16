@@ -1,8 +1,8 @@
 {
   "author": "Amjad & Hamza",
   "pluginName": "Metric plugin",
-  "pluginDescription": "<enter your plugin description here>",
-  "supportEmail": "<enter your support email here>",
+  "pluginDescription": "A simple way to show a dashboard of KPI's",
+  "supportEmail": "devsupport@buildfire.com",
   "control": {
     "content": {
       "enabled": true

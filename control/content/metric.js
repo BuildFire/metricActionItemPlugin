@@ -25,37 +25,4 @@ class Metric {
     this.lastUpdatedOn = data.lastUpdatedOn || null;
     this.lastUpdatedBy = data.lastUpdatedBy || null;
   }
-
-  // renderObject(obj) {
-  //   for (var ob in obj.metrics) {
-  //     return new Metric(obj.metrics[ob]);
-  //   }
 }
-
-// setTimeout(() => {
-//   new Metric({
-//     id: "5f5aa167ad0a6280de4773a7",
-//     actionItem: {},
-//     createdBy: null,
-//     createdOn: "2020-09-10T21:57:59.951Z",
-//     history: [
-//       {
-//         value: 50,
-//         createdOn: null,
-//         createdBy: null,
-//         lastUpdatedOn: null,
-//         lastUpdatedBy: null,
-//       },
-//     ],
-//     icon: "metric1",
-//     lastUpdatedBy: null,
-//     lastUpdatedOn: "2020-09-10T21:57:59.951Z",
-//     max: 0,
-//     min: 100,
-//     order: null,
-//     pointer: "metrics",
-//     title: "metric1",
-//     type: "metric",
-//     value: 50,
-//   }).addHistory(20);
-// }, 2000);
