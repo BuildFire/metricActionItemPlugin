@@ -23,7 +23,7 @@ describe("Test the Metric class", () => {
   });
 });
 
-describe("Test the MetricsDAO class", () => {
+xdescribe("Test the MetricsDAO class", () => {
   it("Should return the metrics object without any errors", async () => {
     await expectAsync(MetricsDAO.getMetrics()).toBeResolved();
   });
@@ -83,3 +83,52 @@ describe("Test the MetricsDAO class", () => {
     MetricsDAO.getMetrics();
   }, 2000);
 });
+
+describe("Test the Settings class", () => {
+  beforeAll(() => {
+    let data = {
+      tags: ["admin", "moderator", "users"],
+      sortBy: "lowest",
+      showSummary: false,
+    };
+    newSettings = new Settings(data);
+  });
+
+  it("Should instantiate an object properly", () => {
+    expect(newSettings.sortBy).toBe("lowest");
+  });
+
+  it("Should save new settings in the datastore", async () => {
+    await newSettings.save().then((data) => {
+      console.log("New settings", data);
+      expect(data).toBeTruthy();
+    });
+  });
+
+  it("Should get settings from the datastore", async () => {
+    await Settings.get().then((data) => {
+      console.log("Settings", data);
+      expect(data).toBeTruthy();
+    });
+  });
+});
+
+// describe("Test the MetricsDAO class", () => {
+//     it("should return all the metrics correctly", async () => {
+//       await expectAsync(MetricsDAO.getMetrics()).toBeResolved();
+//     });
+
+//     it("should return all the metrics correctly", async () => {
+//       await MetricsDAO.getMetrics().then((data) => {
+//         console.log("ALL ", data);
+//         expect(data).toBeTruthy();
+//       });
+//     });
+//     it("should return all the metrics correctly", (done) => {
+//       MetricsDAO.getMetrics().then((data) => {
+//         console.log("ALL ", data);
+//         expect(data).toBeTruthy();
+//         done();
+//       });
+//     });
+//   });
