@@ -53,33 +53,32 @@ describe("Test the MetricsDAO class", () => {
     value: 50,
   });
 
-  MetricsDAO.metrics = { id: "5f5fb72772fd48066a251bea" };
+  MetricsDAO.metrics = { id: "5f627649376369065e7078cb" };
 
-  // it("Should save a metric without any errors", async () => {
-  //   MetricsDAO.setCurrentNode("metrics");
-  //     await expectAsync(MetricsDAO.save(metric)).toBeResolved();
-  // });
+  it("Should save a metric without any errors", async () => {
+    MetricsDAO.setCurrentNode("metrics");
+    await expectAsync(MetricsDAO.save(metric)).toBeResolved();
+  });
 
-  //   it("Should update a metric without any errors", async () => {
-  //     MetricsDAO.setCurrentNode("metrics." + metric.id);
-  // \    await expectAsync(
-  //       MetricsDAO.update({ [`${MetricsDAO.currentNode}.title`]: "New Title" })
-  //     ).toBeResolved();
-  //   });
-
-  it("Should update a metric history value without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics." + "5f5fbaca70805ba300168eb3");
+  it("Should update a metric without any errors", async () => {
+    MetricsDAO.setCurrentNode("metrics." + metric.id);
     await expectAsync(
-      MetricsDAO.updateMetricHistory(99, MetricsDAO.currentNode)
+      MetricsDAO.update({ [`${MetricsDAO.currentNode}.title`]: "Title" })
     ).toBeResolved();
   });
 
-  // it("Should delete a metric without any errors", async () => {
-  //   MetricsDAO.setCurrentNode("metrics");
-  //   await expectAsync(
-  //     MetricsDAO.delete("5f626127fe0f898935ecf1a1")
-  //   ).toBeResolved();
-  // });
+  it("Should update a metric history value without any errors", async () => {
+    MetricsDAO.setCurrentNode("metrics." + metric.id);
+    await expectAsync(
+      MetricsDAO.updateMetricHistory(99, metric.id)
+    ).toBeResolved();
+  });
+
+  it("Should delete a metric without any errors", async () => {
+    MetricsDAO.setCurrentNode("metrics");
+    await expectAsync(MetricsDAO.delete(metric.id)).toBeResolved();
+  });
+
   setTimeout(() => {
     MetricsDAO.getMetrics();
   }, 2000);

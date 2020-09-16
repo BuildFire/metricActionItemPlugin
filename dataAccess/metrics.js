@@ -151,7 +151,7 @@ class MetricsDAO {
               this.metrics.id,
               {
                 $push: {
-                  [this.currentNode]: {
+                  [`${this.currentNode}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -168,7 +168,7 @@ class MetricsDAO {
             );
           }
           // Track Action
-          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
+          // Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
           // Update the metrics object
           this.getMetrics();
           resolve(data);
@@ -236,5 +236,3 @@ const metric = new Metric({
 //     console.log("ALL DATA", data);
 //   });
 // });
-
-MetricsDAO.c;
