@@ -100,14 +100,12 @@ describe("Test the Settings class", () => {
 
   it("Should save new settings in the datastore", async () => {
     await newSettings.save().then((data) => {
-      console.log("New settings", data);
       expect(data).toBeTruthy();
     });
   });
 
   it("Should get settings from the datastore", async () => {
     await Settings.get().then((data) => {
-      console.log("Settings", data);
       expect(data).toBeTruthy();
     });
   });
