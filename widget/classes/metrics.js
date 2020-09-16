@@ -1,12 +1,13 @@
 class MetricsDAO {
   constructor() {}
 
-  static metrics = {};
+  static metric = {};
   static currentNode = "metrics";
 
   static setCurrentNode(node) {
     this.currentNode = node;
   }
+
   static getCurrentNode() {
     return currentNode;
   }
@@ -31,7 +32,7 @@ class MetricsDAO {
               }
             );
           } else {
-            MetricsDAO.metrics = data;
+            this.metrics = data;
             console.log("All Data", data);
             // Calculates the average of each metric history
             MetricsDAO.getHistoryValue(this.metrics);
@@ -75,10 +76,10 @@ class MetricsDAO {
           if (err) reject(err);
           else {
             this.getMetrics();
-            Analytics.registerEvent(
+            registerEvent(
               metric.title,
-              `METRIC_${metric.id}_HISTORY_UPDATE`,
-              "Number of times the metric history updated"
+              `metric_${metric.id}_view`,
+              "Number of times this metric was viewed"
             );
             resolve(data);
           }
@@ -92,7 +93,7 @@ class MetricsDAO {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
-        { $set: updateObject },
+        { $set: { [this.currentNode]: updateObject } },
         "metrics",
         (err, data) => {
           if (err) reject(err);
@@ -129,7 +130,7 @@ class MetricsDAO {
 
   // Control Panel and Widget
   // This will add/update metric history
-  static updateMetricHistory(value, metricId) {
+  static updateMetricHistory(value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -167,9 +168,6 @@ class MetricsDAO {
               }
             );
           }
-          // Track Action
-          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
-          // Update the metrics object
           this.getMetrics();
           resolve(data);
         }
