@@ -5,7 +5,6 @@ class Metric {
     this.icon = data.icon || "";
     this.min = data.min || 0;
     this.max = data.max || 0;
-    this.value = 0;
     this.actionItem = data.actionItem || {};
     this.type = data.type || "";
     this.order = data.order || null;

@@ -22,19 +22,19 @@ class MetricsDAO {
             buildfire.publicData.save(
               { metrics: {} },
               "metrics",
-              (err, result) => {
+              async (err, result) => {
                 if (err) reject(err);
                 else {
-                  MetricsDAO.getMetrics();
+                  await this.getMetrics();
                   resolve(result);
                 }
               }
             );
           } else {
-            MetricsDAO.metrics = data;
+            this.metrics = data;
             console.log("All Data", data);
             // Calculates the average of each metric history
-            MetricsDAO.getHistoryValue(this.metrics);
+            this.getHistoryValue(this.metrics.data);
             resolve(data);
           }
         }
@@ -43,19 +43,19 @@ class MetricsDAO {
   }
 
   // A recurcive function that calculates the average of each metric history
-  static getHistoryValue() {
-    if (this.metrics.type === "metric") {
-      let val = this.metrics.history[this.metrics.history.length - 1].value;
-      this.metrics.value = val;
+  static getHistoryValue(metric) {
+    if (metric.type === "metric") {
+      let val = metric.history[metric.history.length - 1].value;
+      metric.value = val;
       return val;
-    } else if (this.metrics.type === "parent" || !this.metrics.type) {
-      if (this.metrics.metrics) {
+    } else if (metric.type === "parent" || !metric.type) {
+      if (metric.metrics) {
         let sum = 0;
-        for (let key in this.metrics.metrics) {
-          sum += MetricsDAO.getHistoryValue(this.metrics.metrics[key]);
+        for (let key in metric.metrics) {
+          sum += this.getHistoryValue(metric.metrics[key]);
         }
-        let avg = sum / Object.keys(this.metrics.metrics).length;
-        this.metrics.value = avg;
+        let avg = sum / Object.keys(metric.metrics).length;
+        metric.value = avg;
         return avg;
       }
     }
@@ -71,10 +71,10 @@ class MetricsDAO {
         this.metrics.id,
         { $set: { [`${this.currentNode}.${metric.id}`]: metric } },
         "metrics",
-        (err, data) => {
+        async (err, data) => {
           if (err) reject(err);
           else {
-            this.getMetrics();
+            await this.getMetrics();
             Analytics.registerEvent(
               metric.title,
               `METRIC_${metric.id}_HISTORY_UPDATE`,
@@ -220,21 +220,3 @@ const metric = new Metric({
 //   .catch((err) => {
 //     console.log("addMetricHistory ERROR", err);
 //   });
-
-// function del() {
-//   return new Promise((resolve, reject) => {
-//     buildfire.publicData.delete(
-//       "5f5faecc72fd48066a251b99",
-//       "metrics",
-//       (err, data) => {
-//         if (err) reject(err);
-//         else resolve(data);
-//       }
-//     );
-//   });
-// }
-// del().then(() => {
-//   MetricsDAO.getMetrics().then((data) => {
-//     console.log("ALL DATA", data);
-//   });
-// });

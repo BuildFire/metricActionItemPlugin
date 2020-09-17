@@ -25,65 +25,127 @@ describe("Test the Metric class", () => {
 
 describe("Test the MetricsDAO class", () => {
   beforeAll(async () => {
+    await deleteEverything().then((data) => {
+      console.log("deleted", data);
+    });
     await MetricsDAO.getMetrics();
+
+    metric1 = new Metric({
+      id: "5f635a3b62f0aff6f82856d0",
+      actionItem: {},
+      createdBy: "currentUser.username",
+      createdOn: new Date(),
+      history: [
+        {
+          value: 56,
+          createdOn: new Date(),
+          createdBy: "currentUser.username",
+          lastUpdatedOn: new Date(),
+          lastUpdatedBy: "currentUser.username",
+        },
+      ],
+      icon: "metric1",
+      lastUpdatedBy: "currentUser.username",
+      lastUpdatedOn: new Date(),
+      max: 44,
+      min: 78,
+      order: null,
+      title: "metric",
+      type: "metric",
+      value: 23,
+    });
+
+    metric2 = new Metric({
+      id: "5f635a3b66a9afc0e2a8019f",
+      actionItem: {},
+      createdBy: "currentUser.username",
+      createdOn: new Date(),
+      history: [
+        {
+          value: 45,
+          createdOn: new Date(),
+          createdBy: "currentUser.username",
+          lastUpdatedOn: new Date(),
+          lastUpdatedBy: "currentUser.username",
+        },
+      ],
+      icon: "metric1",
+      lastUpdatedBy: "currentUser.username",
+      lastUpdatedOn: new Date(),
+      max: 96,
+      min: 15,
+      order: null,
+      title: "metric",
+      type: "metric",
+      value: 56,
+    });
+
+    metric3 = new Metric({
+      id: "5f635a3b54586a894049c2b1",
+      actionItem: {},
+      createdBy: "currentUser.username",
+      createdOn: new Date(),
+      history: [
+        {
+          value: 19,
+          createdOn: new Date(),
+          createdBy: "currentUser.username",
+          lastUpdatedOn: new Date(),
+          lastUpdatedBy: "currentUser.username",
+        },
+      ],
+      icon: "metric1",
+      lastUpdatedBy: "currentUser.username",
+      lastUpdatedOn: new Date(),
+      max: 56,
+      min: 45,
+      order: null,
+      title: "metric",
+      type: "metric",
+      value: 23,
+    });
   });
 
   it("Should return the metrics object without any errors", async () => {
     await expectAsync(MetricsDAO.getMetrics()).toBeResolved();
   });
 
-  const metric = new Metric({
-    id: "5f626127fe0f898935ecf1a1",
-    actionItem: {},
-    createdBy: "currentUser.username",
-    createdOn: new Date(),
-    history: [
-      {
-        value: 50,
-        createdOn: new Date(),
-        createdBy: "currentUser.username",
-        lastUpdatedOn: new Date(),
-        lastUpdatedBy: "currentUser.username",
-      },
-    ],
-    icon: "metric1",
-    lastUpdatedBy: "currentUser.username",
-    lastUpdatedOn: new Date(),
-    max: 0,
-    min: 100,
-    order: null,
-    title: "metric",
-    type: "metric",
-    value: 50,
+  it("Should save the first metric correctly", async () => {
+    MetricsDAO.setCurrentNode("metrics");
+    await expectAsync(MetricsDAO.save(metric1)).toBeResolved();
+    await expectAsync(MetricsDAO.save(metric2)).toBeResolved();
+    await expectAsync(MetricsDAO.save(metric3)).toBeResolved();
+    expect(Object.keys(MetricsDAO.metrics.data.metrics).length).toBe(3);
   });
 
-  it("Should save a metric without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics");
-    await expectAsync(MetricsDAO.save(metric)).toBeResolved();
+  it("Should save the third metric and calculate the value of the big object correctly", async () => {
+    expect(MetricsDAO.getHistoryValue(MetricsDAO.metrics.data)).toBe(40);
   });
 
   it("Should update a metric without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics." + metric.id);
+    MetricsDAO.setCurrentNode("metrics." + metric1.id);
     await expectAsync(
       MetricsDAO.update({ [`${MetricsDAO.currentNode}.title`]: "Title" })
     ).toBeResolved();
   });
 
   it("Should update a metric history value without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics." + metric.id);
+    MetricsDAO.setCurrentNode("metrics." + metric2.id);
     await expectAsync(
-      MetricsDAO.updateMetricHistory(99, metric.id)
+      MetricsDAO.updateMetricHistory(99, metric2.id)
     ).toBeResolved();
   });
 
   it("Should delete a metric without any errors", async () => {
     MetricsDAO.setCurrentNode("metrics");
-    await expectAsync(MetricsDAO.delete(metric.id)).toBeResolved();
+    await expectAsync(MetricsDAO.delete(metric3.id)).toBeResolved();
   });
 
-  setTimeout(() => {
-    MetricsDAO.getMetrics();
-  }, 2000);
+  afterAll(async () => {
+    await setTimeout(() => {
+      console.log("Metric Object After all testing", MetricsDAO.metrics);
+    }, 3000);
+  });
 });
 
 describe("Test the Settings class", () => {
@@ -132,3 +194,20 @@ describe("Test the Settings class", () => {
 //       });
 //     });
 //   });
+
+// To delete all metrics inside the big object
+function deleteEverything() {
+  return new Promise((resolve, reject) => {
+    buildfire.publicData.save({}, "metrics", (err, result) => {
+      if (err) reject(err);
+      else {
+        console.log("Yes I passed");
+        buildfire.publicData.get("metrics", (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        });
+        resolve(result);
+      }
+    });
+  });
+}
