@@ -2,15 +2,6 @@ class MetricsDAO {
   constructor() {}
 
   static metric = {};
-  static currentNode = "metrics";
-
-  static setCurrentNode(node) {
-    this.currentNode = node;
-  }
-
-  static getCurrentNode() {
-    return currentNode;
-  }
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
@@ -64,17 +55,17 @@ class MetricsDAO {
 
   // Control Panel and Widget
   // This will add/update metric history
-  static updateMetricHistory(value, metricId) {
+  static updateMetricHistory(value, currentNode) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
-        { [`${this.currentNode}.history.date`]: absoluteDate },
+        { [`${currentNode}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${this.currentNode}.history.$.value`]: value,
-            [`${this.currentNode}.history.$.lastUpdatedOn`]: new Date(),
-            [`${this.currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${currentNode}.history.$.value`]: value,
+            [`${currentNode}.history.$.lastUpdatedOn`]: new Date(),
+            [`${currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -86,7 +77,7 @@ class MetricsDAO {
               this.metrics.id,
               {
                 $push: {
-                  [`${this.currentNode}.history`]: {
+                  [`${currentNode}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -102,6 +93,9 @@ class MetricsDAO {
               }
             );
           }
+          // Extract metric id from currentNode
+          let metricId = currentNode.split(".");
+          metricId = metricId[metricId.length - 1];
           // Track Action
           Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
           // Update the metrics object

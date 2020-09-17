@@ -1,3 +1,5 @@
+let currentNode = "metrics";
+
 describe("Test the Metric class", () => {
   beforeAll(() => {
     let data = {
@@ -111,10 +113,10 @@ describe("Test the MetricsDAO class", () => {
   });
 
   it("Should save the first metric correctly", async () => {
-    MetricsDAO.setCurrentNode("metrics");
-    await expectAsync(MetricsDAO.save(metric1)).toBeResolved();
-    await expectAsync(MetricsDAO.save(metric2)).toBeResolved();
-    await expectAsync(MetricsDAO.save(metric3)).toBeResolved();
+    currentNode = "metrics";
+    await expectAsync(MetricsDAO.save(metric1, currentNode)).toBeResolved();
+    await expectAsync(MetricsDAO.save(metric2, currentNode)).toBeResolved();
+    await expectAsync(MetricsDAO.save(metric3, currentNode)).toBeResolved();
     expect(Object.keys(MetricsDAO.metrics.data.metrics).length).toBe(3);
   });
 
@@ -123,22 +125,22 @@ describe("Test the MetricsDAO class", () => {
   });
 
   it("Should update a metric without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics." + metric1.id);
+    currentNode = "metrics." + metric1.id;
     await expectAsync(
-      MetricsDAO.update({ [`${MetricsDAO.currentNode}.title`]: "Title" })
+      MetricsDAO.update({ [`${currentNode}.title`]: "Title" })
     ).toBeResolved();
   });
 
   it("Should update a metric history value without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics." + metric2.id);
+    currentNode = "metrics." + metric2.id;
     await expectAsync(
-      MetricsDAO.updateMetricHistory(99, metric2.id)
+      MetricsDAO.updateMetricHistory(99, currentNode)
     ).toBeResolved();
   });
 
   it("Should delete a metric without any errors", async () => {
-    MetricsDAO.setCurrentNode("metrics");
-    await expectAsync(MetricsDAO.delete(metric3.id)).toBeResolved();
+    currentNode = "metrics";
+    await expectAsync(MetricsDAO.delete(metric3.id, currentNode)).toBeResolved();
   });
 
   afterAll(async () => {

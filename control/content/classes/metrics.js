@@ -2,14 +2,6 @@ class MetricsDAO {
   constructor() {}
 
   static metrics = {};
-  static currentNode = "metrics";
-
-  static setCurrentNode(node) {
-    this.currentNode = node;
-  }
-  static getCurrentNode() {
-    return currentNode;
-  }
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
@@ -62,14 +54,14 @@ class MetricsDAO {
   }
 
   // Control Panel Only
-  static save(metric) {
+  static save(metric, currentNode) {
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
-        { $set: { [`${this.currentNode}.${metric.id}`]: metric } },
+        { $set: { [`${currentNode}.${metric.id}`]: metric } },
         "metrics",
         async (err, data) => {
           if (err) reject(err);
@@ -106,13 +98,13 @@ class MetricsDAO {
   }
 
   // Control Panel Only
-  static delete(id) {
+  static delete(id, currentNode) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         this.metrics.id,
         {
           $unset: {
-            [`${this.currentNode}.${id}`]: "",
+            [`${currentNode}.${id}`]: "",
           },
         },
         "metrics",
@@ -130,17 +122,17 @@ class MetricsDAO {
   // Control Panel and Widget
   // This will add/update metric history
   // TODO: Check if this is required
-  static updateMetricHistory(value, metricId) {
+  static updateMetricHistory(value, currentNode) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
-        { [`${this.currentNode}.history.date`]: absoluteDate },
+        { [`${currentNode}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${this.currentNode}.history.$.value`]: value,
-            [`${this.currentNode}.history.$.lastUpdatedOn`]: new Date(),
-            [`${this.currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${currentNode}.history.$.value`]: value,
+            [`${currentNode}.history.$.lastUpdatedOn`]: new Date(),
+            [`${currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -152,7 +144,7 @@ class MetricsDAO {
               this.metrics.id,
               {
                 $push: {
-                  [`${this.currentNode}.history`]: {
+                  [`${currentNode}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -168,8 +160,10 @@ class MetricsDAO {
               }
             );
           }
-          // TODO: Check if this is required
-          // Track Action
+          // Extract metric id from currentNode
+          let metricId = currentNode.split(".");
+          metricId = metricId[metricId.length - 1];
+          // Track action
           Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
           // Update the metrics object
           this.getMetrics();
@@ -178,6 +172,9 @@ class MetricsDAO {
       );
     });
   }
+
+  // TODO: implement order function for metrics
+  order(metrics) {}
 }
 
 const metric = new Metric({
@@ -199,24 +196,3 @@ const metric = new Metric({
     },
   ],
 });
-
-// MetricsDAO.getMetrics().then((data) => {
-// newMetric.update(metric, "value").then(() => {
-//   newMetric.getMetrics().then((data) => {
-//     console.log("ALL DATA after Delete", data);
-//   });
-// });
-
-// MetricsDAO.save(metric).then((data2) => {
-//   console.log("saved DATA", data2);
-// });
-//   console.log("ALL DATA", data);
-// });
-
-// MetricsDAO.addMetricHistory("metrics.5f5fbaca70805ba300168eb3.history", 88)
-//   .then((data) => {
-//     console.log("addMetricHistory DATA", data);
-//   })
-//   .catch((err) => {
-//     console.log("addMetricHistory ERROR", err);
-//   });
