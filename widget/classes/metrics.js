@@ -1,7 +1,5 @@
-class MetricsDAO {
+class Metrics {
   constructor() {}
-
-  static metric = {};
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
@@ -14,19 +12,18 @@ class MetricsDAO {
             buildfire.publicData.save(
               { metrics: {} },
               "metrics",
-              (err, result) => {
+              async (err, result) => {
                 if (err) reject(err);
                 else {
-                  MetricsDAO.getMetrics();
-                  resolve(result);
+                  await this.getMetrics().then((data) => {
+                    metrics = data;
+                    resolve(data);
+                  });
                 }
               }
             );
           } else {
-            this.metrics = data;
-            console.log("All Data", data);
-            // Calculates the average of each metric history
-            MetricsDAO.getHistoryValue(this.metrics);
+            metrics = data;
             resolve(data);
           }
         }
@@ -35,19 +32,19 @@ class MetricsDAO {
   }
 
   // A recurcive function that calculates the average of each metric history
-  static getHistoryValue() {
-    if (this.metrics.type === "metric") {
-      let val = this.metrics.history[this.metrics.history.length - 1].value;
-      this.metrics.value = val;
+  static getHistoryValue(metric) {
+    if (metric.type === "metric") {
+      let val = metric.history[metric.history.length - 1].value;
+      metric.value = val;
       return val;
-    } else if (this.metrics.type === "parent" || !this.metrics.type) {
-      if (this.metrics.metrics) {
+    } else if (metric.type === "parent" || !metric.type) {
+      if (metric.metrics) {
         let sum = 0;
-        for (let key in this.metrics.metrics) {
-          sum += MetricsDAO.getHistoryValue(this.metrics.metrics[key]);
+        for (let key in metric.metrics) {
+          sum += this.getHistoryValue(metric.metrics[key]);
         }
-        let avg = sum / Object.keys(this.metrics.metrics).length;
-        this.metrics.value = avg;
+        let avg = sum / Object.keys(metric.metrics).length;
+        metric.value = avg;
         return avg;
       }
     }
@@ -55,17 +52,18 @@ class MetricsDAO {
 
   // Control Panel and Widget
   // This will add/update metric history
-  static updateMetricHistory(value, currentNode) {
+  // TODO: Check if this is required
+  static updateMetricHistory(options, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
-        { [`${currentNode}.history.date`]: absoluteDate },
+        { [`${options.nodeSelector}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${currentNode}.history.$.value`]: value,
-            [`${currentNode}.history.$.lastUpdatedOn`]: new Date(),
-            [`${currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${options.nodeSelector}.history.$.value`]: value,
+            [`${options.nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
+            [`${options.nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -74,10 +72,10 @@ class MetricsDAO {
 
           if (data.nModified === 0) {
             buildfire.publicData.update(
-              this.metrics.id,
+              metrics.id,
               {
                 $push: {
-                  [`${currentNode}.history`]: {
+                  [`${options.nodeSelector}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -88,18 +86,17 @@ class MetricsDAO {
                 },
               },
               "metrics",
-              (err, data) => {
+              async (err, data) => {
                 if (err) reject(err);
+                else await this.getMetrics();
               }
             );
           }
-          // Extract metric id from currentNode
-          let metricId = currentNode.split(".");
+          // Extract metric id from options.nodeSelector
+          let metricId = options.nodeSelector.split(".");
           metricId = metricId[metricId.length - 1];
-          // Track Action
+          // Track action
           Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
-          // Update the metrics object
-          this.getMetrics();
           resolve(data);
         }
       );

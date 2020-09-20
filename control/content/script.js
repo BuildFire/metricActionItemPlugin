@@ -1,20 +1,14 @@
 let metrics = {};
-
-Metrics.getMetrics()
-  .then((data) => {
-    metrics = data;
-  })
-  .finally(() => {
-    Metrics.getHistoryValue(metrics);
-  });
-
+// We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
-// Calculates the average of each metric history
+Metrics.getMetrics().then(() => {
+  Metrics.getHistoryValue(metrics);
+});
 
-function renderMetrics(metrics) {
+const renderMetrics = (metrics) => {
   for (let metric in metrics) {
     console.log("child", new Metric(metrics[metric]));
     // TODO: call the function that will render metrics (UI)
   }
-}
+};

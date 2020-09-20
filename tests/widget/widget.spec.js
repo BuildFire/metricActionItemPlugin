@@ -36,4 +36,32 @@ describe("Test The Widget Side", () => {
       expect(isAdmin).toEqual(true);
     });
   });
+
+  describe("Test the Metrics class", () => {
+    it("Should return the metrics object without any errors", async () => {
+      await expectAsync(Metrics.getMetrics()).toBeResolved();
+    });
+
+    it("Should calculate the value of the big object correctly", async () => {
+      expect(Metrics.getHistoryValue(metrics.data)).toBe(77.5);
+    });
+
+    it("Should update a metric history value without any errors", async () => {
+      // Get a random id of a metric from the metrics object
+      let metric2Id = Object.keys(metrics.data)[0];
+      nodeSelector = "metrics." + metric2Id;
+
+      console.log("DADADA");
+      console.log("metric2.id", metric2Id);
+      await expectAsync(
+        Metrics.updateMetricHistory({ nodeSelector }, 55)
+      ).toBeResolved();
+    });
+
+    afterAll(async () => {
+      await setTimeout(async () => {
+        console.log("Metric Object After all testing", metrics);
+      }, 3000);
+    });
+  });
 });

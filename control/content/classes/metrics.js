@@ -16,14 +16,14 @@ class Metrics {
                 if (err) reject(err);
                 else {
                   await this.getMetrics().then((data) => {
+                    metrics = data;
                     resolve(data);
                   });
                 }
               }
             );
           } else {
-            console.log("All Data", data);
-
+            metrics = data;
             resolve(data);
           }
         }
@@ -78,16 +78,21 @@ class Metrics {
   }
 
   // Control Panel Only
-  static update(updateObject) {
+  static update(options, data) {
+    let _set = {};
+    for (let key in data) {
+      _set[`${options.nodeSelector}.${options.metricId}.${key}`] = data[key];
+    }
+
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         metrics.id,
-        { $set: updateObject },
+        { $set: _set },
         "metrics",
-        (err, data) => {
+        async (err, data) => {
           if (err) reject(err);
           else {
-            this.getMetrics();
+            await this.getMetrics();
             resolve(data);
           }
         }
@@ -96,41 +101,42 @@ class Metrics {
   }
 
   // Control Panel Only
-  static delete(id, currentNode) {
+  static delete(options, id) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
         metrics.id,
         {
           $unset: {
-            [`${currentNode}.${id}`]: "",
+            [`${options.nodeSelector}.${id}`]: "",
           },
         },
         "metrics",
-        (err, data) => {
+        async (err, data) => {
           if (err) reject(err);
           else {
-            this.getMetrics();
+            await this.getMetrics();
             resolve(data);
           }
         }
       );
     });
   }
+  // {metricId, nodeSelector}, value
 
   // Control Panel and Widget
   // This will add/update metric history
   // TODO: Check if this is required
-  static updateMetricHistory(value, currentNode) {
+  static updateMetricHistory(options, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
-        { [`${currentNode}.history.date`]: absoluteDate },
+        { [`${options.nodeSelector}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${currentNode}.history.$.value`]: value,
-            [`${currentNode}.history.$.lastUpdatedOn`]: new Date(),
-            [`${currentNode}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${options.nodeSelector}.history.$.value`]: value,
+            [`${options.nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
+            [`${options.nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -142,7 +148,7 @@ class Metrics {
               metrics.id,
               {
                 $push: {
-                  [`${currentNode}.history`]: {
+                  [`${options.nodeSelector}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -153,18 +159,17 @@ class Metrics {
                 },
               },
               "metrics",
-              (err, data) => {
+              async (err, data) => {
                 if (err) reject(err);
+                else await this.getMetrics();
               }
             );
           }
-          // Extract metric id from currentNode
-          let metricId = currentNode.split(".");
+          // Extract metric id from options.nodeSelector
+          let metricId = options.nodeSelector.split(".");
           metricId = metricId[metricId.length - 1];
           // Track action
           Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
-          // Update the metrics object
-          this.getMetrics();
           resolve(data);
         }
       );
@@ -174,62 +179,3 @@ class Metrics {
   // TODO: implement order function for metrics
   static order(metrics) {}
 }
-
-const metric1 = new Metric({
-  title: "ana",
-  icon: "here",
-  min: 9,
-  max: 2,
-  action_item: {},
-  type: "metric",
-  history: [
-    {
-      value: 50,
-      date: helpers.getAbsoluteDate(),
-      createdOn: null,
-      createmetric2dBy: null,
-      lastUpdatedOn: null,
-      lastUpdatedBy: null,
-    },
-  ],
-});
-
-let metric123 = new Metric({
-  id: "5f677e73daf1138b9b627dbf",
-  actionItem: {},
-  createdBy: "currentUser.username",
-  createdOn: new Date(),
-  history: [
-    {
-      date: helpers.getAbsoluteDate(),
-      value: 78,
-      createdOn: new Date(),
-      createdBy: "currentUser.username",
-      lastUpdatedOn: new Date(),
-      lastUpdatedBy: "currentUser.username",
-    },
-  ],
-  icon: "metric1",
-  lastUpdatedBy: "currentUser.username",
-  lastUpdatedOn: new Date(),
-  max: 96,
-  min: 15,
-  order: null,
-  title: "metric",
-  type: "metric",
-  value: 56,
-});
-
-// var test = Metrics.getMetrics().then((data) => {
-//   console.log("No No no", data.data.metrics);
-// });
-
-// Metrics.getMetrics().then((data) => {
-//   Metrics.save(metric123, "metrics.5f635a3b62f0aff6f82856d0.metrics").then(
-//     (result) => {
-//       Metrics.getMetrics().then((data) => {
-//         console.log("No No no", data);
-//       });
-//     }
-//   );
-// });

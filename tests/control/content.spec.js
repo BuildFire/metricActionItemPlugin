@@ -1,9 +1,4 @@
-let metrics = {};
-
 describe("Test The Control Side", () => {
-  // We used nodeSelector to determine where are we inside the big object
-  let nodeSelector = "metrics";
-
   describe("Test the Metric class", () => {
     beforeAll(() => {
       let data = {
@@ -29,11 +24,7 @@ describe("Test The Control Side", () => {
     beforeAll(async () => {
       // Delete all the existed data and start from scratch
       await deleteEverything().then((data) => {
-        console.log("Delete All Data", data);
-      });
-      await Metrics.getMetrics().then((data) => {
-        console.log("asdf", data);
-        metrics = data;
+        console.log("Delete all data", data);
       });
     });
 
@@ -63,7 +54,6 @@ describe("Test The Control Side", () => {
     });
 
     let metric2 = new Metric({
-      id: "5f635a3b66a9afc0e2a8019f",
       actionItem: {},
       createdBy: "currentUser.username",
       createdOn: new Date(),
@@ -89,7 +79,6 @@ describe("Test The Control Side", () => {
     });
 
     let metric3 = new Metric({
-      id: "5f635a3b54586a894049c2b1",
       actionItem: {},
       createdBy: "currentUser.username",
       createdOn: new Date(),
@@ -132,29 +121,32 @@ describe("Test The Control Side", () => {
       expect(Metrics.getHistoryValue(metrics.data)).toBe(40);
     });
 
-    // it("Should update a metric's title  without any errors", async () => {
-    //   nodeSelector = "metrics." + metric1.id;
-    //   await expectAsync(
-    //     Metrics.update({ [`${nodeSelector}.title`]: "Title" })
-    //   ).toBeResolved();
-    // });
+    it("Should update a metric's title without any errors", async () => {
+      nodeSelector = "metrics";
+      await expectAsync(
+        Metrics.update(
+          { metricId: metric1.id, nodeSelector },
+          { title: "Title" }
+        )
+      ).toBeResolved();
+    });
 
-    // it("Should update a metric history value without any errors", async () => {
-    //   nodeSelector = "metrics." + metric2.id;
-    //   await expectAsync(
-    //     Metrics.updateMetricHistory(99, nodeSelector)
-    //   ).toBeResolved();
-    // });
+    it("Should update a metric history value without any errors", async () => {
+      nodeSelector = "metrics." + metric2.id;
+      await expectAsync(
+        Metrics.updateMetricHistory({ nodeSelector }, 99)
+      ).toBeResolved();
+    });
 
-    // it("Should delete a metric without any errors", async () => {
-    //   nodeSelector = "metrics";
-    //   await expectAsync(
-    //     Metrics.delete(metric3.id, nodeSelector)
-    //   ).toBeResolved();
-    // });
+    it("Should delete a metric without any errors", async () => {
+      nodeSelector = "metrics";
+      await expectAsync(
+        Metrics.delete({ nodeSelector }, metric3.id)
+      ).toBeResolved();
+    });
 
     afterAll(async () => {
-      await setTimeout(() => {
+      await setTimeout(async () => {
         console.log("Metric Object After all testing", metrics);
       }, 3000);
     });
@@ -188,7 +180,7 @@ describe("Test The Control Side", () => {
   });
 
   // To delete everything (Big Object)
-  function deleteEverything() {
+  const deleteEverything = () => {
     return new Promise((resolve, reject) => {
       buildfire.publicData.save({}, "metrics", (err, result) => {
         if (err) reject(err);
@@ -197,5 +189,5 @@ describe("Test The Control Side", () => {
         }
       });
     });
-  }
+  };
 });
