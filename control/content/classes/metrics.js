@@ -51,7 +51,7 @@ class Metrics {
   }
 
   // Control Panel Only
-  static save(metric, currentNode) {
+  static insert(metric, currentNode) {
     metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();

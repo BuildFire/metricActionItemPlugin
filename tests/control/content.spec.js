@@ -108,9 +108,9 @@ describe("Test The Control Side", () => {
     });
 
     it("Should save metrics correctly", async () => {
-      await expectAsync(Metrics.save(metric1, nodeSelector)).toBeResolved();
-      await expectAsync(Metrics.save(metric2, nodeSelector)).toBeResolved();
-      await expectAsync(Metrics.save(metric3, nodeSelector)).toBeResolved();
+      await expectAsync(Metrics.insert(metric1, nodeSelector)).toBeResolved();
+      await expectAsync(Metrics.insert(metric2, nodeSelector)).toBeResolved();
+      await expectAsync(Metrics.insert(metric3, nodeSelector)).toBeResolved();
     });
 
     it("Should have the correct number of children", async () => {
