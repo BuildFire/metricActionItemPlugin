@@ -56,6 +56,8 @@ class Metrics {
   static updateMetricHistory(options, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
+    console.log("options.nodeSelector", options.nodeSelector)
+
     return new Promise((resolve, reject) => {
       buildfire.publicData.searchAndUpdate(
         { [`${options.nodeSelector}.history.date`]: absoluteDate },

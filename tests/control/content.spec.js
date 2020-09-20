@@ -144,12 +144,6 @@ describe("Test The Control Side", () => {
         Metrics.delete({ nodeSelector }, metric3.id)
       ).toBeResolved();
     });
-
-    afterAll(async () => {
-      await setTimeout(async () => {
-        console.log("Metric Object After all testing", metrics);
-      }, 3000);
-    });
   });
 
   describe("Test the Settings class", () => {

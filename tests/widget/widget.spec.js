@@ -48,7 +48,8 @@ describe("Test The Widget Side", () => {
 
     it("Should update a metric history value without any errors", async () => {
       // Get a random id of a metric from the metrics object
-      let metric2Id = Object.keys(metrics.data)[0];
+      let metric2Id = Object.keys(metrics.data.metrics)[0];
+
       nodeSelector = "metrics." + metric2Id;
 
       console.log("DADADA");
@@ -59,9 +60,9 @@ describe("Test The Widget Side", () => {
     });
 
     afterAll(async () => {
-      await setTimeout(async () => {
-        console.log("Metric Object After all testing", metrics);
-      }, 3000);
+      Metrics.getMetrics().then((data) => {
+        console.log("Metric Object After all testing", data);
+      });
     });
   });
 });

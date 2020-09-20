@@ -121,8 +121,6 @@ class Metrics {
       );
     });
   }
-  // {metricId, nodeSelector}, value
-
   // Control Panel and Widget
   // This will add/update metric history
   // TODO: Check if this is required
