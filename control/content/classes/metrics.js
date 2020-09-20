@@ -1,7 +1,5 @@
-class MetricsDAO {
+class Metrics {
   constructor() {}
-
-  static metrics = {};
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
@@ -17,16 +15,15 @@ class MetricsDAO {
               async (err, result) => {
                 if (err) reject(err);
                 else {
-                  await this.getMetrics();
-                  resolve(result);
+                  await this.getMetrics().then((data) => {
+                    resolve(data);
+                  });
                 }
               }
             );
           } else {
-            this.metrics = data;
             console.log("All Data", data);
-            // Calculates the average of each metric history
-            this.getHistoryValue(this.metrics.data);
+
             resolve(data);
           }
         }
@@ -55,12 +52,13 @@ class MetricsDAO {
 
   // Control Panel Only
   static save(metric, currentNode) {
+    metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
 
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
-        this.metrics.id,
+        metrics.id,
         { $set: { [`${currentNode}.${metric.id}`]: metric } },
         "metrics",
         async (err, data) => {
@@ -83,7 +81,7 @@ class MetricsDAO {
   static update(updateObject) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
-        this.metrics.id,
+        metrics.id,
         { $set: updateObject },
         "metrics",
         (err, data) => {
@@ -101,7 +99,7 @@ class MetricsDAO {
   static delete(id, currentNode) {
     return new Promise((resolve, reject) => {
       buildfire.publicData.update(
-        this.metrics.id,
+        metrics.id,
         {
           $unset: {
             [`${currentNode}.${id}`]: "",
@@ -141,7 +139,7 @@ class MetricsDAO {
 
           if (data.nModified === 0) {
             buildfire.publicData.update(
-              this.metrics.id,
+              metrics.id,
               {
                 $push: {
                   [`${currentNode}.history`]: {
@@ -174,15 +172,14 @@ class MetricsDAO {
   }
 
   // TODO: implement order function for metrics
-  order(metrics) {}
+  static order(metrics) {}
 }
 
-const metric = new Metric({
+const metric1 = new Metric({
   title: "ana",
-  icon: "amjad",
+  icon: "here",
   min: 9,
   max: 2,
-  value: 6,
   action_item: {},
   type: "metric",
   history: [
@@ -190,9 +187,49 @@ const metric = new Metric({
       value: 50,
       date: helpers.getAbsoluteDate(),
       createdOn: null,
-      createdBy: null,
+      createmetric2dBy: null,
       lastUpdatedOn: null,
       lastUpdatedBy: null,
     },
   ],
 });
+
+let metric123 = new Metric({
+  id: "5f677e73daf1138b9b627dbf",
+  actionItem: {},
+  createdBy: "currentUser.username",
+  createdOn: new Date(),
+  history: [
+    {
+      date: helpers.getAbsoluteDate(),
+      value: 78,
+      createdOn: new Date(),
+      createdBy: "currentUser.username",
+      lastUpdatedOn: new Date(),
+      lastUpdatedBy: "currentUser.username",
+    },
+  ],
+  icon: "metric1",
+  lastUpdatedBy: "currentUser.username",
+  lastUpdatedOn: new Date(),
+  max: 96,
+  min: 15,
+  order: null,
+  title: "metric",
+  type: "metric",
+  value: 56,
+});
+
+// var test = Metrics.getMetrics().then((data) => {
+//   console.log("No No no", data.data.metrics);
+// });
+
+// Metrics.getMetrics().then((data) => {
+//   Metrics.save(metric123, "metrics.5f635a3b62f0aff6f82856d0.metrics").then(
+//     (result) => {
+//       Metrics.getMetrics().then((data) => {
+//         console.log("No No no", data);
+//       });
+//     }
+//   );
+// });
