@@ -1,11 +1,14 @@
 let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
-
-// Metrics.getMetrics().then((data) => {
-//   metrics = data;
-//   // Metrics.getHistoryValue(metrics);
-// });
+let tag = "metrics";
+Metrics.getMetrics().then((data) => {
+  metrics = data;
+  Metrics.getHistoryValue(metrics);
+  if (typeof sortableListUI !== "undefined") {
+    sortableListUI.init("metricsList", tag);
+  }
+});
 
 const renderMetrics = (metrics) => {
   for (let metric in metrics) {
@@ -13,8 +16,6 @@ const renderMetrics = (metrics) => {
     // TODO: call the function that will render metrics (UI)
   }
 };
-
-let tag = "metrics";
 
 function addItem() {
   let metric = {
@@ -26,9 +27,6 @@ function addItem() {
   sortableListUI.addItem(metric); /// this will also add it to the database
 }
 
-if (typeof sortableListUI !== "undefined") {
-  sortableListUI.init("metrics", tag);
-}
 // sortableListUI.onItemClick = (metric, index, divRow) => {
 //   ///pop up a windows to edit then when you come back call sortableListUI.updateItem is there is an edit
 //   metric.title += " Updated!";

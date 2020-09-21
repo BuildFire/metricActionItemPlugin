@@ -22,7 +22,6 @@ const sortableListUI = {
         this.contrainer.innerHTML =
           "An error has occurred. Please contact your system admin.";
       } else if (obj && obj.data) {
-        console.log("lalo", obj);
         this.data = obj.data;
         this.id = obj.id;
         if (!obj.data.metrics)
@@ -60,14 +59,20 @@ const sortableListUI = {
           if (e) console.error(e);
           if (data.selectedButton.key == "y") {
             sortableListUI.sortableList.items.splice(index, 1);
-            buildfire.publicData.save(
-              { $set: { items: sortableListUI.sortableList.items } },
-              t.tag,
-              (e) => {
-                if (e) console.error(e);
-                else callback(item);
-              }
-            );
+            Metrics.delete(
+              { nodeSelector, metricsId: metrics.id },
+              item.id
+            ).then((data) => {
+              callback(data);
+            });
+            // buildfire.publicData.save(
+            //   { $set: { items: sortableListUI.sortableList.items } },
+            //   t.tag,
+            //   (e) => {
+            //     if (e) console.error(e);
+            //     else callback(item);
+            //   }
+            // );
           }
         }
       );

@@ -70,6 +70,7 @@ buildfire.components.SortableList = class SortableList {
     // Create the required DOM elements
     var moveHandle = document.createElement("span"),
       title = document.createElement("a"),
+      minMax = document.createElement("span"),
       deleteButton = document.createElement("button"),
       editButton = document.createElement("button");
 
@@ -77,13 +78,14 @@ buildfire.components.SortableList = class SortableList {
     divRow.className = "d-item clearfix";
     moveHandle.className = "icon icon-menu cursor-grab";
     title.className = "title ellipsis item-title";
-
     deleteButton.className = "btn btn-danger margin-x-y";
-    deleteButton.innerHTML = "Delete";
     editButton.className = "btn btn-primary margin-x-y";
+
+    deleteButton.innerHTML = "Delete";
     editButton.innerHTML = "Edit";
     title.innerHTML = item.title;
-
+    minMax.innerHTML = item.min ? `${item.min} - ${item.max}` : "Parent";
+    minMax.style.flex = "2";
     // Append elements to the DOM
     divRow.appendChild(moveHandle);
     if (item.icon) {
@@ -95,6 +97,7 @@ buildfire.components.SortableList = class SortableList {
       divRow.appendChild(img);
     }
     divRow.appendChild(title);
+    divRow.appendChild(minMax);
     divRow.appendChild(editButton);
     divRow.appendChild(deleteButton);
 

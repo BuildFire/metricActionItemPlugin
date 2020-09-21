@@ -3,7 +3,6 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="buildfire" content="disableBootstrap, enableMDTheme" />
-    
 
     <!-- build:bundleControlBFMinJS  -->
     <script src="../../../../scripts/buildfire.js"></script>
@@ -32,10 +31,13 @@
   <body>
     <h1>Metrics</h1>
 
-    <div id="metrics"></div>
+    <div id="metricsList"></div>
 
     <div>
-      <button class=" mdc-button  mdc-button--raised btn mdc-theme--secondary-bg" onclick="addItem()">
+      <button
+        class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+        onclick="addItem()"
+      >
         <span class="icon icon-plus"></span>Add
       </button>
     </div>

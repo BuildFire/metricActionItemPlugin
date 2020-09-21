@@ -197,6 +197,11 @@ select {
   color: #000;
   border: 1px solid #d8d8d8;
 }
+.btn-danger {
+  background-color: #ed4b4b;
+  color: #fff;
+}
+
 .btn .icon-plus {
   margin-right: 0.25rem;
 }
