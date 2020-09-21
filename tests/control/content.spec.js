@@ -23,8 +23,12 @@ describe("Test The Control Side", () => {
   describe("Test the Metrics class", () => {
     beforeAll(async () => {
       // Delete all the existed data and start from scratch
-      await deleteEverything().then((data) => {
+      await deleteEverything().then(async (data) => {
         console.log("Delete all data", data);
+      });
+
+      await Metrics.getMetrics().then((data) => {
+        metrics = data;
       });
     });
 
@@ -60,7 +64,7 @@ describe("Test The Control Side", () => {
       history: [
         {
           date: helpers.getAbsoluteDate(),
-          value: 45,
+          value: 41,
           createdOn: new Date(),
           createdBy: "currentUser.username",
           lastUpdatedOn: new Date(),
@@ -85,7 +89,7 @@ describe("Test The Control Side", () => {
       history: [
         {
           date: helpers.getAbsoluteDate(),
-          value: 19,
+          value: 23,
           createdOn: new Date(),
           createdBy: "currentUser.username",
           lastUpdatedOn: new Date(),
@@ -95,12 +99,12 @@ describe("Test The Control Side", () => {
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "currentUser.username",
       lastUpdatedOn: new Date(),
-      max: 56,
-      min: 45,
+      max: 44,
+      min: 78,
       order: null,
       title: "metric",
       type: "metric",
-      value: 23,
+      value: 22,
     });
 
     it("Should return the metrics object without any errors", async () => {
@@ -108,41 +112,47 @@ describe("Test The Control Side", () => {
     });
 
     it("Should save metrics correctly", async () => {
-      await expectAsync(Metrics.insert(metric1, nodeSelector)).toBeResolved();
-      await expectAsync(Metrics.insert(metric2, nodeSelector)).toBeResolved();
-      await expectAsync(Metrics.insert(metric3, nodeSelector)).toBeResolved();
+      await expectAsync(
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric1)
+      ).toBeResolved();
+      await expectAsync(
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric2)
+      ).toBeResolved();
+      await expectAsync(
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric3)
+      ).toBeResolved();
+      await Metrics.getMetrics().then(data => {
+        metrics = data;
+      })
     });
 
     it("Should have the correct number of children", async () => {
-      expect(Object.keys(metrics.data.metrics).length).toBe(3);
+      await expect(Object.keys(metrics.data.metrics).length).toBe(3);
     });
 
     it("Should calculate the value of the big object correctly", async () => {
-      expect(Metrics.getHistoryValue(metrics.data)).toBe(40);
+      await expect(Metrics.getHistoryValue(metrics.data)).toBe(40);
     });
 
     it("Should update a metric's title without any errors", async () => {
       nodeSelector = "metrics";
       await expectAsync(
         Metrics.update(
-          { metricId: metric1.id, nodeSelector },
-          { title: "Title" }
+          { nodeSelector, metricsId: metrics.id },
+          { title: "Title" },
+          metric1.id
         )
-      ).toBeResolved();
-    });
-
-    it("Should update a metric history value without any errors", async () => {
-      nodeSelector = "metrics." + metric2.id;
-      await expectAsync(
-        Metrics.updateMetricHistory({ nodeSelector }, 99)
       ).toBeResolved();
     });
 
     it("Should delete a metric without any errors", async () => {
       nodeSelector = "metrics";
       await expectAsync(
-        Metrics.delete({ nodeSelector }, metric3.id)
+        Metrics.delete({ nodeSelector, metricsId: metrics.id }, metric3.id)
       ).toBeResolved();
+      await Metrics.getMetrics().then(data => {
+        metrics = data;
+      })
     });
   });
 

@@ -2,9 +2,10 @@ let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
-Metrics.getMetrics().then(() => {
-  Metrics.getHistoryValue(metrics);
-});
+// Metrics.getMetrics().then((data) => {
+//   metrics = data;
+//   // Metrics.getHistoryValue(metrics);
+// });
 
 const renderMetrics = (metrics) => {
   for (let metric in metrics) {

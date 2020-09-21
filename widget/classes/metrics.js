@@ -16,14 +16,12 @@ class Metrics {
                 if (err) reject(err);
                 else {
                   await this.getMetrics().then((data) => {
-                    metrics = data;
                     resolve(data);
                   });
                 }
               }
             );
           } else {
-            metrics = data;
             resolve(data);
           }
         }
@@ -53,19 +51,20 @@ class Metrics {
   // Control Panel and Widget
   // This will add/update metric history
   // TODO: Check if this is required
-  static updateMetricHistory(options, value) {
+  static updateMetricHistory({ nodeSelector, metricsId }, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
-    console.log("options.nodeSelector", options.nodeSelector)
-
     return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
       buildfire.publicData.searchAndUpdate(
-        { [`${options.nodeSelector}.history.date`]: absoluteDate },
+        { [`${nodeSelector}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${options.nodeSelector}.history.$.value`]: value,
-            [`${options.nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${options.nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${nodeSelector}.history.$.value`]: value,
+            [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -74,10 +73,10 @@ class Metrics {
 
           if (data.nModified === 0) {
             buildfire.publicData.update(
-              metrics.id,
+              metricsId,
               {
                 $push: {
-                  [`${options.nodeSelector}.history`]: {
+                  [`${nodeSelector}.history`]: {
                     date: helpers.getAbsoluteDate(),
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -90,15 +89,15 @@ class Metrics {
               "metrics",
               async (err, data) => {
                 if (err) reject(err);
-                else await this.getMetrics();
+                else resolve(data);
               }
             );
           }
-          // Extract metric id from options.nodeSelector
-          let metricId = options.nodeSelector.split(".");
-          metricId = metricId[metricId.length - 1];
+          // Extract metric id from nodeSelector
+          let updatedMetricId = nodeSelector.split(".");
+          updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
           // Track action
-          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
+          Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
           resolve(data);
         }
       );

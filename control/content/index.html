@@ -2,6 +2,12 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="buildfire" content="disableBootstrap, enableMDTheme" />
+    
+
+    <!-- build:bundleControlBFMinJS  -->
+    <script src="../../../../scripts/buildfire.js"></script>
+    <!-- endbuild -->
 
     <!-- Material Design css & js -->
     <link
@@ -14,10 +20,6 @@
     ></script>
 
     <link rel="stylesheet" href="../assets/base.css" />
-
-    <!-- build:bundleControlBFMinJS  -->
-    <script src="../../../../scripts/buildfire.js"></script>
-    <!-- endbuild -->
 
     <script src="../../../../scripts/sortable.min.js"></script>
 
@@ -33,7 +35,7 @@
     <div id="metrics"></div>
 
     <div>
-      <button class="btn btn-success" onclick="addItem()">
+      <button class=" mdc-button  mdc-button--raised btn mdc-theme--secondary-bg" onclick="addItem()">
         <span class="icon icon-plus"></span>Add
       </button>
     </div>

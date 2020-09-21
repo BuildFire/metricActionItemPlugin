@@ -3,27 +3,25 @@ class Metrics {
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", (err, data) => {
+      buildfire.publicData.get("metrics", async (err, data) => {
         if (err) reject(err);
         else {
           // Check if there is already objects in the database
           if (!data.data.metrics) {
             // If there is no object, then create the parent object
-            buildfire.publicData.save(
+            await buildfire.publicData.save(
               { metrics: {} },
               "metrics",
               async (err, result) => {
                 if (err) reject(err);
                 else {
                   await this.getMetrics().then((data) => {
-                    metrics = data;
                     resolve(data);
                   });
                 }
               }
             );
           } else {
-            metrics = data;
             resolve(data);
           }
         }
@@ -51,20 +49,22 @@ class Metrics {
   }
 
   // Control Panel Only
-  static insert(metric, currentNode) {
+  static insert({ nodeSelector, metricsId }, metric) {
     metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
 
     return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
       buildfire.publicData.update(
-        metrics.id,
-        { $set: { [`${currentNode}.${metric.id}`]: metric } },
+        metricsId,
+        { $set: { [`${nodeSelector}.${metric.id}`]: metric } },
         "metrics",
-        async (err, data) => {
+        (err, data) => {
           if (err) reject(err);
           else {
-            await this.getMetrics();
             Analytics.registerEvent(
               metric.title,
               `METRIC_${metric.id}_HISTORY_UPDATE`,
@@ -78,21 +78,23 @@ class Metrics {
   }
 
   // Control Panel Only
-  static update(options, data) {
-    let _set = {};
-    for (let key in data) {
-      _set[`${options.nodeSelector}.${options.metricId}.${key}`] = data[key];
-    }
-
+  static update({ nodeSelector, metricsId }, data, id) {
     return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
+      let _set = {};
+      for (let key in data) {
+        _set[`${nodeSelector}.${id}.${key}`] = data[key];
+      }
+
       buildfire.publicData.update(
-        metrics.id,
+        metricsId,
         { $set: _set },
         "metrics",
-        async (err, data) => {
+        (err, data) => {
           if (err) reject(err);
           else {
-            await this.getMetrics();
             resolve(data);
           }
         }
@@ -101,79 +103,28 @@ class Metrics {
   }
 
   // Control Panel Only
-  static delete(options, id) {
+  static delete({ nodeSelector, metricsId }, id) {
     return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
       buildfire.publicData.update(
-        metrics.id,
+        metricsId,
         {
           $unset: {
-            [`${options.nodeSelector}.${id}`]: "",
+            [`${nodeSelector}.${id}`]: "",
           },
         },
         "metrics",
-        async (err, data) => {
+        (err, data) => {
           if (err) reject(err);
           else {
-            await this.getMetrics();
             resolve(data);
           }
         }
       );
     });
   }
-  // Control Panel and Widget
-  // This will add/update metric history
-  // TODO: Check if this is required
-  static updateMetricHistory(options, value) {
-    const absoluteDate = helpers.getAbsoluteDate();
-
-    return new Promise((resolve, reject) => {
-      buildfire.publicData.searchAndUpdate(
-        { [`${options.nodeSelector}.history.date`]: absoluteDate },
-        {
-          $set: {
-            [`${options.nodeSelector}.history.$.value`]: value,
-            [`${options.nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${options.nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
-          },
-        },
-        "metrics",
-        (err, data) => {
-          if (err) reject(err);
-
-          if (data.nModified === 0) {
-            buildfire.publicData.update(
-              metrics.id,
-              {
-                $push: {
-                  [`${options.nodeSelector}.history`]: {
-                    date: helpers.getAbsoluteDate(),
-                    createdOn: new Date(),
-                    createdBy: "currentUser.username",
-                    lastUpdatedOn: new Date(),
-                    lastUpdatedBy: "currentUser.username",
-                    value,
-                  },
-                },
-              },
-              "metrics",
-              async (err, data) => {
-                if (err) reject(err);
-                else await this.getMetrics();
-              }
-            );
-          }
-          // Extract metric id from options.nodeSelector
-          let metricId = options.nodeSelector.split(".");
-          metricId = metricId[metricId.length - 1];
-          // Track action
-          Analytics.trackAction(`METRIC_${metricId}_HISTORY_UPDATE`);
-          resolve(data);
-        }
-      );
-    });
-  }
-
   // TODO: implement order function for metrics
   static order(metrics) {}
 }

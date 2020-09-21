@@ -1,3 +1,57 @@
+// For tests purposes only
+Metrics.updateMetricHistory = ({ nodeSelector, metricsId }, value) => {
+  const absoluteDate = helpers.getAbsoluteDate();
+
+  return new Promise((resolve, reject) => {
+    if (!nodeSelector) reject("nodeSelector not provided");
+    if (!metricsId) reject("metricsId not provided");
+
+    buildfire.publicData.searchAndUpdate(
+      { [`${nodeSelector}.history.date`]: absoluteDate },
+      {
+        $set: {
+          [`${nodeSelector}.history.$.value`]: value,
+          [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
+          [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
+        },
+      },
+      "metrics",
+      (err, data) => {
+        if (err) reject(err);
+
+        if (data.nModified === 0) {
+          buildfire.publicData.update(
+            metricsId,
+            {
+              $push: {
+                [`${nodeSelector}.history`]: {
+                  date: helpers.getAbsoluteDate(),
+                  createdOn: new Date(),
+                  createdBy: "currentUser.username",
+                  lastUpdatedOn: new Date(),
+                  lastUpdatedBy: "currentUser.username",
+                  value,
+                },
+              },
+            },
+            "metrics",
+            async (err, data) => {
+              if (err) reject(err);
+              else resolve(data);
+            }
+          );
+        }
+        // Extract metric id from nodeSelector
+        let updatedMetricId = nodeSelector.split(".");
+        updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
+        // Track action
+        Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
+        resolve(data);
+      }
+    );
+  });
+};
+
 describe("Test The Widget Side", () => {
   describe("Test users' permissions in the widget", () => {
     beforeAll(() => {
@@ -43,7 +97,7 @@ describe("Test The Widget Side", () => {
     });
 
     it("Should calculate the value of the big object correctly", async () => {
-      expect(Metrics.getHistoryValue(metrics.data)).toBe(77.5);
+      expect(Metrics.getHistoryValue(metrics.data)).toBe(48.5);
     });
 
     it("Should update a metric history value without any errors", async () => {
@@ -52,10 +106,8 @@ describe("Test The Widget Side", () => {
 
       nodeSelector = "metrics." + metric2Id;
 
-      console.log("DADADA");
-      console.log("metric2.id", metric2Id);
       await expectAsync(
-        Metrics.updateMetricHistory({ nodeSelector }, 55)
+        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55)
       ).toBeResolved();
     });
 
