@@ -2,8 +2,6 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="buildfire" content="disableBootstrap" />
-    <meta name="buildfire" content="enableMDTheme" />
 
     <!-- Material Design css & js -->
     <link
@@ -21,18 +19,26 @@
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <!-- build:bundleDataJSFiles  -->
-    <script src="../../data/section.js"></script>
-    <script src="../../dataAccess/sections.js"></script>
-    <!-- End of Scripts -->
+    <script src="../../../../scripts/sortable.min.js"></script>
+
+    <script src="js/sortableList.js"></script>
+    <script src="js/sortableListUI.js"></script>
+
+    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
+    <link rel="stylesheet" href="css/sortableList.css" />
   </head>
   <body>
-    <button class="mdc-button mdc-button--raised btn">
-      <div class="mdc-button__ripple"></div>
-      <span class="mdc-button__label">Select Feature</span>
-    </button>
+    <h1>Metrics</h1>
 
-    <h3 class="section__title">StarterKit Sample Pages</h3>
+    <div id="metrics"></div>
+
+    <div>
+      <button class="btn btn-success" onclick="addItem()">
+        <span class="icon icon-plus"></span>Add
+      </button>
+    </div>
+
+    <!-- <h3 class="section__title">StarterKit Sample Pages</h3>
     <ul>
       <li onclick="location='samples/sortableList/sortableList.html'">
         Draggable List
@@ -41,7 +47,7 @@
       <li onclick="location='samples/searchTable/searchTable.html'">
         Search Table
       </li>
-    </ul>
+    </ul> -->
     <script>
       //location = "samples/sortableList/sortableList.html";
     </script>

@@ -12,3 +12,25 @@ const renderMetrics = (metrics) => {
     // TODO: call the function that will render metrics (UI)
   }
 };
+
+let tag = "metrics";
+
+function addItem() {
+  let metric = {
+    title: "Added Manually Item " + new Date().toLocaleTimeString(),
+    imgUrl: "https://img.icons8.com/material/4ac144/256/user-male.png",
+    createdOn: new Date(),
+    prop1: "blah blah",
+  };
+  sortableListUI.addItem(metric); /// this will also add it to the database
+}
+
+if (typeof sortableListUI !== "undefined") {
+  sortableListUI.init("metrics", tag);
+}
+// sortableListUI.onItemClick = (metric, index, divRow) => {
+//   ///pop up a windows to edit then when you come back call sortableListUI.updateItem is there is an edit
+//   metric.title += " Updated!";
+//   metric.lastUpdatedOn = new Date();
+//   sortableListUI.updateItem(metric, index, divRow);
+// };
