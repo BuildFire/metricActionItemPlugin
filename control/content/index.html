@@ -8,6 +8,8 @@
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
+    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
+
     <!-- Material Design css & js -->
     <link
       href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
@@ -18,6 +20,11 @@
       type="text/javascript"
     ></script>
 
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../../../../styles/helper.css"
+    />
     <link rel="stylesheet" href="../assets/base.css" />
 
     <script src="../../../../scripts/sortable.min.js"></script>
@@ -39,6 +46,122 @@
         onclick="addItem()"
       >
         <span class="icon icon-plus"></span>Add
+      </button>
+    </div>
+
+    <br />
+
+    <div class="metric-form">
+      <div class="form-group">
+        <label>Title</label
+        ><input
+          class="form-control"
+          type="text"
+          id="title"
+          autocomplete="false"
+          placeholder="Title"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Min</label
+        ><input
+          class="form-control"
+          type="number"
+          id="min"
+          autocomplete="false"
+          placeholder="Min"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Max</label
+        ><input
+          class="form-control"
+          type="number"
+          id="max"
+          autocomplete="false"
+          placeholder="Max"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Action Item</label
+        ><input
+          class="form-control"
+          type="text"
+          id="actionItem"
+          autocomplete="false"
+          placeholder="Action Item"
+        />
+      </div>
+
+      <div id="icon"></div>
+      <br />
+
+      <div id="metricTypeRadioGroup" class="fullwidth form-group">
+        <lable>Metric type</lable><br />
+        <div class="mdc-form-field fullwidth">
+          <label class="radio-label designLabel" for="metricType">
+            Metric
+          </label>
+          <div class="mdc-radio">
+            <input
+              class="mdc-radio__native-control"
+              type="radio"
+              value="metric"
+              id="metricType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+        <div class="mdc-form-field fullwidth" id="tagOnly">
+          <label class="radio-label designLabel" for="parentType">
+            Parent
+          </label>
+          <div class="mdc-radio">
+            <input
+              class="mdc-radio__native-control"
+              type="radio"
+              value="parent"
+              id="parentType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        let thumbnail;
+        thumbnail = new buildfire.components.images.thumbnail("#icon", {
+          title: "Icon",
+        });
+
+        thumbnail.onChange = (url) => {
+          metricInputFields.icon = url;
+          console.log(metricInputFields);
+        };
+
+        thumbnail.onDelete = () => {
+          metricInputFields.icon = null;
+        };
+      </script>
+
+      <button
+        class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+        onclick="createMetric()"
+      >
+        <span class="icon icon-plus"></span>Create Metric
       </button>
     </div>
 

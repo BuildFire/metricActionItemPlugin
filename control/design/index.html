@@ -26,8 +26,10 @@
 			settings=s;
 			thumbnail = new buildfire.components.images.thumbnail("#bgImage",{imageUrl:s.bgImageUrl});
 
-			thumbnail.onChange =url=>{
-				settings.bgImageUrl =url;
+			thumbnail.onChange = url =>{
+        console.log('url', url)
+
+				settings.bgImageUrl = url;
 				settings.save();
 				buildfire.messaging.sendMessageToWidget({cmd:"refresh"});
 			};
