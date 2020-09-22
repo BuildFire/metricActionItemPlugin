@@ -3,10 +3,10 @@ let metrics = {};
 let nodeSelector = "metrics";
 let currentUser;
 
-authManager.getCurrentUser().then((user) => {
-  console.log("authManager.currentUser", user);
-  currentUser = user;
-});
+// authManager.getCurrentUser().then((user) => {
+//   console.log("authManager.currentUser", user);
+//   currentUser = user;
+// });
 
 Metrics.getMetrics().then(() => {
   Metrics.getHistoryValue(metrics);

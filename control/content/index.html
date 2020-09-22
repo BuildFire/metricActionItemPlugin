@@ -13,6 +13,12 @@
       href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
       rel="stylesheet"
     />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
     <link rel="stylesheet" href="css/sortableList.css" />
     <!-- Load helper.css to use our helper classes -->
@@ -57,6 +63,7 @@
       <div class="form-group">
         <label>Title</label
         ><input
+          onchange="onFieldChange('metricTitle')"
           class="form-control"
           type="text"
           id="metricTitle"
@@ -68,6 +75,7 @@
       <div class="form-group">
         <label>Min</label
         ><input
+          onchange="onFieldChange('min')"
           class="form-control"
           type="number"
           id="min"
@@ -79,6 +87,7 @@
       <div class="form-group">
         <label>Max</label
         ><input
+          onchange="onFieldChange('max')"
           class="form-control"
           type="number"
           id="max"
@@ -88,14 +97,14 @@
       </div>
 
       <div class="form-group">
-        <label>Action Item</label
-        ><input
-          class="form-control"
-          type="text"
-          id="actionItem"
-          autocomplete="false"
-          placeholder="Action Item"
-        />
+        <button
+          class="mdc-button mdc-button--raised"
+          onclick="updateActionItem()"
+        >
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+          <span class="mdc-button__label">Add Action Item</span>
+        </button>
       </div>
 
       <div id="icon"></div>
@@ -109,6 +118,7 @@
           </label>
           <div class="mdc-radio">
             <input
+              onchange="onRadioChange('metric')"
               class="mdc-radio__native-control"
               type="radio"
               value="metric"
@@ -130,6 +140,7 @@
             <input
               class="mdc-radio__native-control"
               type="radio"
+              onchange="onRadioChange('parent')"
               value="parent"
               id="parentType"
               name="metricTypes"
@@ -142,22 +153,6 @@
           </div>
         </div>
       </div>
-
-      <script>
-        let thumbnail;
-        thumbnail = new buildfire.components.images.thumbnail("#icon", {
-          title: "Icon",
-          dimensionsLabel: "400x400",
-        });
-
-        thumbnail.onChange = (url) => {
-          metricInputFields.icon = url;
-        };
-
-        thumbnail.onDelete = () => {
-          metricInputFields.icon = null;
-        };
-      </script>
 
       <button
         id="createAMetric"
@@ -173,7 +168,12 @@
       >
         <span class="icon icon-plus"></span>Update Metric
       </button>
-      <button class="mdc-button btn-default" onclick="cancel()">Cancel</button>
+
+      <button id="test" class="mdc-button mdc-button--raised mdc-error" onclick="cancel()">
+        <div class="mdc-button__ripple"></div>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">cancel</i>
+        <span class="mdc-button__label">Cancel</span>
+      </button>
     </div>
 
     <!-- <h3 class="section__title">StarterKit Sample Pages</h3>

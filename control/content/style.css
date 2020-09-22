@@ -41,3 +41,8 @@
 .hidden {
   display: none;
 }
+
+.mdc-error {
+  --mdc-theme-primary: #b00020;
+  --mdc-theme-on-primary: white;
+}
