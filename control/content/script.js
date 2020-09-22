@@ -7,29 +7,26 @@ Metrics.getMetrics().then((data) => {
   metrics = data;
   Metrics.getHistoryValue(metrics);
   if (typeof sortableListUI !== "undefined") {
-    sortableListUI.init("metricsList", tag);
+    sortableListUI.init("metrics-list", tag);
   }
 });
 
-const renderMetrics = (metrics) => {
-  for (let metric in metrics) {
-    console.log("child", new Metric(metrics[metric]));
-    // TODO: call the function that will render metrics (UI)
-  }
-};
-
 function addItem() {
-  let metric = {
-    title: "Added Manually Item " + new Date().toLocaleTimeString(),
-    imgUrl: "https://img.icons8.com/material/4ac144/256/user-male.png",
-    createdOn: new Date(),
-    prop1: "blah blah",
-  };
-  sortableListUI.addItem(metric); /// this will also add it to the database
+  metricForm.style.display = "block";
+  metricsMain.style.display = "none";
+  createAMetric.style.display = "inline";
+  updateMetric.style.display = "none";
+  //   sortableListUI.addItem(metric); /// this will also add it to the database
+}
+function cancel() {
+  metricForm.style.display = "none";
+  metricsMain.style.display = "block";
+  createAMetric.style.display = "none";
+  updateMetric.style.display = "none";
 }
 
 let metricInputFields = {
-  title: "",
+  metricTitle: "",
   icon: "",
   min: "",
   max: "",
@@ -40,10 +37,12 @@ let metricInputFields = {
 const createMetric = () => {
   return new Promise((resolve, reject) => {
     for (let input in metricInputFields) {
+      if (input === "icon") {
+        if (!metricInputFields[input]) reject(`Please fill ${input}`);
+        continue;
+      }
       if (input === "metricTypes") {
-        const metricTypes = document.querySelectorAll(
-          "input#metricType, input#parentType"
-        );
+        const metricTypes = document.getElementsByName("metricTypes");
         if (!metricTypes[0].checked && !metricTypes[1].checked) {
           reject("Please select a type");
         } else {
@@ -52,6 +51,7 @@ const createMetric = () => {
             : metricTypes[1].value;
         }
       } else {
+        console.log("value", input);
         let inputValue = document.getElementById(input).value;
         if (!inputValue) reject(`Please fill ${input}`);
         else metricInputFields[input] = inputValue;
@@ -71,3 +71,17 @@ const createMetric = () => {
 //   metric.lastUpdatedOn = new Date();
 //   sortableListUI.updateItem(metric, index, divRow);
 // };
+
+function getCurrentUser() {
+  return new Promise((resolve, reject) => {
+    buildfire.auth.getCurrentUser((err, user) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.log("I am the user", user);
+        resolve(user);
+      }
+    });
+  });
+}
+getCurrentUser();

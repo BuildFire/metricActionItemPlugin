@@ -26,7 +26,7 @@ const sortableListUI = {
         this.id = obj.id;
         if (!obj.data.metrics)
           t.contrainer.innerHTML = "No items have been added yet.";
-        else if (obj.data.metrics.length == 0)
+        else if (Object.keys(obj.data.metrics).length == 0)
           this.contrainer.innerHTML = "No items have been added yet.";
         else this.contrainer.innerHTML = "";
         let arr = [];

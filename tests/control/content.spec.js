@@ -49,8 +49,8 @@ describe("Test The Control Side", () => {
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "currentUser.username",
       lastUpdatedOn: new Date(),
-      max: 44,
-      min: 78,
+      max: 78,
+      min: 44,
       order: null,
       title: "metric",
       type: "metric",
@@ -99,8 +99,8 @@ describe("Test The Control Side", () => {
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "currentUser.username",
       lastUpdatedOn: new Date(),
-      max: 44,
-      min: 78,
+      max: 95,
+      min: 23,
       order: null,
       title: "metric",
       type: "metric",
@@ -121,9 +121,9 @@ describe("Test The Control Side", () => {
       await expectAsync(
         Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric3)
       ).toBeResolved();
-      await Metrics.getMetrics().then(data => {
+      await Metrics.getMetrics().then((data) => {
         metrics = data;
-      })
+      });
     });
 
     it("Should have the correct number of children", async () => {
@@ -150,9 +150,9 @@ describe("Test The Control Side", () => {
       await expectAsync(
         Metrics.delete({ nodeSelector, metricsId: metrics.id }, metric3.id)
       ).toBeResolved();
-      await Metrics.getMetrics().then(data => {
+      await Metrics.getMetrics().then((data) => {
         metrics = data;
-      })
+      });
     });
   });
 

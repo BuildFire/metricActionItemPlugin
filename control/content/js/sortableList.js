@@ -120,6 +120,27 @@ buildfire.components.SortableList = class SortableList {
       });
       return false;
     };
+    editButton.onclick = () => {
+      metricForm.style.display = "block";
+      updateMetric.style.display = "inline";
+      createAMetric.style.display = "none";
+      metricsMain.style.display = "none";
+      metricTitle.value = item.title;
+      min.value = item.min;
+      max.value = item.max;
+      max.value = item.max;
+      actionItem.value = item.actionItem;
+      document.querySelectorAll("img[alt='Background Image']")[0].src =
+        item.icon;
+      document
+        .querySelectorAll("img[alt='Background Image']")[0]
+        .classList.remove("hidden");
+      item.icon;
+
+      item.type == "parent"
+        ? (parentType.checked = true)
+        : (metricType.checked = true);
+    };
   }
 
   // initialize the generic events

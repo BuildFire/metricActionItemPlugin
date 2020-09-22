@@ -8,56 +8,58 @@
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
-
     <!-- Material Design css & js -->
     <link
       href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
       rel="stylesheet"
     />
-    <script
-      src="../../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
-      type="text/javascript"
-    ></script>
-
+    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
+    <link rel="stylesheet" href="css/sortableList.css" />
+    <!-- Load helper.css to use our helper classes -->
+    <link href="../../../../styles/siteIcons.css" rel="stylesheet" />
     <link
       rel="stylesheet"
       type="text/css"
       href="../../../../styles/helper.css"
     />
     <link rel="stylesheet" href="../assets/base.css" />
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
+    <script
+      src="../../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
+      type="text/javascript"
+    ></script>
 
     <script src="../../../../scripts/sortable.min.js"></script>
-
     <script src="js/sortableList.js"></script>
     <script src="js/sortableListUI.js"></script>
-
-    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
-    <link rel="stylesheet" href="css/sortableList.css" />
+    <script src="../../../../scripts/buildfire/components/actionItems/sortableList.js"></script>
   </head>
   <body>
-    <h1>Metrics</h1>
+    <div id="metricsMain">
+      <h1>Metrics</h1>
 
-    <div id="metricsList"></div>
+      <div id="metrics-list"></div>
 
-    <div>
-      <button
-        class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
-        onclick="addItem()"
-      >
-        <span class="icon icon-plus"></span>Add
-      </button>
+      <div>
+        <button
+          class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+          onclick="addItem()"
+        >
+          <span class="icon icon-plus"></span>Add
+        </button>
+      </div>
+
+      <br />
     </div>
-
-    <br />
-
-    <div class="metric-form">
+    <div id="metricForm">
       <div class="form-group">
         <label>Title</label
         ><input
           class="form-control"
           type="text"
-          id="title"
+          id="metricTitle"
           autocomplete="false"
           placeholder="Title"
         />
@@ -145,11 +147,11 @@
         let thumbnail;
         thumbnail = new buildfire.components.images.thumbnail("#icon", {
           title: "Icon",
+          dimensionsLabel: "400x400",
         });
 
         thumbnail.onChange = (url) => {
           metricInputFields.icon = url;
-          console.log(metricInputFields);
         };
 
         thumbnail.onDelete = () => {
@@ -158,11 +160,20 @@
       </script>
 
       <button
-        class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+        id="createAMetric"
+        class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
         onclick="createMetric()"
       >
         <span class="icon icon-plus"></span>Create Metric
       </button>
+      <button
+        id="updateMetric"
+        class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+        onclick="updateMetric()"
+      >
+        <span class="icon icon-plus"></span>Update Metric
+      </button>
+      <button class="mdc-button btn-default" onclick="cancel()">Cancel</button>
     </div>
 
     <!-- <h3 class="section__title">StarterKit Sample Pages</h3>
