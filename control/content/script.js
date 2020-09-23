@@ -2,7 +2,7 @@ let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
-let breadcrumpsHistory = [];
+let breadcrumbsHistory = ["Metrics"];
 
 // initialize metric fields;
 let metricFields;
@@ -202,6 +202,14 @@ const pushBreadcrumb = (breadcrumb, data) => {
   return new Promise((resolve, reject) => {
     // nodeSelector = nodeSelector + `.metrics.id.metrics`
     buildfire.history.push(breadcrumb, data);
+    breadcrumbsHistory.push(breadcrumb);
+    let crumb = document.createElement("span");
+    crumb.innerHTML = ` / ${breadcrumb}`;
+    crumb.onclick = () => {
+      crumb.setAttribute("arrayIndex", 3);
+      console.log("go to ", data.elementToShow);
+    };
+    bread.appendChild(crumb);
     resolve(true);
   });
 };
@@ -217,6 +225,7 @@ const popBreadcrumb = () => {
 
 // Listen to breadcrumb history removal
 buildfire.history.onPop((breadcrumb) => {
+  console.log("yalla hey");
   // Show / Hide views
   // document.getElementById(breadcrumb.options.elementToShow).style.display = "block";
 });
