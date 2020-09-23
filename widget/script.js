@@ -8,6 +8,6 @@ let currentUser;
 //   currentUser = user;
 // });
 
-Metrics.getMetrics().then(() => {
-  Metrics.getHistoryValue(metrics);
-});
+// Metrics.getMetrics().then(() => {
+//   Metrics.getHistoryValue(metrics);
+// });

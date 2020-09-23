@@ -69,7 +69,6 @@ buildfire.components.SortableList = class SortableList {
 
   // append new sortable item to the DOM
   injectItemElements(item, index, divRow) {
-    console.log("every very", item, index, divRow);
     if (!item) throw "Missing Item";
     divRow.innerHTML = "";
     divRow.setAttribute("arrayIndex", index);

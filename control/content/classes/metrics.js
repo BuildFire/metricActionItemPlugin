@@ -180,6 +180,27 @@ class Metrics {
     });
   }
 
-  // TODO: implement order function for metrics
-  static order(metrics) {}
+  static order({ nodeSelector, metricsId }, orderObj) {
+    return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
+      let _set = {};
+      for (let id in orderObj) {
+        _set[`${nodeSelector}.${id}.order`] = orderObj[id];
+      }
+
+      buildfire.publicData.update(
+        metricsId,
+        { $set: _set },
+        "metrics",
+        (err, data) => {
+          if (err) reject(err);
+          else {
+            resolve(data);
+          }
+        }
+      );
+    });
+  }
 }

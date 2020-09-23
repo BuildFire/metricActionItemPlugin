@@ -1,7 +1,6 @@
 let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
-let tag = "metrics";
 
 let breadcrumpsHistory = [];
 
@@ -12,6 +11,17 @@ let currentUser = {};
 
 getCurrentUser().then((user) => {
   currentUser = user;
+});
+
+Metrics.getMetrics().then((data) => {
+  metrics = data.data;
+  metrics.id = data.id;
+
+  Metrics.getHistoryValue(metrics);
+
+  if (typeof sortableListUI !== "undefined") {
+    sortableListUI.init("metrics-list");
+  }
 });
 
 const initMetricFields = (data = {}) => {
@@ -60,14 +70,6 @@ const initIconComponent = (imageUrl = "") => {
     metricFields.icon = null;
   };
 };
-
-Metrics.getMetrics().then((data) => {
-  metrics = data;
-  Metrics.getHistoryValue(metrics);
-  if (typeof sortableListUI !== "undefined") {
-    sortableListUI.init("metrics-list", tag);
-  }
-});
 
 function addItem() {
   metricForm.style.display = "block";
