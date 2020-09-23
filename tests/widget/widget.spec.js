@@ -43,7 +43,7 @@ describe("Test The Widget Side", () => {
     });
 
     it("Should calculate the value of the big object correctly", async () => {
-      expect(Metrics.getHistoryValue(metrics.data)).toBe(48.5);
+      expect(Metrics.getHistoryValue(metrics.data)).toBe(40);
     });
 
     it("Should update a metric history value without any errors", async () => {

@@ -108,10 +108,11 @@ buildfire.components.SortableList = class SortableList {
     divRow.appendChild(deleteButton);
 
     title.onclick = () => {
-      let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
-      index = parseInt(index);
-      this.onItemClick(item, index, divRow);
-      return false;
+      // console.error('dasdsads')
+      // let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
+      // index = parseInt(index);
+      // this.onItemClick(item, index, divRow);
+      // return false;
     };
 
     deleteButton.onclick = () => {

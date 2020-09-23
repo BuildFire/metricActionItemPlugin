@@ -13,7 +13,8 @@ const sortableListUI = {
 	 */
   init(elementId) {
     this.contrainer = document.getElementById(elementId);
-
+    this.contrainer.innerHTML = '';
+    
     let currentMetricList = [];
     for (let metric in metrics[nodeSelector]) {
       metrics[nodeSelector][metric].id = metric;

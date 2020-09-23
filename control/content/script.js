@@ -2,7 +2,7 @@ let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
-let breadcrumbsHistory = ["Metrics"];
+let breadcrumbsHistory = ["Home"];
 
 // initialize metric fields;
 let metricFields;
@@ -13,7 +13,7 @@ getCurrentUser().then((user) => {
   currentUser = user;
 });
 
-Metrics.getMetrics().then((data) => {
+Metrics.getMetrics().then(async (data) => {
   metrics = data.data;
   metrics.id = data.id;
 
@@ -21,6 +21,7 @@ Metrics.getMetrics().then((data) => {
 
   if (typeof sortableListUI !== "undefined") {
     sortableListUI.init("metrics-list");
+    pushBreadcrumb("Home");
   }
 });
 
@@ -198,21 +199,42 @@ const getBreadcrumbs = () => {
 };
 
 // Add Breadcrumb
-const pushBreadcrumb = (breadcrumb, data) => {
+const pushBreadcrumb = (breadcrumb, id) => {
   return new Promise((resolve, reject) => {
-    // nodeSelector = nodeSelector + `.metrics.id.metrics`
-    buildfire.history.push(breadcrumb, data);
-    breadcrumbsHistory.push(breadcrumb);
+    if (id && metrics[nodeSelector][id]["type"] === "parent") {
+      nodeSelector += `.${id}.metrics`;
+    } else if (id && metrics[nodeSelector][id]["type"] === "metric") {
+      nodeSelector += `.${id}`;
+    }
+
+    buildfire.history.push(breadcrumb, { nodeSelector });
+    breadcrumbsHistory.push({ title: breadcrumb, nodeSelector });
+
+    let oldNodeSelector = nodeSelector;
     let crumb = document.createElement("span");
-    crumb.innerHTML = ` / ${breadcrumb}`;
+    crumb.innerHTML =
+      breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
     crumb.onclick = () => {
-      crumb.setAttribute("arrayIndex", 3);
-      console.log("go to ", data.elementToShow);
+      console.log("go to ", oldNodeSelector);
     };
+
     bread.appendChild(crumb);
+
+
     resolve(true);
   });
 };
+
+// Handle Breadcrumbs
+// const breadcrumbsUI = () => {
+//   getBreadcrumbs().then((data) => {
+//     data.forEach((crumb, i) => {
+//       if (i === 0)
+//         bread.innerHTML += `<span index="${i}">${crumb.title}</span>`;
+//       else bread.innerHTML += `<span index="${i}">/ ${crumb.title}</span>`;
+//     });
+//   });
+// };
 
 // Remove Breadcrumb
 const popBreadcrumb = () => {
@@ -229,3 +251,25 @@ buildfire.history.onPop((breadcrumb) => {
   // Show / Hide views
   // document.getElementById(breadcrumb.options.elementToShow).style.display = "block";
 });
+
+/* 
+step 1
+nodeSelector = metrics 
+step 2 
+Marketing => onclick 
+1- nodeSelector = metrics.id
+2- bread
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+step 1 
+*/
