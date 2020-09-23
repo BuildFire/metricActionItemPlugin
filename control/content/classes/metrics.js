@@ -70,7 +70,7 @@ class Metrics {
               `METRIC_${metric.id}_HISTORY_UPDATE`,
               "Number of times the metric history updated"
             );
-            resolve(data);
+            resolve(metric);
           }
         }
       );

@@ -8,15 +8,40 @@ let breadcrumpsHistory = [];
 // initialize metric fields;
 let metricFields;
 
+let currentUser = {};
+
+getCurrentUser().then((user) => {
+  currentUser = user;
+});
+
 const initMetricFields = (data = {}) => {
   metricFields = {
-    metricTitle: data.metricTitle || "",
+    title: data.title || "",
     icon: data.icon || "",
-    min: data.min || 0,
-    max: data.max || 0,
+    min: data.min || "",
+    max: data.max || "",
     actionItem: data.actionItem || {},
-    metricTypes: data.metricTypes || "",
+    type: data.type || "",
   };
+  initIconComponent(data.icon);
+  //   let iconImage = document.querySelectorAll("img[alt='Background Image']");
+  title.value = metricFields.title;
+  min.value = metricFields.min;
+  max.value = metricFields.max;
+  max.value = metricFields.max;
+  //   actionItem.value = item.actionItem;
+  //   metricFields.icon ? (iconImage[0].src = metricFields.icon) : (iconImage[0].src = "");
+  //   metricFields.icon
+  //     ? iconImage[0].classList.remove("hidden")
+  //     : iconImage[0].classList.add("hidden");
+  if (metricFields.type === "") {
+    parentType.checked = false;
+    metricType.checked = false;
+  } else if (metricFields.type === "parent") {
+    parentType.checked = true;
+  } else {
+    metricType.checked = true;
+  }
 };
 
 const initIconComponent = (imageUrl = "") => {
@@ -35,9 +60,6 @@ const initIconComponent = (imageUrl = "") => {
     metricFields.icon = null;
   };
 };
-// Init
-initMetricFields();
-initIconComponent();
 
 Metrics.getMetrics().then((data) => {
   metrics = data;
@@ -54,7 +76,6 @@ function addItem() {
   updateMetric.style.display = "none";
 
   // Reset input field to it's initial value after saving it in the database
-
   initMetricFields();
   //   sortableListUI.addItem(metric); /// this will also add it to the database
 }
@@ -63,7 +84,6 @@ function cancel() {
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
-
   // Reset input field to it's initial value
   initMetricFields();
 }
@@ -73,30 +93,55 @@ const onFieldChange = (field) => {
 };
 
 const onRadioChange = (value) => {
-  metricFields["metricType"] = value;
+  metricFields["type"] = value;
 };
 
 const createMetric = () => {
-  return new Promise((resolve, reject) => {
-    const {
-      metricTitle,
-      icon,
-      actionItem,
-      min,
-      max,
-      metricType,
-    } = metricFields;
-    // Metric fields validation
-    if (!metricTitle) reject(`Please add a metric title`);
-    if (min !== 0 && !min) reject(`Please add a max value`);
-    if (max !== 0 && !max) reject(`Please add a min value`);
-    if (!Object.keys(actionItem)) reject(`Please add an action`);
-    if (!icon) reject(`Please add an icon`);
-    if (!metricType) reject("Please select metric type");
+  const { title, icon, actionItem, min, max, type } = metricFields;
+  // Metric fields validation
+  if (!title) return `Please add a metric title`;
+  if (min !== 0 && !min) return `Please add a max value`;
+  if (max !== 0 && !max) return `Please add a min value`;
+  if (!Object.keys(actionItem)) return `Please add an action`;
+  if (!icon) return `Please add an icon`;
+  if (!type) return "Please select metric type";
+  // Empty the form fields after submitting
+  metricFields.createdBy = currentUser.firstName;
+  metricFields.lastUpdatedBy = currentUser.firstName;
+  console.log("everything", nodeSelector, metrics.id, new Metric(metricFields));
+  Metrics.insert(
+    { nodeSelector, metricsId: metrics.id },
+    new Metric(metricFields)
+  ).then((metric) => {
+    sortableListUI.sortableList.append(metric);
+    cancel();
+  });
+};
 
-    // Empty the form fields after submitting
-    resolve("Saved successfully");
-  }).catch(console.log);
+const updateMetrics = (item, divRow) => {
+  let updateObj = {};
+  for (let prop in metricFields) {
+    if (metricFields[prop] !== item[prop]) {
+      updateObj[prop] = metricFields[prop];
+      console.log("thus is", prop, metricFields[prop]);
+    }
+  }
+  console.log(
+    "hala",
+    { nodeSelector, metricsId: metrics.id },
+    updateObj,
+    item.id
+  );
+  Metrics.update(
+    { nodeSelector, metricsId: metrics.id },
+    updateObj,
+    item.id
+  ).then((data) => {
+    divRow.parentNode.removeChild(divRow);
+    sortableListUI.sortableList.append(metricFields);
+    sortableListUI.sortableList.reIndexRows();
+    cancel();
+  });
 };
 
 // sortableListUI.onItemClick = (metric, index, divRow) => {
@@ -127,14 +172,11 @@ function getCurrentUser() {
       if (err) {
         reject(err);
       } else {
-        console.log("I am the user", user);
         resolve(user);
       }
     });
   });
 }
-
-getCurrentUser();
 
 // Handle Breadcrumbs
 // Get Breadcrumbs
@@ -165,7 +207,7 @@ const pushBreadcrumb = (breadcrumb, data) => {
 // Remove Breadcrumb
 const popBreadcrumb = () => {
   return new Promise((resolve, reject) => {
-    nodeSelector = nodeSelector.split()
+    nodeSelector = nodeSelector.split();
     buildfire.history.pop();
     resolve(true);
   });

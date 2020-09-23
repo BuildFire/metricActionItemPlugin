@@ -43,11 +43,17 @@ buildfire.components.SortableList = class SortableList {
 
   // allows you to append a single item or an array of items
   append(items) {
+    console.log("load", items);
+
     if (!items) return;
     else if (!(items instanceof Array) && typeof items == "object")
       items = [items];
-
+    console.log("load", items);
     this.loadItems(items, true);
+  }
+
+  updateView(metric) {
+    console.log("lalsals", metric);
   }
 
   // remove all items in list
@@ -63,6 +69,7 @@ buildfire.components.SortableList = class SortableList {
 
   // append new sortable item to the DOM
   injectItemElements(item, index, divRow) {
+    console.log("every very", item, index, divRow);
     if (!item) throw "Missing Item";
     divRow.innerHTML = "";
     divRow.setAttribute("arrayIndex", index);
@@ -121,25 +128,15 @@ buildfire.components.SortableList = class SortableList {
       return false;
     };
     editButton.onclick = () => {
+      item.lastUpdatedBy = currentUser.firstName;
+      initMetricFields(item);
       metricForm.style.display = "block";
       updateMetric.style.display = "inline";
       createAMetric.style.display = "none";
       metricsMain.style.display = "none";
-      metricTitle.value = item.title;
-      min.value = item.min;
-      max.value = item.max;
-      max.value = item.max;
-      actionItem.value = item.actionItem;
-      document.querySelectorAll("img[alt='Background Image']")[0].src =
-        item.icon;
-      document
-        .querySelectorAll("img[alt='Background Image']")[0]
-        .classList.remove("hidden");
-      item.icon;
-
-      item.type == "parent"
-        ? (parentType.checked = true)
-        : (metricType.checked = true);
+      updateMetric.onclick = () => {
+        updateMetrics(item, divRow);
+      };
     };
   }
 
@@ -165,6 +162,8 @@ buildfire.components.SortableList = class SortableList {
   }
 
   reIndexRows() {
+    console.log("re index", this.items);
+
     let i = 0;
     this.element.childNodes.forEach((e) => {
       e.setAttribute("arrayIndex", i);

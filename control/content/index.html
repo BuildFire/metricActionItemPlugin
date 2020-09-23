@@ -21,8 +21,6 @@
 
     <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
     <link rel="stylesheet" href="css/sortableList.css" />
-    <!-- Load helper.css to use our helper classes -->
-    <link href="../../../../styles/siteIcons.css" rel="stylesheet" />
     <link
       rel="stylesheet"
       type="text/css"
@@ -40,7 +38,6 @@
     <script src="../../../../scripts/sortable.min.js"></script>
     <script src="js/sortableList.js"></script>
     <script src="js/sortableListUI.js"></script>
-    <script src="../../../../scripts/buildfire/components/actionItems/sortableList.js"></script>
   </head>
   <body>
     <div id="metricsMain">
@@ -63,10 +60,10 @@
       <div class="form-group">
         <label>Title</label
         ><input
-          onchange="onFieldChange('metricTitle')"
+          onchange="onFieldChange('title')"
           class="form-control"
           type="text"
-          id="metricTitle"
+          id="title"
           autocomplete="false"
           placeholder="Title"
         />
@@ -157,19 +154,22 @@
       <button
         id="createAMetric"
         class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
-        onclick="createMetric()"
+        onclick="console.log(createMetric())"
       >
         <span class="icon icon-plus"></span>Create Metric
       </button>
       <button
         id="updateMetric"
         class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
-        onclick="updateMetric()"
       >
         <span class="icon icon-plus"></span>Update Metric
       </button>
 
-      <button id="test" class="mdc-button mdc-button--raised mdc-error" onclick="cancel()">
+      <button
+        id="test"
+        class="mdc-button mdc-button--raised mdc-error"
+        onclick="cancel()"
+      >
         <div class="mdc-button__ripple"></div>
         <i class="material-icons mdc-button__icon" aria-hidden="true">cancel</i>
         <span class="mdc-button__label">Cancel</span>
