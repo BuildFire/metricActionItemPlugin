@@ -21,7 +21,7 @@ Metrics.getMetrics().then(async (data) => {
   console.log("laslalss", metrics);
   if (typeof sortableListUI !== "undefined") {
     sortableListUI.init("metrics-list");
-    pushBreadcrumb("Metrics", { nodeSelector });
+    pushBreadcrumb("Home", { nodeSelector });
   }
 });
 
@@ -208,9 +208,13 @@ const pushBreadcrumb = (breadcrumb, data) => {
     buildfire.history.push(breadcrumb, data);
     breadcrumbsHistory.push(breadcrumb);
     let crumb = document.createElement("span");
-    crumb.innerHTML = ` / ${breadcrumb}`;
+    crumb.innerHTML =
+      breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
     crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
     crumb.onclick = () => {
+      if (data.nodeSelector === nodeSelector) {
+        return;
+      }
       let tre = breadcrumbsHistory.length;
       console.log("go to ", +crumb.getAttribute("arrayIndex"));
       for (var i = 0; i < tre - 1 - +crumb.getAttribute("arrayIndex"); i++) {
@@ -252,25 +256,3 @@ buildfire.history.onPop((breadcrumb) => {
   // Show / Hide views
   // document.getElementById(breadcrumb.options.elementToShow).style.display = "block";
 });
-
-/* 
-step 1
-nodeSelector = metrics 
-step 2 
-Marketing => onclick 
-1- nodeSelector = metrics.id
-2- bread
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-step 1 
-*/

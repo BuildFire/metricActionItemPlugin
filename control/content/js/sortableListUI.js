@@ -17,14 +17,7 @@ const sortableListUI = {
 
     // console.log("haho", elementId, metrics[nodeSelector.split(".")]);
     // var metricsChildren = metrics["metrics"];
-    let splittedNode = nodeSelector.split(".");
-    // console.log("fin", splittedNode);
-    // if (splittedNode.length > 1) {
-    //   console.log("fin", metrics[splittedNode[0]][splittedNode[1]][splittedNode[2]]);
-    let metricsChildren = metrics;
-    splittedNode.forEach((item) => {
-      metricsChildren = metricsChildren[item];
-    });
+    let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
     //   metricsChildren = metrics[splittedNode[0]][splittedNode[1]][splittedNode[2]];
     // }
     let currentMetricList = [];
@@ -86,6 +79,7 @@ const sortableListUI = {
       this.items.forEach((item, index) => {
         orderObj[item.id] = index;
       });
+      console.log("very", { nodeSelector, metricsId: metrics.id }, orderObj);
 
       Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
         .then(console.log)

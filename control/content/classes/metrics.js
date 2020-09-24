@@ -32,7 +32,9 @@ class Metrics {
   // A recurcive function that calculates the average of each metric history
   static getHistoryValue(metric) {
     if (metric.type === "metric") {
-      let val = metric.history[metric.history.length - 1].value;
+      let val = metric.history[metric.history.length - 1]
+        ? metric.history[metric.history.length - 1].value
+        : 0;
       metric.value = val;
       return val;
     } else if (metric.type === "parent" || !metric.type) {

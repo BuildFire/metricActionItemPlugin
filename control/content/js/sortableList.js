@@ -77,18 +77,16 @@ buildfire.components.SortableList = class SortableList {
     var moveHandle = document.createElement("span"),
       title = document.createElement("a"),
       minMax = document.createElement("span"),
-      deleteButton = document.createElement("button"),
-      editButton = document.createElement("button");
+      deleteButton = document.createElement("span"),
+      editButton = document.createElement("span");
 
     // Add the required classes to the elements
     divRow.className = "d-item clearfix";
     moveHandle.className = "icon icon-menu cursor-grab";
     title.className = "title ellipsis item-title";
-    deleteButton.className = "btn btn-danger margin-x-y";
-    editButton.className = "btn btn-primary margin-x-y";
+    deleteButton.className = "btn btn--icon icon icon-cross2";
+    editButton.className = "btn btn--icon icon icon-pencil";
 
-    deleteButton.innerHTML = "Delete";
-    editButton.innerHTML = "Edit";
     title.innerHTML = item.title;
     minMax.innerHTML = item.min ? `${item.min} - ${item.max}` : "Parent";
     minMax.style.flex = "2";
@@ -108,9 +106,12 @@ buildfire.components.SortableList = class SortableList {
     divRow.appendChild(deleteButton);
 
     title.onclick = () => {
-      nodeSelector += `.${item.id}.metrics`;
-      sortableListUI.init("metrics-list");
-      pushBreadcrumb(item.title, { nodeSelector });
+      if (item.type === "parent") {
+        nodeSelector += `.${item.id}.metrics`;
+        sortableListUI.init("metrics-list");
+        pushBreadcrumb(item.title, { nodeSelector });
+      }
+
       //   let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
       //   index = parseInt(index);
       //   this.onItemClick(item, index, divRow);

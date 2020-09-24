@@ -4,4 +4,13 @@ const helpers = {
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
   // Return absolute date
   getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
+  nodeSplitter: (nodeSelector, metrics) => {
+    let splittedNode = nodeSelector.split(".");
+
+    let metricsChildren = metrics;
+    splittedNode.forEach((item) => {
+      metricsChildren = metricsChildren[item];
+    });
+    return metricsChildren;
+  },
 };
