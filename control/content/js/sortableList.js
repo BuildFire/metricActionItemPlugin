@@ -72,6 +72,7 @@ buildfire.components.SortableList = class SortableList {
     if (!item) throw "Missing Item";
     divRow.innerHTML = "";
     divRow.setAttribute("arrayIndex", index);
+    divRow.setAttribute("id", item.id);
 
     // Create the required DOM elements
     var moveHandle = document.createElement("span"),
@@ -168,7 +169,7 @@ buildfire.components.SortableList = class SortableList {
   }
 
   reIndexRows() {
-    console.log("re index", this.items);
+    // console.log("re index", this.items);
 
     let i = 0;
     this.element.childNodes.forEach((e) => {

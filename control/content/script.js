@@ -119,6 +119,8 @@ const createMetric = () => {
     },
     new Metric(metricFields)
   ).then((metric) => {
+    let currentMetric = helpers.nodeSplitter(nodeSelector, metrics);
+    currentMetric[metric.id] = metric;
     sortableListUI.sortableList.append(metric);
     cancel();
   });

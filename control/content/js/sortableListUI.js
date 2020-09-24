@@ -73,23 +73,19 @@ const sortableListUI = {
     };
 
     this.sortableList.onOrderChange = (item, oldIndex, newIndex) => {
-      console.log("this.items", this.items);
       let orderObj = {};
 
-      this.items.forEach((item, index) => {
-        orderObj[item.id] = index;
+      document.getElementById("metrics-list").childNodes.forEach((e) => {
+        const metricId = e.getAttribute("id"),
+          index = parseInt(e.getAttribute("arrayIndex"));
+        orderObj[metricId] = index;
       });
-      console.log("very", { nodeSelector, metricsId: metrics.id }, orderObj);
+
+      console.log("HELLO", orderObj);
 
       Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
         .then(console.log)
         .catch(console.log);
-
-      // buildfire.publicData.save(
-      //   { $set: { items: sortableListUI.sortableList.items } },
-      //   this.tag,
-      //   () => {}
-      // );
     };
   },
   // /**
