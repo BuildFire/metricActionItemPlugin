@@ -13,12 +13,24 @@ const sortableListUI = {
 	 */
   init(elementId) {
     this.contrainer = document.getElementById(elementId);
-    this.contrainer.innerHTML = '';
-    
+    this.contrainer.innerHTML = "";
+
+    // console.log("haho", elementId, metrics[nodeSelector.split(".")]);
+    // var metricsChildren = metrics["metrics"];
+    let splittedNode = nodeSelector.split(".");
+    // console.log("fin", splittedNode);
+    // if (splittedNode.length > 1) {
+    //   console.log("fin", metrics[splittedNode[0]][splittedNode[1]][splittedNode[2]]);
+    let metricsChildren = metrics;
+    splittedNode.forEach((item) => {
+      metricsChildren = metricsChildren[item];
+    });
+    //   metricsChildren = metrics[splittedNode[0]][splittedNode[1]][splittedNode[2]];
+    // }
     let currentMetricList = [];
-    for (let metric in metrics[nodeSelector]) {
-      metrics[nodeSelector][metric].id = metric;
-      currentMetricList.push(metrics[nodeSelector][metric]);
+    for (let metric in metricsChildren) {
+      metricsChildren[metric].id = metric;
+      currentMetricList.push(metricsChildren[metric]);
     }
 
     if (currentMetricList.length === 0) {

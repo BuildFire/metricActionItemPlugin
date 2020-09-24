@@ -108,11 +108,13 @@ buildfire.components.SortableList = class SortableList {
     divRow.appendChild(deleteButton);
 
     title.onclick = () => {
-      // console.error('dasdsads')
-      // let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
-      // index = parseInt(index);
-      // this.onItemClick(item, index, divRow);
-      // return false;
+      nodeSelector += `.${item.id}.metrics`;
+      sortableListUI.init("metrics-list");
+      pushBreadcrumb(item.title, { nodeSelector });
+      //   let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
+      //   index = parseInt(index);
+      //   this.onItemClick(item, index, divRow);
+      //   return false;
     };
 
     deleteButton.onclick = () => {
@@ -128,6 +130,9 @@ buildfire.components.SortableList = class SortableList {
       return false;
     };
     editButton.onclick = () => {
+      nodeSelector += `.${item.id}.metrics`;
+      //   sortableListUI.init("metrics-list");
+      pushBreadcrumb(item.title, { nodeSelector });
       item.lastUpdatedBy = currentUser.firstName;
       initMetricFields(item);
       metricForm.style.display = "block";

@@ -2,7 +2,7 @@ let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
-let breadcrumbsHistory = ["Home"];
+let breadcrumbsHistory = [];
 
 // initialize metric fields;
 let metricFields;
@@ -18,10 +18,10 @@ Metrics.getMetrics().then(async (data) => {
   metrics.id = data.id;
 
   Metrics.getHistoryValue(metrics);
-
+  console.log("laslalss", metrics);
   if (typeof sortableListUI !== "undefined") {
     sortableListUI.init("metrics-list");
-    pushBreadcrumb("Home");
+    pushBreadcrumb("Metrics", { nodeSelector });
   }
 });
 
@@ -113,7 +113,10 @@ const createMetric = () => {
   metricFields.lastUpdatedBy = currentUser.firstName;
   console.log("everything", nodeSelector, metrics.id, new Metric(metricFields));
   Metrics.insert(
-    { nodeSelector, metricsId: metrics.id },
+    {
+      nodeSelector,
+      metricsId: metrics.id,
+    },
     new Metric(metricFields)
   ).then((metric) => {
     sortableListUI.sortableList.append(metric);
@@ -199,28 +202,26 @@ const getBreadcrumbs = () => {
 };
 
 // Add Breadcrumb
-const pushBreadcrumb = (breadcrumb, id) => {
+const pushBreadcrumb = (breadcrumb, data) => {
   return new Promise((resolve, reject) => {
-    if (id && metrics[nodeSelector][id]["type"] === "parent") {
-      nodeSelector += `.${id}.metrics`;
-    } else if (id && metrics[nodeSelector][id]["type"] === "metric") {
-      nodeSelector += `.${id}`;
-    }
-
-    buildfire.history.push(breadcrumb, { nodeSelector });
-    breadcrumbsHistory.push({ title: breadcrumb, nodeSelector });
-
-    let oldNodeSelector = nodeSelector;
+    // nodeSelector = nodeSelector + `.metrics.id.metrics`
+    buildfire.history.push(breadcrumb, data);
+    breadcrumbsHistory.push(breadcrumb);
     let crumb = document.createElement("span");
-    crumb.innerHTML =
-      breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
+    crumb.innerHTML = ` / ${breadcrumb}`;
+    crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
     crumb.onclick = () => {
-      console.log("go to ", oldNodeSelector);
+      let tre = breadcrumbsHistory.length;
+      console.log("go to ", +crumb.getAttribute("arrayIndex"));
+      for (var i = 0; i < tre - 1 - +crumb.getAttribute("arrayIndex"); i++) {
+        bread.removeChild(bread.lastChild);
+        breadcrumbsHistory.pop();
+      }
+      nodeSelector = data.nodeSelector;
+      sortableListUI.init("metrics-list");
+      cancel();
     };
-
     bread.appendChild(crumb);
-
-
     resolve(true);
   });
 };
