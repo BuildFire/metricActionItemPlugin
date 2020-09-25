@@ -64,7 +64,8 @@ class Metrics {
         metricsId,
         { $set: { [`${nodeSelector}.${metric.id}`]: metric } },
         "metrics",
-        (err, data) => {
+        (err, result) => {
+          console.log("every data", result);
           if (err) reject(err);
           else {
             Analytics.registerEvent(
@@ -72,7 +73,8 @@ class Metrics {
               `METRIC_${metric.id}_HISTORY_UPDATE`,
               "Number of times the metric history updated"
             );
-            resolve(metric);
+            result.data.id = metricsId;
+            resolve(result);
           }
         }
       );
@@ -94,10 +96,11 @@ class Metrics {
         metricsId,
         { $set: _set },
         "metrics",
-        (err, data) => {
+        (err, result) => {
           if (err) reject(err);
           else {
-            resolve(data);
+            result.data.id = metricsId;
+            resolve(result);
           }
         }
       );
@@ -118,10 +121,11 @@ class Metrics {
           },
         },
         "metrics",
-        (err, data) => {
+        (err, result) => {
           if (err) reject(err);
           else {
-            resolve(data);
+            result.data.id = metricsId;
+            resolve(result);
           }
         }
       );

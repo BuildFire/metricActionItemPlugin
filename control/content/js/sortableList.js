@@ -52,10 +52,6 @@ buildfire.components.SortableList = class SortableList {
     this.loadItems(items, true);
   }
 
-  updateView(metric) {
-    console.log("lalsals", metric);
-  }
-
   // remove all items in list
   clear() {
     this._removeAll();
@@ -107,16 +103,10 @@ buildfire.components.SortableList = class SortableList {
     divRow.appendChild(deleteButton);
 
     title.onclick = () => {
-      if (item.type === "parent") {
-        nodeSelector += `.${item.id}.metrics`;
-        sortableListUI.init("metrics-list");
-        pushBreadcrumb(item.title, { nodeSelector });
-      }
-
-      //   let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
-      //   index = parseInt(index);
-      //   this.onItemClick(item, index, divRow);
-      //   return false;
+      let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
+      index = parseInt(index);
+      this.onItemClick(item, index, divRow);
+      return false;
     };
 
     deleteButton.onclick = () => {
@@ -132,9 +122,6 @@ buildfire.components.SortableList = class SortableList {
       return false;
     };
     editButton.onclick = () => {
-      nodeSelector += `.${item.id}.metrics`;
-      //   sortableListUI.init("metrics-list");
-      pushBreadcrumb(item.title, { nodeSelector });
       item.lastUpdatedBy = currentUser.firstName;
       initMetricFields(item);
       metricForm.style.display = "block";

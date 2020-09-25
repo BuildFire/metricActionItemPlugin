@@ -56,7 +56,8 @@ const sortableListUI = {
             Metrics.delete(
               { nodeSelector, metricsId: metrics.id },
               item.id
-            ).then((data) => {
+            ).then((metric) => {
+              metrics = metric.data;
               callback(data);
             });
             // buildfire.publicData.save(
@@ -128,6 +129,11 @@ const sortableListUI = {
     sortableListUI.sortableList.append(item);
   },
   onItemClick(item, divRow) {
-    buildfire.notifications.alert({ message: item.title + " clicked" });
+    if (item.type === "parent") {
+      nodeSelector += `.${item.id}.metrics`;
+      sortableListUI.init("metrics-list");
+      pushBreadcrumb(item.title, { nodeSelector });
+    }
+    // buildfire.notifications.alert({ message: item.title + " clicked" });
   },
 };

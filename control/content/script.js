@@ -119,9 +119,8 @@ const createMetric = () => {
     },
     new Metric(metricFields)
   ).then((metric) => {
-    let currentMetric = helpers.nodeSplitter(nodeSelector, metrics);
-    currentMetric[metric.id] = metric;
-    sortableListUI.sortableList.append(metric);
+    metrics = metric.data;
+    sortableListUI.init("metrics-list");
     cancel();
   });
 };
@@ -144,10 +143,9 @@ const updateMetrics = (item, divRow) => {
     { nodeSelector, metricsId: metrics.id },
     updateObj,
     item.id
-  ).then((data) => {
-    divRow.parentNode.removeChild(divRow);
-    sortableListUI.sortableList.append(metricFields);
-    sortableListUI.sortableList.reIndexRows();
+  ).then((metric) => {
+    metrics = metric.data;
+    sortableListUI.init("metrics-list");
     cancel();
   });
 };
@@ -212,6 +210,7 @@ const pushBreadcrumb = (breadcrumb, data) => {
     let crumb = document.createElement("span");
     crumb.innerHTML =
       breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
+    crumb.style.cursor = "pointer";
     crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
     crumb.onclick = () => {
       if (data.nodeSelector === nodeSelector) {
