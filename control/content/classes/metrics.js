@@ -1,6 +1,7 @@
 class Metrics {
   constructor() {}
 
+  // Get the big Object (metrics object)
   static getMetrics() {
     return new Promise((resolve, reject) => {
       buildfire.publicData.get("metrics", async (err, data) => {
@@ -29,7 +30,7 @@ class Metrics {
     });
   }
 
-  // A recurcive function that calculates the average of each metric history
+  // A recurcive function that calculates the value of each metric
   static getHistoryValue(metric) {
     if (metric.type === "metric") {
       let val = metric.history[metric.history.length - 1]
@@ -50,7 +51,7 @@ class Metrics {
     }
   }
 
-  // Control Panel Only
+  // Add new metrics in the big object (Control Panel Only)
   static insert({ nodeSelector, metricsId }, metric) {
     metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
@@ -81,7 +82,7 @@ class Metrics {
     });
   }
 
-  // Control Panel Only
+  // To update any metric properties but not historys' values (Control Panel Only)
   static update({ nodeSelector, metricsId }, data, id) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
@@ -107,7 +108,7 @@ class Metrics {
     });
   }
 
-  // Control Panel Only
+  // To delete any metrics (Control Panel Only)
   static delete({ nodeSelector, metricsId }, id) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
@@ -132,7 +133,7 @@ class Metrics {
     });
   }
 
-  // For testing only
+  // For testing only (It should be just in the widget's code)
   static updateMetricHistory({ nodeSelector, metricsId }, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
@@ -159,7 +160,7 @@ class Metrics {
               {
                 $push: {
                   [`${nodeSelector}.history`]: {
-                    date: helpers.getAbsoluteDate(),
+                    date: absoluteDate,
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
                     lastUpdatedOn: new Date(),

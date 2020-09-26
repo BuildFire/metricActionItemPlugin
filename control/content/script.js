@@ -77,10 +77,8 @@ function addItem() {
   metricsMain.style.display = "none";
   createAMetric.style.display = "inline";
   updateMetric.style.display = "none";
-
   // Reset input field to it's initial value after saving it in the database
   initMetricFields();
-  //   sortableListUI.addItem(metric); /// this will also add it to the database
 }
 function cancel() {
   metricForm.style.display = "none";
@@ -125,7 +123,7 @@ const createMetric = () => {
   });
 };
 
-const updateMetrics = (item, divRow) => {
+const updateMetrics = (item) => {
   let updateObj = {};
   for (let prop in metricFields) {
     if (metricFields[prop] !== item[prop]) {
@@ -133,12 +131,6 @@ const updateMetrics = (item, divRow) => {
       console.log("thus is", prop, metricFields[prop]);
     }
   }
-  console.log(
-    "hala",
-    { nodeSelector, metricsId: metrics.id },
-    updateObj,
-    item.id
-  );
   Metrics.update(
     { nodeSelector, metricsId: metrics.id },
     updateObj,

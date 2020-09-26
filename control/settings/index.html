@@ -20,7 +20,7 @@
   <body>
     <label for="cars">Sort Metrics By:</label>
 
-    <select name="cars" id="cars">
+    <select id="sortBy" onchange="sortBy(this.value)">
       <option value="manual">Manual</option>
       <option value="heighest">Heighest</option>
       <option value="lowest">Lowest</option>
@@ -40,7 +40,5 @@
         <div class="mdc-checkbox__ripple"></div>
       </div>
     </div>
-
-    
   </body>
 </html>

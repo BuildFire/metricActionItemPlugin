@@ -13,13 +13,7 @@ const sortableListUI = {
 	 */
   init(elementId) {
     this.contrainer = document.getElementById(elementId);
-    this.contrainer.innerHTML = "";
-
-    // console.log("haho", elementId, metrics[nodeSelector.split(".")]);
-    // var metricsChildren = metrics["metrics"];
     let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
-    //   metricsChildren = metrics[splittedNode[0]][splittedNode[1]][splittedNode[2]];
-    // }
     let currentMetricList = [];
     for (let metric in metricsChildren) {
       metricsChildren[metric].id = metric;
@@ -58,16 +52,8 @@ const sortableListUI = {
               item.id
             ).then((metric) => {
               metrics = metric.data;
-              callback(data);
+              callback(metric);
             });
-            // buildfire.publicData.save(
-            //   { $set: { items: sortableListUI.sortableList.items } },
-            //   t.tag,
-            //   (e) => {
-            //     if (e) console.error(e);
-            //     else callback(item);
-            //   }
-            // );
           }
         }
       );
@@ -75,58 +61,15 @@ const sortableListUI = {
 
     this.sortableList.onOrderChange = (item, oldIndex, newIndex) => {
       let orderObj = {};
-
       document.getElementById("metrics-list").childNodes.forEach((e) => {
         const metricId = e.getAttribute("id"),
           index = parseInt(e.getAttribute("arrayIndex"));
         orderObj[metricId] = index;
       });
-
-      console.log("HELLO", orderObj);
-
       Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
         .then(console.log)
         .catch(console.log);
     };
-  },
-  // /**
-  //  * Updates item in publicData and updates sortable list UI
-  //  * @param {Object} item Item to be updated
-  //  * @param {Number} index Array index of the item you are updating
-  //  * @param {HTMLElement} divRow Html element (div) of the entire row that is being updated
-  //  * @param {Function} callback Optional callback function
-  //  */
-  // updateItem(item, index, divRow, callback) {
-  //   console.log(divRow);
-  //   sortableListUI.sortableList.injectItemElements(item, index, divRow);
-  //   let cmd = { $set: {} };
-  //   cmd.$set["items." + index] = item;
-  //   buildfire.publicData.save(cmd, this.tag, (err, data) => {
-  //     if (err) {
-  //       console.error(err);
-  //       if (callback) return callback(err);
-  //     }
-  //     if (callback) return callback(null, data);
-  //   });
-  // },
-  /**
-   * This function adds item to publicData and updates sortable list UI
-   * @param {Object} item Item to be added to publicData
-   * @param {Function} callback Optional callback function
-   */
-  addItem(item, callback) {
-    let cmd = {
-      $push: { items: item },
-    };
-    buildfire.publicData.save(cmd, this.tag, (err, data) => {
-      if (err) {
-        console.error(err);
-        if (callback) return callback(err);
-      }
-      if (callback) return callback(null, data);
-    });
-
-    sortableListUI.sortableList.append(item);
   },
   onItemClick(item, divRow) {
     if (item.type === "parent") {

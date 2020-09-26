@@ -43,12 +43,9 @@ buildfire.components.SortableList = class SortableList {
 
   // allows you to append a single item or an array of items
   append(items) {
-    console.log("load", items);
-
     if (!items) return;
     else if (!(items instanceof Array) && typeof items == "object")
       items = [items];
-    console.log("load", items);
     this.loadItems(items, true);
   }
 
@@ -129,7 +126,7 @@ buildfire.components.SortableList = class SortableList {
       createAMetric.style.display = "none";
       metricsMain.style.display = "none";
       updateMetric.onclick = () => {
-        updateMetrics(item, divRow);
+        updateMetrics(item);
       };
     };
   }
@@ -156,8 +153,6 @@ buildfire.components.SortableList = class SortableList {
   }
 
   reIndexRows() {
-    // console.log("re index", this.items);
-
     let i = 0;
     this.element.childNodes.forEach((e) => {
       e.setAttribute("arrayIndex", i);
