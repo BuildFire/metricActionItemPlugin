@@ -55,6 +55,51 @@
       <br />
     </div>
     <div id="metricForm">
+
+      <div id="metricTypeRadioGroup" class="fullwidth form-group">
+        <lable>Metric type</lable><br />
+        <div class="mdc-form-field fullwidth">
+          <label class="radio-label designLabel" for="metricType">
+            Metric
+          </label>
+          <div class="mdc-radio">
+            <input
+              onchange="onRadioChange('metric')"
+              class="mdc-radio__native-control"
+              type="radio"
+              value="metric"
+              id="metricType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+        <div class="mdc-form-field fullwidth" id="tagOnly">
+          <label class="radio-label designLabel" for="parentType">
+            Parent
+          </label>
+          <div class="mdc-radio">
+            <input
+              class="mdc-radio__native-control"
+              type="radio"
+              onchange="onRadioChange('parent')"
+              value="parent"
+              id="parentType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+      </div>
+      
       <div class="form-group">
         <label>Title</label
         ><input
@@ -104,50 +149,6 @@
 
       <div id="icon"></div>
       <br />
-
-      <div id="metricTypeRadioGroup" class="fullwidth form-group">
-        <lable>Metric type</lable><br />
-        <div class="mdc-form-field fullwidth">
-          <label class="radio-label designLabel" for="metricType">
-            Metric
-          </label>
-          <div class="mdc-radio">
-            <input
-              onchange="onRadioChange('metric')"
-              class="mdc-radio__native-control"
-              type="radio"
-              value="metric"
-              id="metricType"
-              name="metricTypes"
-            />
-            <div class="mdc-radio__background">
-              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
-              <div class="mdc-radio__inner-circle"></div>
-            </div>
-            <div class="mdc-radio__ripple"></div>
-          </div>
-        </div>
-        <div class="mdc-form-field fullwidth" id="tagOnly">
-          <label class="radio-label designLabel" for="parentType">
-            Parent
-          </label>
-          <div class="mdc-radio">
-            <input
-              class="mdc-radio__native-control"
-              type="radio"
-              onchange="onRadioChange('parent')"
-              value="parent"
-              id="parentType"
-              name="metricTypes"
-            />
-            <div class="mdc-radio__background">
-              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
-              <div class="mdc-radio__inner-circle"></div>
-            </div>
-            <div class="mdc-radio__ripple"></div>
-          </div>
-        </div>
-      </div>
 
       <button
         id="createAMetric"

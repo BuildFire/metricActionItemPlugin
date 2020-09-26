@@ -42,3 +42,7 @@
   --mdc-theme-primary: #b00020;
   --mdc-theme-on-primary: white;
 }
+
+input:disabled {
+  background: lightgray !important;
+}

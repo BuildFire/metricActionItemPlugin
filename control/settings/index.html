@@ -5,26 +5,25 @@
 
     <!-- Load helper.css to use our helper classes.
 	<link href="../../../../styles/helper.css" rel="stylesheet">
-	-->
+  -->
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
 
     <!-- JS -->
     <script src="../../../../scripts/buildfire.js"></script>
   </head>
 
-  <style>
-    select.simple {
-      background: #f5f5f5;
-      border: 0;
-    }
-  </style>
   <body>
     <label for="cars">Sort Metrics By:</label>
 
-    <select id="sortBy" onchange="sortBy(this.value)">
+    <select id="sortBy" onchange="onFieldChange('sortBy')">
       <option value="manual">Manual</option>
       <option value="heighest">Heighest</option>
-      <option value="lowest">Lowest</option>
-    </select>
+      <option value="lowest">Lowest</option></select
+    ><br /><br />
 
     <div class="mdc-touch-target-wrapper">
       <div class="mdc-checkbox mdc-checkbox--touch">
@@ -32,7 +31,8 @@
         <input
           type="checkbox"
           class="mdc-checkbox__native-control"
-          id="checkbox-1"
+          id="showSummary"
+          onchange="onFieldChange('showSummary')"
         />
         <div class="mdc-checkbox__background">
           <div class="mdc-checkbox__mixedmark"></div>
@@ -40,5 +40,28 @@
         <div class="mdc-checkbox__ripple"></div>
       </div>
     </div>
+    <br />
+
+    <div class="form-group">
+      <label>Add tag</label
+      ><input
+        class="form-control"
+        type="text"
+        id="tag"
+        autocomplete="false"
+        placeholder="Tag"
+      />
+    </div>
+
+    <div class="form-group">
+      <button class="mdc-button mdc-button--raised" onclick="saveTag()">
+        <div class="mdc-button__ripple"></div>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+        <span class="mdc-button__label">Add Tag</span>
+      </button>
+    </div>
+
+    <script src="js/classes/settings.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>

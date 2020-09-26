@@ -29,8 +29,8 @@ const initMetricFields = (data = {}) => {
   metricFields = {
     title: data.title || "",
     icon: data.icon || "",
-    min: data.min || "",
-    max: data.max || "",
+    min: data.min || 0,
+    max: data.max || 0,
     actionItem: data.actionItem || {},
     type: data.type || "",
   };
@@ -39,19 +39,27 @@ const initMetricFields = (data = {}) => {
   title.value = metricFields.title;
   min.value = metricFields.min;
   max.value = metricFields.max;
-  max.value = metricFields.max;
   //   actionItem.value = item.actionItem;
   //   metricFields.icon ? (iconImage[0].src = metricFields.icon) : (iconImage[0].src = "");
   //   metricFields.icon
   //     ? iconImage[0].classList.remove("hidden")
   //     : iconImage[0].classList.add("hidden");
+
+  let maxInput = document.getElementById("max"),
+    minInput = document.getElementById("min");
   if (metricFields.type === "") {
     parentType.checked = false;
     metricType.checked = false;
+    maxInput.disabled = false;
+    minInput.disabled = false;
   } else if (metricFields.type === "parent") {
     parentType.checked = true;
+    maxInput.disabled = true;
+    minInput.disabled = true;
   } else {
     metricType.checked = true;
+    maxInput.disabled = false;
+    minInput.disabled = false;
   }
 };
 
@@ -95,17 +103,34 @@ const onFieldChange = (field) => {
 
 const onRadioChange = (value) => {
   metricFields["type"] = value;
+
+  let maxInput = document.getElementById("max"),
+    minInput = document.getElementById("min");
+  if (value === "parent") {
+    maxInput.disabled = true;
+    minInput.disabled = true;
+  } else {
+    maxInput.disabled = false;
+    minInput.disabled = false;
+  }
 };
 
 const createMetric = () => {
   const { title, icon, actionItem, min, max, type } = metricFields;
   // Metric fields validation
   if (!title) return `Please add a metric title`;
-  if (min !== 0 && !min) return `Please add a max value`;
-  if (max !== 0 && !max) return `Please add a min value`;
   if (!Object.keys(actionItem)) return `Please add an action`;
   if (!icon) return `Please add an icon`;
   if (!type) return "Please select metric type";
+
+  if (type === "parent") {
+    delete metricFields.min;
+    delete metricFields.max;
+  } else if (type === "metric") {
+    if (min !== 0 && !min) return `Please add a max value`;
+    if (max !== 0 && !max) return `Please add a min value`;
+  }
+
   // Empty the form fields after submitting
   metricFields.createdBy = currentUser.firstName;
   metricFields.lastUpdatedBy = currentUser.firstName;
@@ -131,6 +156,22 @@ const updateMetrics = (item) => {
       console.log("thus is", prop, metricFields[prop]);
     }
   }
+
+  if (
+    updateObj.type === "parent" ||
+    (updateObj.type !== "metric" && item.type === "parent")
+  ) {
+    delete metricFields.min;
+    delete metricFields.max;
+  } else if (updateObj.type === "metric" && item.type === "parent") {
+    updateObj.max = item.type.max;
+    updateObj.min = item.type.min;
+  }
+
+  console.log("updateObj", updateObj);
+  console.log("metricFields.type ", metricFields.type);
+  return;
+
   Metrics.update(
     { nodeSelector, metricsId: metrics.id },
     updateObj,
