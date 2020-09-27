@@ -1,4 +1,4 @@
-class Settings {
+class Setting {
   constructor() {
     this.sortBy;
     this.showSummary;

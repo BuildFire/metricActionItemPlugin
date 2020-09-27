@@ -84,6 +84,7 @@ buildfire.components.SortableList = class SortableList {
     title.innerHTML = item.title;
     minMax.innerHTML =
       item.type === "parent" ? "Parent" : `${item.min} - ${item.max}`;
+    title.style.cursor = "pointer";
     minMax.style.flex = "2";
     // Append elements to the DOM
     divRow.appendChild(moveHandle);

@@ -6,9 +6,15 @@
     <meta name="buildfire" content="enableMDTheme" />
 
     <!-- Material Design css & js -->
-    <link href="../../../styles/materialDesign/material-components-web@4.0.0.min.css" rel="stylesheet">
-    <script src="../../../scripts/materialDesign/material-components-web@4.0.0.min.js" type="text/javascript"></script>
-    
+    <link
+      href="../../../styles/materialDesign/material-components-web@4.0.0.min.css"
+      rel="stylesheet"
+    />
+    <script
+      src="../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
+      type="text/javascript"
+    ></script>
+
     <!-- build:bundleWidgetBFMinJS  -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
@@ -26,41 +32,18 @@
     <!-- build:bundleCSSFiles  -->
     <link rel="stylesheet" type="text/css" href="css/a.css" />
     <link rel="stylesheet" type="text/css" href="css/b.css" />
+    <link rel="stylesheet" href="listView.css" />
+
+    <script src="js/shared/ui.js"></script>
+    <script src="listView.js"></script>
+
+    <script src="dummyData.js"></script>
     <!-- endbuild -->
-
-    <script>
-      /// string will have all the language settings from teh strings page on the control side
-      let strings = new buildfire.services.Strings("en-us", stringsConfig);
-      strings.init().then((s) => {
-        /// Inject into elements that have an attribute bfString
-        strings.inject(document, false);
-        //strings.get("screenOne.loading",true)},()=>{} );
-      });
-
-      buildfire.messaging.onReceivedMessage = (msg) => {
-        if (msg.cmd == "refresh")
-          /// message comes from the strings page on the control side
-          location.reload();
-      };
-
-      let settings;
-      Settings.get().then((s) => {
-        settings = s;
-        if (s.bgImageUrl) {
-          document.body.style.backgroundImage = `url(${buildfire.imageLib.cropImage(
-            s.bgImageUrl,
-            {
-              width: "full",
-              height: "full",
-            }
-          )})`;
-          document.body.style.backgroundSize = "cover";
-        }
-      });
-    </script>
   </head>
   <body>
-    <div class="padded">
+    <div id="listViewContainer"></div>
+
+    <!-- <div class="padded">
       <h3 bfString="screenOne.welcomeMessage">Widget - Hello, world!</h3>
       <p>Samples</p>
       <ul>
@@ -77,12 +60,13 @@
           <a href="samples/mapView/mapView.html">Map View</a>
         </li>
       </ul>
-    </div>
+    </div> -->
 
     <script src="js/helpers/helpers.js"></script>
     <script src="classes/analytics.js"></script>
     <script src="classes/metric.js"></script>
     <script src="classes/metrics.js"></script>
+    <script src="classes/settings.js"></script>
 
     <script src="js/shared/authManager.js"></script>
     <script src="script.js"></script>
