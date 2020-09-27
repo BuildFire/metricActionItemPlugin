@@ -82,7 +82,8 @@ buildfire.components.SortableList = class SortableList {
     editButton.className = "btn btn--icon icon icon-pencil";
 
     title.innerHTML = item.title;
-    minMax.innerHTML = item.min ? `${item.min} - ${item.max}` : "Parent";
+    minMax.innerHTML =
+      item.type === "parent" ? "Parent" : `${item.min} - ${item.max}`;
     minMax.style.flex = "2";
     // Append elements to the DOM
     divRow.appendChild(moveHandle);
@@ -119,15 +120,8 @@ buildfire.components.SortableList = class SortableList {
       return false;
     };
     editButton.onclick = () => {
-      item.lastUpdatedBy = currentUser.firstName;
-      initMetricFields(item);
-      metricForm.style.display = "block";
-      updateMetric.style.display = "inline";
-      createAMetric.style.display = "none";
-      metricsMain.style.display = "none";
-      updateMetric.onclick = () => {
-        updateMetrics(item);
-      };
+      this.onUpdateItem(item, index);
+      return false;
     };
   }
 
@@ -186,6 +180,10 @@ buildfire.components.SortableList = class SortableList {
   // This will be triggered when you delete an item
   onDeleteItem(item, index) {
     console.error("please handle onDeleteItem", item);
+  }
+
+  onUpdateItem(item, index) {
+    console.error("please handle onUpdateItem", item);
   }
 
   // This will be triggered when you delete an item

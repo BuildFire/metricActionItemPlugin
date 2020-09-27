@@ -51,7 +51,6 @@ class Metrics {
     }
   }
 
-  
   // Add new metrics in the big object (Control Panel Only)
   static insert({ nodeSelector, metricsId }, metric) {
     metric.id = helpers.uuidv4();
@@ -202,10 +201,11 @@ class Metrics {
         metricsId,
         { $set: _set },
         "metrics",
-        (err, data) => {
+        (err, result) => {
           if (err) reject(err);
           else {
-            resolve(data);
+            result.data.id = metricsId;
+            resolve(result);
           }
         }
       );

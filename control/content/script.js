@@ -1,15 +1,12 @@
 let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
-
 let breadcrumbsHistory = [];
-
 // initialize metric fields;
 let metricFields;
-
 let currentUser = {};
 
-getCurrentUser().then((user) => {
+authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
 
@@ -20,7 +17,7 @@ Metrics.getMetrics().then(async (data) => {
   Metrics.getHistoryValue(metrics);
   console.log("laslalss", metrics);
   if (typeof sortableListUI !== "undefined") {
-    sortableListUI.init("metrics-list");
+    sortableListUI.renderInit("metricsList");
     pushBreadcrumb("Home", { nodeSelector });
   }
 });
@@ -29,22 +26,15 @@ const initMetricFields = (data = {}) => {
   metricFields = {
     title: data.title || "",
     icon: data.icon || "",
-    min: data.min || 0,
-    max: data.max || 0,
+    min: data.min || "",
+    max: data.max || "",
     actionItem: data.actionItem || {},
     type: data.type || "",
   };
   initIconComponent(data.icon);
-  //   let iconImage = document.querySelectorAll("img[alt='Background Image']");
   title.value = metricFields.title;
   min.value = metricFields.min;
   max.value = metricFields.max;
-  //   actionItem.value = item.actionItem;
-  //   metricFields.icon ? (iconImage[0].src = metricFields.icon) : (iconImage[0].src = "");
-  //   metricFields.icon
-  //     ? iconImage[0].classList.remove("hidden")
-  //     : iconImage[0].classList.add("hidden");
-
   let maxInput = document.getElementById("max"),
     minInput = document.getElementById("min");
   if (metricFields.type === "") {
@@ -80,7 +70,7 @@ const initIconComponent = (imageUrl = "") => {
   };
 };
 
-function addItem() {
+function goToAddItem() {
   metricForm.style.display = "block";
   metricsMain.style.display = "none";
   createAMetric.style.display = "inline";
@@ -88,13 +78,11 @@ function addItem() {
   // Reset input field to it's initial value after saving it in the database
   initMetricFields();
 }
-function cancel() {
+function goToMetricspage() {
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
-  // Reset input field to it's initial value
-  initMetricFields();
 }
 
 const onFieldChange = (field) => {
@@ -134,6 +122,7 @@ const createMetric = () => {
   // Empty the form fields after submitting
   metricFields.createdBy = currentUser.firstName;
   metricFields.lastUpdatedBy = currentUser.firstName;
+  metricFields.order = metricsList.childNodes.length;
   console.log("everything", nodeSelector, metrics.id, new Metric(metricFields));
   Metrics.insert(
     {
@@ -143,8 +132,8 @@ const createMetric = () => {
     new Metric(metricFields)
   ).then((metric) => {
     metrics = metric.data;
-    sortableListUI.init("metrics-list");
-    cancel();
+    sortableListUI.renderInit("metricsList");
+    goToMetricspage();
   });
 };
 
@@ -156,7 +145,6 @@ const updateMetrics = (item) => {
       console.log("thus is", prop, metricFields[prop]);
     }
   }
-
   if (
     updateObj.type === "parent" ||
     (updateObj.type !== "metric" && item.type === "parent")
@@ -168,30 +156,18 @@ const updateMetrics = (item) => {
     updateObj.min = item.type.min;
   }
 
-  console.log("updateObj", updateObj);
-  console.log("metricFields.type ", metricFields.type);
-  return;
-
   Metrics.update(
     { nodeSelector, metricsId: metrics.id },
     updateObj,
     item.id
   ).then((metric) => {
     metrics = metric.data;
-    sortableListUI.init("metrics-list");
-    cancel();
+    sortableListUI.renderInit("metricsList");
+    goToMetricspage();
   });
 };
 
-// sortableListUI.onItemClick = (metric, index, divRow) => {
-//   ///pop up a windows to edit then when you come back call sortableListUI.updateItem is there is an edit
-//   metric.title += " Updated!";
-//   metric.lastUpdatedOn = new Date();
-//   sortableListUI.updateItem(metric, index, divRow);
-// };
-
-const updateActionItem = (actionItem = {}) => {
-  // actionItem <optional> , options <optional> , callback
+const addActionItem = (actionItem = {}) => {
   return new Promise((resolve, reject) => {
     const options = {
       showIcon: false,
@@ -205,40 +181,11 @@ const updateActionItem = (actionItem = {}) => {
   });
 };
 
-function getCurrentUser() {
-  return new Promise((resolve, reject) => {
-    buildfire.auth.getCurrentUser((err, user) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(user);
-      }
-    });
-  });
-}
-
 // Handle Breadcrumbs
-// Get Breadcrumbs
-const getBreadcrumbs = () => {
-  return new Promise((resolve, reject) => {
-    buildfire.history.get(
-      {
-        pluginBreadcrumbsOnly: true,
-      },
-      (err, result) => {
-        if (err) reject(err);
-        console.info("Current Plugin Breadcrumbs", result);
-        resolve(result);
-      }
-    );
-  });
-};
-
 // Add Breadcrumb
 const pushBreadcrumb = (breadcrumb, data) => {
   return new Promise((resolve, reject) => {
-    // nodeSelector = nodeSelector + `.metrics.id.metrics`
-    buildfire.history.push(breadcrumb, data);
+    // buildfire.history.push(breadcrumb, data);
     breadcrumbsHistory.push(breadcrumb);
     let crumb = document.createElement("span");
     crumb.innerHTML =
@@ -249,44 +196,116 @@ const pushBreadcrumb = (breadcrumb, data) => {
       if (data.nodeSelector === nodeSelector) {
         return;
       }
-      let tre = breadcrumbsHistory.length;
+      let breadLength = breadcrumbsHistory.length;
       console.log("go to ", +crumb.getAttribute("arrayIndex"));
-      for (var i = 0; i < tre - 1 - +crumb.getAttribute("arrayIndex"); i++) {
+      for (
+        let i = 0;
+        i < breadLength - 1 - +crumb.getAttribute("arrayIndex");
+        i++
+      ) {
         bread.removeChild(bread.lastChild);
         breadcrumbsHistory.pop();
       }
       nodeSelector = data.nodeSelector;
-      sortableListUI.init("metrics-list");
-      cancel();
+      sortableListUI.renderInit("metricsList");
+      goToMetricspage();
     };
     bread.appendChild(crumb);
     resolve(true);
   });
 };
 
-// Handle Breadcrumbs
-// const breadcrumbsUI = () => {
-//   getBreadcrumbs().then((data) => {
-//     data.forEach((crumb, i) => {
-//       if (i === 0)
-//         bread.innerHTML += `<span index="${i}">${crumb.title}</span>`;
-//       else bread.innerHTML += `<span index="${i}">/ ${crumb.title}</span>`;
-//     });
-//   });
-// };
+const sortableListUI = {
+  sortableList: null,
+  container: null,
+  tag: "",
+  data: null,
+  id: null,
+  get items() {
+    return sortableListUI.sortableList.items;
+  },
+  /*
+		This method will call the publicData to pull a single object
+		it needs to have an array property called `items` each item need {title, imgUrl}
+	 */
+  renderInit(elementId) {
+    this.container = document.getElementById(elementId);
+    let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+    let currentMetricList = [];
+    for (let metricId in metricsChildren) {
+      metricsChildren[metricId].id = metricId;
+      currentMetricList.push(metricsChildren[metricId]);
+    }
 
-// Remove Breadcrumb
-const popBreadcrumb = () => {
-  return new Promise((resolve, reject) => {
-    nodeSelector = nodeSelector.split();
-    buildfire.history.pop();
-    resolve(true);
-  });
+    if (currentMetricList.length === 0) {
+      this.container.innerHTML = "No items have been added yet.";
+    } else this.container.innerHTML = "";
+
+    currentMetricList.sort((a, b) => a.order - b.order);
+    this.render(currentMetricList);
+  },
+
+  render(items) {
+    let t = this;
+    this.sortableList = new buildfire.components.SortableList(
+      this.container,
+      items || []
+    );
+
+    this.sortableList.onItemClick = (item, divRow) => {
+      if (item.type === "parent") {
+        nodeSelector += `.${item.id}.metrics`;
+        this.renderInit("metricsList");
+        pushBreadcrumb(item.title, { nodeSelector });
+      }
+      // buildfire.notifications.alert({ message: item.title + " clicked" });
+    };
+    this.sortableList.onDeleteItem = (item, index, callback) => {
+      buildfire.notifications.confirm(
+        {
+          message: "Are you sure you want to delete " + item.title + "?",
+          confirmButton: { text: "Delete", key: "y", type: "danger" },
+          cancelButton: { text: "Cancel", key: "n", type: "default" },
+        },
+        (e, data) => {
+          if (e) console.error(e);
+          if (data.selectedButton.key == "y") {
+            sortableListUI.sortableList.items.splice(index, 1);
+            Metrics.delete(
+              { nodeSelector, metricsId: metrics.id },
+              item.id
+            ).then((metric) => {
+              metrics = metric.data;
+              callback(metric);
+            });
+          }
+        }
+      );
+    };
+
+    this.sortableList.onOrderChange = (item, oldIndex, newIndex) => {
+      let orderObj = {};
+      this.container.childNodes.forEach((e) => {
+        const metricId = e.getAttribute("id"),
+          index = parseInt(e.getAttribute("arrayIndex"));
+        orderObj[metricId] = index;
+      });
+      Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
+        .then((metric) => {
+          metrics = metric.data;
+        })
+        .catch(console.log);
+    };
+    this.sortableList.onUpdateItem = (item, index) => {
+      item.lastUpdatedBy = currentUser.firstName;
+      initMetricFields(item);
+      metricForm.style.display = "block";
+      updateMetric.style.display = "inline";
+      createAMetric.style.display = "none";
+      metricsMain.style.display = "none";
+      updateMetric.onclick = () => {
+        updateMetrics(item);
+      };
+    };
+  },
 };
-
-// Listen to breadcrumb history removal
-buildfire.history.onPop((breadcrumb) => {
-  console.log("yalla hey");
-  // Show / Hide views
-  // document.getElementById(breadcrumb.options.elementToShow).style.display = "block";
-});
