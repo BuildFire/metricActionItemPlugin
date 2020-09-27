@@ -13,4 +13,7 @@ const helpers = {
     });
     return metricsChildren;
   },
+  inputAlert: (message) => {
+    buildfire.notifications.alert({ message });
+  },
 };

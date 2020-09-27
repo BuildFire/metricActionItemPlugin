@@ -16,7 +16,7 @@ Metrics.getMetrics().then(async (data) => {
 
   Metrics.getHistoryValue(metrics);
   console.log("laslalss", metrics);
-  if (typeof sortableListUI !== "undefined") {
+  if (typeof Sortable !== "undefined") {
     sortableListUI.renderInit("metricsList");
     pushBreadcrumb("Home", { nodeSelector });
   }
@@ -106,8 +106,14 @@ const onRadioChange = (value) => {
 const createMetric = () => {
   const { title, icon, actionItem, min, max, type } = metricFields;
   // Metric fields validation
-  if (!title) return `Please add a metric title`;
-  if (!Object.keys(actionItem)) return `Please add an action`;
+  if (!title) {
+    helpers.inputAlert("please add metric title");
+    return;
+  }
+  if (Object.keys(actionItem).length === 0) {
+    helpers.inputAlert("Please add an action item");
+    return;
+  }
   if (!icon) return `Please add an icon`;
   if (!type) return "Please select metric type";
 
@@ -132,7 +138,9 @@ const createMetric = () => {
     new Metric(metricFields)
   ).then((metric) => {
     metrics = metric.data;
-    sortableListUI.renderInit("metricsList");
+    if (typeof Sortable !== "undefined") {
+      sortableListUI.renderInit("metricsList");
+    }
     goToMetricspage();
   });
 };
@@ -162,7 +170,9 @@ const updateMetrics = (item) => {
     item.id
   ).then((metric) => {
     metrics = metric.data;
-    sortableListUI.renderInit("metricsList");
+    if (typeof Sortable !== "undefined") {
+      sortableListUI.renderInit("metricsList");
+    }
     goToMetricspage();
   });
 };
@@ -176,7 +186,7 @@ const addActionItem = (actionItem = {}) => {
     buildfire.actionItems.showDialog(actionItem, options, (err, data) => {
       if (err) reject(err);
 
-      metricFields["actionItem"] = data;
+      metricFields["actionItem"] = data || {};
     });
   });
 };
@@ -207,7 +217,9 @@ const pushBreadcrumb = (breadcrumb, data) => {
         breadcrumbsHistory.pop();
       }
       nodeSelector = data.nodeSelector;
-      sortableListUI.renderInit("metricsList");
+      if (typeof Sortable !== "undefined") {
+        sortableListUI.renderInit("metricsList");
+      }
       goToMetricspage();
     };
     bread.appendChild(crumb);
@@ -255,7 +267,9 @@ const sortableListUI = {
     this.sortableList.onItemClick = (item, divRow) => {
       if (item.type === "parent") {
         nodeSelector += `.${item.id}.metrics`;
-        this.renderInit("metricsList");
+        if (typeof Sortable !== "undefined") {
+          sortableListUI.renderInit("metricsList");
+        }
         pushBreadcrumb(item.title, { nodeSelector });
       }
       // buildfire.notifications.alert({ message: item.title + " clicked" });
