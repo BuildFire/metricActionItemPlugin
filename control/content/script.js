@@ -6,6 +6,10 @@ let breadcrumbsHistory = [];
 let metricFields;
 let currentUser = {};
 
+// SortableList variables
+let sortableList = null;
+let metricsContainer = null;
+
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
@@ -17,8 +21,10 @@ Metrics.getMetrics().then(async (data) => {
   Metrics.getHistoryValue(metrics);
   console.log("laslalss", metrics);
   if (typeof Sortable !== "undefined") {
-    sortableListUI.renderInit("metricsList");
-    pushBreadcrumb("Home", { nodeSelector });
+    await Settings.load().then(() => {
+      renderInit("metricsList");
+      pushBreadcrumb("Home", { nodeSelector });
+    });
   }
 });
 
@@ -139,7 +145,7 @@ const createMetric = () => {
   ).then((metric) => {
     metrics = metric.data;
     if (typeof Sortable !== "undefined") {
-      sortableListUI.renderInit("metricsList");
+      renderInit("metricsList");
     }
     goToMetricspage();
   });
@@ -171,7 +177,7 @@ const updateMetrics = (item) => {
   ).then((metric) => {
     metrics = metric.data;
     if (typeof Sortable !== "undefined") {
-      sortableListUI.renderInit("metricsList");
+      renderInit("metricsList");
     }
     goToMetricspage();
   });
@@ -218,7 +224,7 @@ const pushBreadcrumb = (breadcrumb, data) => {
       }
       nodeSelector = data.nodeSelector;
       if (typeof Sortable !== "undefined") {
-        sortableListUI.renderInit("metricsList");
+        renderInit("metricsList");
       }
       goToMetricspage();
     };
@@ -227,99 +233,93 @@ const pushBreadcrumb = (breadcrumb, data) => {
   });
 };
 
-const sortableListUI = {
-  sortableList: null,
-  container: null,
-  tag: "",
-  data: null,
-  id: null,
-  get items() {
-    return sortableListUI.sortableList.items;
-  },
-  /*
-		This method will call the publicData to pull a single object
-		it needs to have an array property called `items` each item need {title, imgUrl}
-	 */
-  renderInit(elementId) {
-    this.container = document.getElementById(elementId);
-    let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
-    let currentMetricList = [];
-    for (let metricId in metricsChildren) {
-      metricsChildren[metricId].id = metricId;
-      currentMetricList.push(metricsChildren[metricId]);
-    }
+// SortableList component
+const renderInit = (elementId) => {
+  metricsContainer = document.getElementById(elementId);
+  let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+  let currentMetricList = [];
+  for (let metricId in metricsChildren) {
+    metricsChildren[metricId].id = metricId;
+    currentMetricList.push(metricsChildren[metricId]);
+  }
 
-    if (currentMetricList.length === 0) {
-      this.container.innerHTML = "No items have been added yet.";
-    } else this.container.innerHTML = "";
+  if (currentMetricList.length === 0) {
+    metricsContainer.innerHTML = "No items have been added yet.";
+  } else metricsContainer.innerHTML = "";
 
+  console.log("Settings.sortBy", Settings.sortBy);
+
+  if (Settings.sortBy === "heighest") {
+    currentMetricList.sort((a, b) => b.value - a.value);
+  } else if (Settings.sortBy === "lowest") {
+    currentMetricList.sort((a, b) => a.value - b.value);
+  } else {
     currentMetricList.sort((a, b) => a.order - b.order);
-    this.render(currentMetricList);
-  },
+  }
 
-  render(items) {
-    let t = this;
-    this.sortableList = new buildfire.components.SortableList(
-      this.container,
-      items || []
-    );
+  render(currentMetricList);
+};
 
-    this.sortableList.onItemClick = (item, divRow) => {
-      if (item.type === "parent") {
-        nodeSelector += `.${item.id}.metrics`;
-        if (typeof Sortable !== "undefined") {
-          sortableListUI.renderInit("metricsList");
-        }
-        pushBreadcrumb(item.title, { nodeSelector });
+const render = (items) => {
+  sortableList = new buildfire.components.SortableList(
+    metricsContainer,
+    items || []
+  );
+
+  sortableList.onItemClick = (item, divRow) => {
+    if (item.type === "parent") {
+      nodeSelector += `.${item.id}.metrics`;
+      if (typeof Sortable !== "undefined") {
+        renderInit("metricsList");
       }
-      // buildfire.notifications.alert({ message: item.title + " clicked" });
-    };
-    this.sortableList.onDeleteItem = (item, index, callback) => {
-      buildfire.notifications.confirm(
-        {
-          message: "Are you sure you want to delete " + item.title + "?",
-          confirmButton: { text: "Delete", key: "y", type: "danger" },
-          cancelButton: { text: "Cancel", key: "n", type: "default" },
-        },
-        (e, data) => {
-          if (e) console.error(e);
-          if (data.selectedButton.key == "y") {
-            sortableListUI.sortableList.items.splice(index, 1);
-            Metrics.delete(
-              { nodeSelector, metricsId: metrics.id },
-              item.id
-            ).then((metric) => {
+      pushBreadcrumb(item.title, { nodeSelector });
+    }
+  };
+  sortableList.onDeleteItem = (item, index, callback) => {
+    buildfire.notifications.confirm(
+      {
+        message: "Are you sure you want to delete " + item.title + "?",
+        confirmButton: { text: "Delete", key: "y", type: "danger" },
+        cancelButton: { text: "Cancel", key: "n", type: "default" },
+      },
+      (e, data) => {
+        if (e) console.error(e);
+        if (data.selectedButton.key == "y") {
+          sortableList.items.splice(index, 1);
+          Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
+            (metric) => {
               metrics = metric.data;
               callback(metric);
-            });
-          }
+            }
+          );
         }
-      );
-    };
+      }
+    );
+  };
 
-    this.sortableList.onOrderChange = (item, oldIndex, newIndex) => {
-      let orderObj = {};
-      this.container.childNodes.forEach((e) => {
-        const metricId = e.getAttribute("id"),
-          index = parseInt(e.getAttribute("arrayIndex"));
-        orderObj[metricId] = index;
-      });
-      Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
-        .then((metric) => {
-          metrics = metric.data;
-        })
-        .catch(console.log);
+  sortableList.onOrderChange = (item, oldIndex, newIndex) => {
+    let orderObj = {};
+    metricsContainer.childNodes.forEach((e) => {
+      const metricId = e.getAttribute("id"),
+        index = parseInt(e.getAttribute("arrayIndex"));
+      orderObj[metricId] = index;
+    });
+    Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
+      .then((metric) => {
+        metrics = metric.data;
+      })
+      .catch(console.log);
+  };
+
+  sortableList.onUpdateItem = (item, index) => {
+    item.lastUpdatedBy = currentUser.firstName;
+    initMetricFields(item);
+    metricForm.style.display = "block";
+    updateMetric.style.display = "inline";
+    createAMetric.style.display = "none";
+    metricsMain.style.display = "none";
+    updateMetric.onclick = () => {
+      updateMetrics(item);
     };
-    this.sortableList.onUpdateItem = (item, index) => {
-      item.lastUpdatedBy = currentUser.firstName;
-      initMetricFields(item);
-      metricForm.style.display = "block";
-      updateMetric.style.display = "inline";
-      createAMetric.style.display = "none";
-      metricsMain.style.display = "none";
-      updateMetric.onclick = () => {
-        updateMetrics(item);
-      };
-    };
-  },
+  };
 };

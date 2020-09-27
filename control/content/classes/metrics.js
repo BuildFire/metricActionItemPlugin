@@ -39,6 +39,7 @@ class Metrics {
       metric.value = val;
       return val;
     } else if (metric.type === "parent" || !metric.type) {
+      // if (Object.keys(metric.metrics).length === 0) return 0;
       if (metric.metrics) {
         let sum = 0;
         for (let key in metric.metrics) {
