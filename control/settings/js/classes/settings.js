@@ -1,23 +1,24 @@
 class Settings {
-  constructor(data = {}) {
-    this.sortBy = data.sortBy || "";
-    this.showSummary = data.showSummary || true;
-    this.tags = data.tags || [];
+  constructor() {
+    this.sortBy;
+    this.showSummary;
+    this.tags;
   }
 
-  static get() {
+  static load() {
     return new Promise((resolve, reject) => {
       buildfire.datastore.get("settings", (err, data) => {
+        console.log(data);
         if (err) reject(err);
-        else resolve(data);
+        else {
+          this.sortBy = data.data.sortBy;
+          this.tags = data.data.tags;
+          this.showSummary =
+            data.data.showSummary === false ? data.data.showSummary : true;
+          resolve(data);
+        }
       });
     });
-  }
-
-  static set(data) {
-    this.sortBy = data.sortBy;
-    this.showSummary = data.showSummary;
-    this.tags = data.tags;
   }
 
   static save() {
@@ -27,7 +28,6 @@ class Settings {
       showSummary: this.showSummary,
     };
 
-    console.log("settings", settings);
     return new Promise((resolve, reject) => {
       buildfire.datastore.save(settings, "settings", (err, data) => {
         if (err) reject(err);

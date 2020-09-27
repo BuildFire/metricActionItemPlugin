@@ -158,26 +158,26 @@ describe("Test The Control Side", () => {
 
   describe("Test the Settings class", () => {
     beforeAll(() => {
-      let data = {
-        tags: ["admin", "moderator", "users"],
-        sortBy: "lowest",
-        showSummary: false,
-      };
-      newSettings = new Settings(data);
+      Settings.tags = [
+        { id: "5f56bb9355f6b40645e2daeb", tagName: "admin" },
+        { id: "5f56bb9355f6b40635e2daeb", tagName: "user" },
+      ];
+      Settings.sortBy = "lowest";
+      Settings.showSummary = false;
     });
 
     it("Should instantiate an object correctly", () => {
-      expect(newSettings.sortBy).toBe("lowest");
+      expect(Settings.sortBy).toBe("lowest");
     });
 
     it("Should save new settings in the datastore", async () => {
-      await newSettings.save().then((data) => {
+      await Settings.save().then((data) => {
         expect(data).toBeTruthy();
       });
     });
 
     it("Should get settings from the datastore correctly", async () => {
-      await Settings.get().then((result) => {
+      await Settings.load().then((result) => {
         expect(result.data.showSummary).toBeFalse();
       });
     });

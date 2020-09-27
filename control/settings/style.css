@@ -1,0 +1,10 @@
+.show-summary-lable {
+  display: block;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+
+.show-summary-input {
+  position: relative;
+  top: 13px;
+}
