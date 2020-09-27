@@ -22,7 +22,13 @@ class Metric {
       let val = metric.history[metric.history.length - 1]
         ? metric.history[metric.history.length - 1].value
         : 0;
+      // Get metric Previous value
+      let previousVal = metric.history[metric.history.length - 2]
+      ? metric.history[metric.history.length - 2].value
+      : 0;
+
       metric.value = val;
+      metric.previousVal = previousVal;
       return val;
     } else if (metric.type === "parent" || !metric.type) {
       if (metric.metrics) {

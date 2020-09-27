@@ -15,6 +15,12 @@
       type="text/javascript"
     ></script>
 
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
     <!-- build:bundleWidgetBFMinJS  -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
@@ -41,6 +47,14 @@
     <!-- endbuild -->
   </head>
   <body>
+    <div style="padding: 10px">
+      <div class="mdc-card summary-card" style="padding: 20px; text-align: center;">
+        <div class="mdc-card-wrapper__text-section">
+          <div class="card__title" id="summaryValue"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="listViewContainer"></div>
 
     <!-- <div class="padded">

@@ -57,8 +57,10 @@ class ListViewItem {
     this.title = obj.title;
     this.icon = obj.icon;
     this.description = obj.description;
-    this.value = obj.value || 1;
+    this.value = obj.value || 0;
     this.data = obj.data;
+    this.previousVal = obj.previousVal;
+    this.actionItem = obj.actionItem;
   }
 
   toRawData() {
@@ -69,6 +71,8 @@ class ListViewItem {
       description: this.description,
       value: this.value,
       data: this.data,
+      previousVal: this.previousVal,
+      actionItem: this.actionItem,
     };
   }
 
@@ -120,16 +124,29 @@ class ListViewItem {
     let t = this;
     console.log("this.value", this.value);
 
-    if (this.value) {
-      console.log("this.value", this.value);
+    if (this.value === 0 || this.value) {
       let listViewItemToolbar = ui.create("div", card, null, [
         "listViewItemToolbar",
       ]);
-      let i = ui.create("span", listViewItemToolbar, `${this.value}%`, [
+      // Add icon
+      if (this.value > this.previousVal) {
+        ui.create("i", listViewItemToolbar, "north", [
+          "material-icons",
+          "mdc-button__icon",
+        ]);
+      } else if (this.value < this.previousVal) {
+        ui.create("i", listViewItemToolbar, "south", [
+          "material-icons",
+          "mdc-button__icon",
+        ]);
+      }
+
+      ui.create("span", listViewItemToolbar, `${this.value}%`, [
         "listViewItemToolbarItem",
-        "valueDesign",
+        "value",
       ]);
-      i.onclick = (e) => {
+
+      listViewItemToolbar.onclick = (e) => {
         t.onToolbarClicked("btnBadge", t, e);
         e.preventDefault();
         e.stopPropagation();
@@ -143,6 +160,7 @@ class ListViewItem {
   onToolbarClicked(key, item) {}
 
   update() {
+
     this.render(this.container, this.card);
   }
 }
