@@ -148,28 +148,7 @@ class ListViewItem {
       ]);
 
       listViewItemToolbar.onclick = (e) => {
-        // update the node selector
-        // if parent: nodeselector = nodeselector += '.id.metrics'
-        // if child: nodeselector = nodeselector += '.id'
-
-        // check for the type
-        // if parent load the next metrics
-        // if metric go to chart page
-
-        // Add onclick funtionality
-        let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
-        let currentMetricList = [];
-        // Prepare metrics to be rendered (Object to Array)
-        for (let metricId in metricsChildren) {
-          metricsChildren[metricId].id = metricId;
-          currentMetricList.push(metricsChildren[metricId]);
-        }
-
-        // then this function should update the data
-
-        loadListViewItems(currentMetricList);
-
-        // t.onToolbarClicked("btnBadge", t, e);
+        t.onToolbarClicked("btnBadge", t, e);
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -179,7 +158,9 @@ class ListViewItem {
     return card;
   }
 
-  onToolbarClicked(key, item) {}
+  onToolbarClicked(key, item) {
+    console.log("come on", key, item);
+  }
 
   update() {
     this.render(this.container, this.card);
