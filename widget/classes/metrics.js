@@ -3,11 +3,11 @@ class Metrics {
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", async (err, data) => {
+      buildfire.publicData.get("metrics", async (err, result) => {
         if (err) reject(err);
         else {
           // Check if there is already objects in the database
-          if (!data.data.metrics) {
+          if (!result.data.metrics) {
             // If there is no object, then create the parent object
             await buildfire.publicData.save(
               { metrics: {} },
@@ -15,14 +15,15 @@ class Metrics {
               async (err, result) => {
                 if (err) reject(err);
                 else {
-                  await this.getMetrics().then((data) => {
-                    resolve(data);
+                  await this.getMetrics().then((result) => {
+                    resolve(result);
                   });
                 }
               }
             );
           } else {
-            resolve(data);
+            result.data.id = result.id;
+            resolve(result.data);
           }
         }
       });
@@ -46,7 +47,7 @@ class Metrics {
           },
         },
         "metrics",
-        (err, data) => {
+        async (err, data) => {
           if (err) reject(err);
           if (data.nModified === 0) {
             buildfire.publicData.update(
@@ -64,9 +65,12 @@ class Metrics {
                 },
               },
               "metrics",
-              async (err, data) => {
+              async (err, result) => {
                 if (err) reject(err);
-                else resolve(data);
+                else {
+                  result.data.id = result.id;
+                  resolve(result.data);
+                }
               }
             );
           }
@@ -75,7 +79,11 @@ class Metrics {
           updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
           // Track action
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
-          resolve(data);
+
+          await Metrics.getMetrics().then((result) => {
+            result.id = result.id;
+            resolve(result.data);
+          });
         }
       );
     });

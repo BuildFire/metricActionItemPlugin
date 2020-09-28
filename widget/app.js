@@ -2,31 +2,32 @@ let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 let currentUser;
-let lv;
+let listViewContainer;
 authManager.getCurrentUser().then((user) => {
-  console.log("authManager.currentUser", user);
   currentUser = user;
 });
 
 var e = buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
-    console.log("it passes");
     metrics = event.data;
-    metrics.id = event.id;
     renderInit();
   }
 });
 
 Metrics.getMetrics().then(async (data) => {
-  metrics = data.data;
-  metrics.id = data.id;
+  metrics = data;
 
   console.log("laslalss", metrics);
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
       renderInit();
     }
-    // pushBreadcrumb("Home", { nodeSelector });
+
+    buildfire.history.push("Home", {
+      nodeSelector,
+      showLabelInTitlebar: true,
+      elementToShow: "#2014Top10",
+    });
   });
 });
 buildfire.messaging.onReceivedMessage = (msg) => {
@@ -35,37 +36,21 @@ buildfire.messaging.onReceivedMessage = (msg) => {
     location.reload();
 };
 if (typeof ListView !== "undefined") {
-  lv = new ListView("listViewContainer", {
+  listViewContainer = new ListView("listViewContainer", {
     enableAddButton: true,
     Title: "",
   });
-  lv.onAddButtonClicked = () => {
-    let item = new ListViewItem({
-      title: "Title 1",
-      description:
-        "Here is my really long description. Here is my really long description. Here is my really long description. ",
-      imageUrl: "https://img.icons8.com/officel/2x/worldwide-location.png",
-    });
 
-    lv.addItem(item);
-  };
-
-  lv.onItemClicked = (item) => {
-    //open and maybe edit
-    // item.title = "Updated " + new Date().toLocaleTimeString();
-    // Check if the item have an action
-
+  listViewContainer.onItemClicked = (item) => {
     if (Object.keys(item.actionItem).length > 0) {
       buildfire.actionItems.execute(item.actionItem, () => {
         console.log("DONE DSADSA");
       });
     }
-
-    // item.update();
   };
 }
 
-function renderInit() {
+const renderInit = () => {
   listViewContainer.innerHTML = "";
 
   let currentMetricList = [];
@@ -84,5 +69,5 @@ function renderInit() {
     sum / Object.keys(metrics.metrics).length
   }%`;
 
-  lv.loadListViewItems(currentMetricList);
-}
+  listViewContainer.loadListViewItems(currentMetricList);
+};

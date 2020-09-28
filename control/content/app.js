@@ -18,8 +18,7 @@ authManager.getCurrentUser().then((user) => {
 });
 
 Metrics.getMetrics().then(async (result) => {
-  metrics = result.data;
-  metrics.id = result.id;
+  metrics = result;
 
   // Metrics.getHistoryValue(metrics);
   console.log("All metrics", metrics);
@@ -138,8 +137,8 @@ const createMetric = () => {
         metricsId: metrics.id,
       },
       new Metric(metricFields)
-    ).then((metric) => {
-      metrics = metric.data;
+    ).then((result) => {
+      metrics = result;
       if (typeof Sortable !== "undefined") {
         renderInit("metricsList");
       }
@@ -208,8 +207,8 @@ const updateMetrics = (item) => {
       { nodeSelector, metricsId: metrics.id },
       updateObj,
       item.id
-    ).then((metric) => {
-      metrics = metric.data;
+    ).then((result) => {
+      metrics = result;
       if (typeof Sortable !== "undefined") {
         renderInit("metricsList");
       }
@@ -327,9 +326,9 @@ const render = (items) => {
         if (data.selectedButton.key == "y") {
           sortableList.items.splice(index, 1);
           Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
-            (metric) => {
-              metrics = metric.data;
-              callback(metric);
+            (result) => {
+              metrics = result;
+              callback(metrics);
             }
           );
         }
@@ -345,8 +344,8 @@ const render = (items) => {
       orderObj[metricId] = index;
     });
     Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
-      .then((metric) => {
-        metrics = metric.data;
+      .then((result) => {
+        metrics = result;
       })
       .catch(console.log);
   };

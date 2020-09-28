@@ -23,9 +23,7 @@ describe("Test The Control Side", () => {
   describe("Test the Metrics class", () => {
     beforeAll(async () => {
       // Delete all the existed data and start from scratch
-      await deleteEverything().then(async (data) => {
-        console.log("Delete all data", data);
-      });
+      await deleteEverything().then(async (data) => {});
 
       await Metrics.getMetrics().then((data) => {
         metrics = data;
@@ -112,6 +110,7 @@ describe("Test The Control Side", () => {
     });
 
     it("Should save metrics correctly", async () => {
+      // console.log("metrics IDDDDDDDD", metrics);
       await expectAsync(
         Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric1)
       ).toBeResolved();
@@ -121,9 +120,8 @@ describe("Test The Control Side", () => {
       await expectAsync(
         Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric3)
       ).toBeResolved();
-      await Metrics.getMetrics().then((data) => {
-        metrics = data.data;
-        metrics.id = data.id;
+      await Metrics.getMetrics().then((result) => {
+        metrics = result;
       });
     });
 

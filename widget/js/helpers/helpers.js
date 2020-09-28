@@ -4,4 +4,18 @@ const helpers = {
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
   // Return absolute date
   getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
+  nodeSplitter: (nodeSelector, metrics) => {
+    let splittedNode = nodeSelector.split(".");
+    let metricsChildren = metrics;
+    console.log("metricsChildren", metricsChildren);
+    splittedNode.forEach((item) => {
+      console.log(" metricsChildren = metricsChildren[item];", item);
+
+      metricsChildren = metricsChildren[item];
+    });
+    return metricsChildren;
+  },
+  inputAlert: (message) => {
+    buildfire.notifications.alert({ message });
+  },
 };

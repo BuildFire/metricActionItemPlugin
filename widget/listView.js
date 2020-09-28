@@ -12,16 +12,16 @@ class ListView {
   }
   loadListViewItems(items) {
     if (this.container.innerHTML == "") {
-      if (this.options.enableAddButton) {
-        let addButton = ui.create("button", this.container, "<span></span>", [
-          "listViewAddButton",
-          "btn",
-          "btn--add",
-          "btn--fab",
-          "btn-primary",
-        ]);
-        addButton.onclick = this.onAddButtonClicked;
-      }
+      // if (this.options.enableAddButton) {
+      //   let addButton = ui.create("button", this.container, "<span></span>", [
+      //     "listViewAddButton",
+      //     "btn",
+      //     "btn--add",
+      //     "btn--fab",
+      //     "btn-primary",
+      //   ]);
+      //   addButton.onclick = this.onAddButtonClicked;
+      // }
     }
     items.forEach((item) => this.addItem(item));
   }
@@ -128,6 +128,7 @@ class ListViewItem {
       let listViewItemToolbar = ui.create("div", card, null, [
         "listViewItemToolbar",
       ]);
+
       // Add icon
       if (this.value > this.previousVal) {
         ui.create("i", listViewItemToolbar, "north", [
@@ -147,7 +148,28 @@ class ListViewItem {
       ]);
 
       listViewItemToolbar.onclick = (e) => {
-        t.onToolbarClicked("btnBadge", t, e);
+        // update the node selector
+        // if parent: nodeselector = nodeselector += '.id.metrics'
+        // if child: nodeselector = nodeselector += '.id'
+
+        // check for the type
+        // if parent load the next metrics
+        // if metric go to chart page
+
+        // Add onclick funtionality
+        let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+        let currentMetricList = [];
+        // Prepare metrics to be rendered (Object to Array)
+        for (let metricId in metricsChildren) {
+          metricsChildren[metricId].id = metricId;
+          currentMetricList.push(metricsChildren[metricId]);
+        }
+
+        // then this function should update the data
+
+        loadListViewItems(currentMetricList);
+
+        // t.onToolbarClicked("btnBadge", t, e);
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -160,7 +182,6 @@ class ListViewItem {
   onToolbarClicked(key, item) {}
 
   update() {
-
     this.render(this.container, this.card);
   }
 }
