@@ -1,25 +1,29 @@
+// The big object that contains all the metrics
 let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
+// To save breadcrumb related data
 let breadcrumbsHistory = [];
-// initialize metric fields;
+// Initialize metric fields (For add/edit pages' forms)
 let metricFields;
 let currentUser = {};
 
-// SortableList variables
+// SortableList variables (used to manage draggable list)
 let sortableList = null;
 let metricsContainer = null;
 
+// Get the logged in user
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
 
-Metrics.getMetrics().then(async (data) => {
-  metrics = data.data;
-  metrics.id = data.id;
+Metrics.getMetrics().then(async (result) => {
+  metrics = result.data;
+  metrics.id = result.id;
 
-  Metrics.getHistoryValue(metrics);
-  console.log("laslalss", metrics);
+  // Metrics.getHistoryValue(metrics);
+  console.log("All metrics", metrics);
+  // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
     await Settings.load().then(() => {
       renderInit("metricsList");
@@ -27,7 +31,7 @@ Metrics.getMetrics().then(async (data) => {
     });
   }
 });
-
+// Initialize add/edit Forms' Fields
 const initMetricFields = (data = {}) => {
   metricFields = {
     title: data.title || "",
@@ -59,6 +63,7 @@ const initMetricFields = (data = {}) => {
   }
 };
 
+// Initialize metric's icon
 const initIconComponent = (imageUrl = "") => {
   let thumbnail;
   thumbnail = new buildfire.components.images.thumbnail("#icon", {
@@ -76,14 +81,17 @@ const initIconComponent = (imageUrl = "") => {
   };
 };
 
+// Go to Add metric's form page
 function goToAddItem() {
   metricForm.style.display = "block";
   metricsMain.style.display = "none";
   createAMetric.style.display = "inline";
   updateMetric.style.display = "none";
-  // Reset input field to it's initial value after saving it in the database
+  // Reset input field to it's initial values
   initMetricFields();
 }
+
+// Go to metrics page from add/edit pages
 function goToMetricspage() {
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
@@ -91,10 +99,12 @@ function goToMetricspage() {
   updateMetric.style.display = "none";
 }
 
-const onFieldChange = (field) => {
-  metricFields[field] = document.getElementById(field).value;
+// Handle Input fields values' changes
+const onFieldChange = (ele) => {
+  metricFields[ele.id] = ele.value;
 };
 
+// Handle Input fields values' changes (Radio buttons)
 const onRadioChange = (value) => {
   metricFields["type"] = value;
 
@@ -110,77 +120,102 @@ const onRadioChange = (value) => {
 };
 
 const createMetric = () => {
-  const { title, icon, actionItem, min, max, type } = metricFields;
   // Metric fields validation
+  if (inputValidation()) {
+    // Empty the form fields after submitting
+    metricFields.createdBy = currentUser.firstName;
+    metricFields.lastUpdatedBy = currentUser.firstName;
+    metricFields.order = metricsList.childNodes.length;
+    console.log(
+      "everything",
+      nodeSelector,
+      metrics.id,
+      new Metric(metricFields)
+    );
+    Metrics.insert(
+      {
+        nodeSelector,
+        metricsId: metrics.id,
+      },
+      new Metric(metricFields)
+    ).then((metric) => {
+      metrics = metric.data;
+      if (typeof Sortable !== "undefined") {
+        renderInit("metricsList");
+      }
+      goToMetricspage();
+    });
+  }
+};
+
+const inputValidation = () => {
+  const { title, icon, actionItem, min, max, type } = metricFields;
+
   if (!title) {
     helpers.inputAlert("please add metric title");
-    return;
+    return false;
   }
   if (Object.keys(actionItem).length === 0) {
     helpers.inputAlert("Please add an action item");
-    return;
+    return false;
   }
-  if (!icon) return `Please add an icon`;
-  if (!type) return "Please select metric type";
-
+  if (!icon) {
+    helpers.inputAlert("Please add icon");
+    return false;
+  }
+  if (!type) {
+    helpers.inputAlert("Please add metric type");
+    return false;
+  }
   if (type === "parent") {
     delete metricFields.min;
     delete metricFields.max;
   } else if (type === "metric") {
-    if (min !== 0 && !min) return `Please add a max value`;
-    if (max !== 0 && !max) return `Please add a min value`;
-  }
-
-  // Empty the form fields after submitting
-  metricFields.createdBy = currentUser.firstName;
-  metricFields.lastUpdatedBy = currentUser.firstName;
-  metricFields.order = metricsList.childNodes.length;
-  console.log("everything", nodeSelector, metrics.id, new Metric(metricFields));
-  Metrics.insert(
-    {
-      nodeSelector,
-      metricsId: metrics.id,
-    },
-    new Metric(metricFields)
-  ).then((metric) => {
-    metrics = metric.data;
-    if (typeof Sortable !== "undefined") {
-      renderInit("metricsList");
+    if (min !== 0 && !min) {
+      helpers.inputAlert("Please add min value");
+      return false;
     }
-    goToMetricspage();
-  });
+    if (max !== 0 && !max) {
+      helpers.inputAlert("Please add max value");
+      return false;
+    }
+  }
+  return true;
 };
 
 const updateMetrics = (item) => {
-  let updateObj = {};
-  for (let prop in metricFields) {
-    if (metricFields[prop] !== item[prop]) {
-      updateObj[prop] = metricFields[prop];
-      console.log("thus is", prop, metricFields[prop]);
+  // Metric fields validation
+  if (inputValidation()) {
+    let updateObj = {};
+    for (let prop in metricFields) {
+      // To determine what fileds are needed to be updated
+      if (metricFields[prop] !== item[prop]) {
+        updateObj[prop] = metricFields[prop];
+        console.log("thus is", prop, metricFields[prop]);
+      }
     }
-  }
-  if (
-    updateObj.type === "parent" ||
-    (updateObj.type !== "metric" && item.type === "parent")
-  ) {
-    delete metricFields.min;
-    delete metricFields.max;
-  } else if (updateObj.type === "metric" && item.type === "parent") {
-    updateObj.max = item.type.max;
-    updateObj.min = item.type.min;
-  }
-
-  Metrics.update(
-    { nodeSelector, metricsId: metrics.id },
-    updateObj,
-    item.id
-  ).then((metric) => {
-    metrics = metric.data;
-    if (typeof Sortable !== "undefined") {
-      renderInit("metricsList");
+    if (
+      updateObj.type === "parent" ||
+      (updateObj.type !== "metric" && item.type === "parent")
+    ) {
+      delete metricFields.min;
+      delete metricFields.max;
+    } else if (updateObj.type === "metric" && item.type === "parent") {
+      updateObj.max = item.type.max;
+      updateObj.min = item.type.min;
     }
-    goToMetricspage();
-  });
+    Metrics.update(
+      { nodeSelector, metricsId: metrics.id },
+      updateObj,
+      item.id
+    ).then((metric) => {
+      metrics = metric.data;
+      if (typeof Sortable !== "undefined") {
+        renderInit("metricsList");
+      }
+      goToMetricspage();
+    });
+  }
 };
 
 const addActionItem = (actionItem = {}) => {
@@ -198,7 +233,6 @@ const addActionItem = (actionItem = {}) => {
 };
 
 // Handle Breadcrumbs
-// Add Breadcrumb
 const pushBreadcrumb = (breadcrumb, data) => {
   return new Promise((resolve, reject) => {
     // buildfire.history.push(breadcrumb, data);
@@ -234,10 +268,13 @@ const pushBreadcrumb = (breadcrumb, data) => {
 };
 
 // SortableList component
+// To initialize and prepare metrics to be rendered
 const renderInit = (elementId) => {
   metricsContainer = document.getElementById(elementId);
+  // Extract the desired metrics (children) from the big object using nodeSelector
   let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
   let currentMetricList = [];
+  // Prepare metrics to be rendered (Object to Array)
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
     currentMetricList.push(metricsChildren[metricId]);
@@ -249,7 +286,7 @@ const renderInit = (elementId) => {
 
   console.log("Settings.sortBy", Settings.sortBy);
 
-  if (Settings.sortBy === "heighest") {
+  if (Settings.sortBy === "highest") {
     currentMetricList.sort((a, b) => b.value - a.value);
   } else if (Settings.sortBy === "lowest") {
     currentMetricList.sort((a, b) => a.value - b.value);
@@ -260,12 +297,14 @@ const renderInit = (elementId) => {
   render(currentMetricList);
 };
 
+// To render metrics
 const render = (items) => {
   sortableList = new buildfire.components.SortableList(
     metricsContainer,
     items || []
   );
 
+  // Overwrite the generic method (onItemClick) (on metric's title click)
   sortableList.onItemClick = (item, divRow) => {
     if (item.type === "parent") {
       nodeSelector += `.${item.id}.metrics`;
@@ -275,6 +314,7 @@ const render = (items) => {
       pushBreadcrumb(item.title, { nodeSelector });
     }
   };
+  // Overwrite the generic method (onDeleteItem)
   sortableList.onDeleteItem = (item, index, callback) => {
     buildfire.notifications.confirm(
       {
@@ -296,7 +336,7 @@ const render = (items) => {
       }
     );
   };
-
+  // Overwrite the generic method (onOrderChange)
   sortableList.onOrderChange = (item, oldIndex, newIndex) => {
     let orderObj = {};
     metricsContainer.childNodes.forEach((e) => {

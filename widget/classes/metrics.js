@@ -48,7 +48,6 @@ class Metrics {
         "metrics",
         (err, data) => {
           if (err) reject(err);
-
           if (data.nModified === 0) {
             buildfire.publicData.update(
               metricsId,

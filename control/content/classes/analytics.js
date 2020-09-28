@@ -11,4 +11,7 @@ class Analytics {
       { silentNotification }
     );
   }
+  static trackAction(key, data = {}) {
+    buildfire.analytics.trackAction(key, data);
+  }
 }

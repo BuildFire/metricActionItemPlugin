@@ -1,4 +1,4 @@
-class Setting {
+class Settings {
   constructor() {
     this.sortBy;
     this.showSummary;
@@ -16,21 +16,6 @@ class Setting {
             data.data.showSummary === false ? data.data.showSummary : true;
           resolve(data);
         }
-      });
-    });
-  }
-
-  static save() {
-    let settings = {
-      tags: this.tags,
-      sortBy: this.sortBy,
-      showSummary: this.showSummary,
-    };
-
-    return new Promise((resolve, reject) => {
-      buildfire.datastore.save(settings, "settings", (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
       });
     });
   }

@@ -30,28 +30,6 @@ class Metrics {
     });
   }
 
-  // A recurcive function that calculates the value of each metric
-  static getHistoryValue(metric) {
-    if (metric.type === "metric") {
-      let val = metric.history[metric.history.length - 1]
-        ? metric.history[metric.history.length - 1].value
-        : 0;
-      metric.value = val;
-      return val;
-    } else if (metric.type === "parent" || !metric.type) {
-      // if (Object.keys(metric.metrics).length === 0) return 0;
-      if (metric.metrics) {
-        let sum = 0;
-        for (let key in metric.metrics) {
-          sum += this.getHistoryValue(metric.metrics[key]);
-        }
-        let avg = sum / Object.keys(metric.metrics).length;
-        metric.value = avg;
-        return avg;
-      }
-    }
-  }
-
   // Add new metrics in the big object (Control Panel Only)
   static insert({ nodeSelector, metricsId }, metric) {
     metric.id = helpers.uuidv4();

@@ -16,7 +16,7 @@
     "customTabs": [
       {
         "title": "Tests",
-        "url": "tests/index.html"
+        "url": "tests/control.html"
       }
     ]
   },
