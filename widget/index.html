@@ -37,7 +37,7 @@
     <!-- endbuild -->
 
     <!-- build:bundleCSSFiles  -->
-    <link rel="stylesheet" type="text/css" href="css/a.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="css/a.css" /> -->
     <link rel="stylesheet" type="text/css" href="css/b.css" />
     <link rel="stylesheet" href="listView.css" />
 
@@ -57,8 +57,19 @@
 
     <div id="listViewContainer"></div>
 
-    <div id="updateHistoryContainer"></div>
+    <div id="progressbarContainer">
+      <div id="updateHistoryContainer"></div>
 
+      <div class="form-group">
+        <button class="mdc-button mdc-button--raised" id="updateHistoryBtn">
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true"
+            >system_update_alt</i
+          >
+          <span class="mdc-button__label">Update</span>
+        </button>
+      </div>
+    </div>
     <!-- <div class="padded">
       <h3 bfString="screenOne.welcomeMessage">Widget - Hello, world!</h3>
       <p>Samples</p>

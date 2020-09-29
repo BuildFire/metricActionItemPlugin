@@ -1,12 +1,23 @@
 span {
   font-size: x-large;
 }
+
+#progressbarContainer {
+  padding: 40px;
+}
 #updateHistoryContainer {
-  margin: 40px;
-  width: 200px;
-  height: 100px;
+  width: 100%;
 }
 
-#updateHistoryContainer {
+#progressbarContainer {
   display: none;
+}
+
+#progressbarContainer .form-group {
+  text-align: center;
+  padding: 40px 0 0 0;
+}
+
+#progressbarContainer .form-group button {
+  padding: 25px 20px;
 }

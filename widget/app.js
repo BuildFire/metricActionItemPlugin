@@ -75,8 +75,6 @@ const renderInit = () => {
     sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
     listItem.onToolbarClicked = (e) => {
-      console.log("metricsChildren[metricId]", metricsChildren[metricId]);
-
       if (metricsChildren[metricId].type === "parent") {
         nodeSelector += `.${metricId}.metrics`;
         console.log("nodeSelector", nodeSelector);
@@ -84,7 +82,34 @@ const renderInit = () => {
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
         listViewContainer.style.display = "none";
-        updateHistoryContainer.style.display = "block";
+        progressbarContainer.style.display = "block";
+
+        nodeSelector += `.${metricId}`;
+
+        updateHistoryBtn.onclick = function (event) {
+          console.log("newMetric", newMetric);
+          const value = Math.round(bar.value() * 100); // the value of the progressbar
+          console.log("value", value);
+          console.log("bar.value()", bar.value());
+          // return;
+          Metrics.updateMetricHistory(
+            { nodeSelector, metricsId: metrics.id },
+            value
+          ).then((result) => {
+            metrics = result;
+            console.log("AFTER UPDATE nodeSelector", nodeSelector);
+            // let tempNode = nodeSelector.split(".");
+            // tempNode.split(".").pop();
+            // nodeSelector = tempNode.join(".");
+
+            console.log("AFTER UPDATE nodeSelector", nodeSelector);
+
+            renderInit();
+            listViewContainer.style.display = "block";
+            progressbarContainer.style.display = "none";
+          });
+        };
+        bar.animate(Math.round(newMetric.value) / 100);
       }
     };
     currentMetricList.push(listItem);
@@ -108,11 +133,11 @@ const renderInit = () => {
 };
 
 // updateMetricHistory progress bar
-var bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
-  strokeWidth: 6,
+let bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
+  strokeWidth: 10,
   color: "#FFEA82",
   trailColor: "#eee",
-  trailWidth: 1,
+  trailWidth: 10,
   easing: "easeInOut",
   duration: 1400,
   svgStyle: null,
@@ -127,7 +152,7 @@ var bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
     bar.path.setAttribute("stroke", state.color);
     var value = Math.round(bar.value() * 100);
     if (value === 0) {
-      bar.setText("");
+      bar.setText(0);
     } else {
       bar.setText(value);
     }
@@ -137,5 +162,3 @@ var bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
 });
 bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
 bar.text.style.fontSize = "2rem";
-
-bar.animate(0.8); // Number from 0.0 to 1.0

@@ -2,7 +2,6 @@
   padding: 1rem;
   overflow-y: auto;
   max-height: 100vh;
-  padding-bottom: 6rem;
 }
 .listViewItem {
   display: flex;
@@ -11,7 +10,7 @@
   background-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0.125rem 0.5rem rgba(50, 50, 50, 0.2);
   margin-bottom: 0.75rem;
-  min-height: 3.75rem;
+  height: 3.75rem;
 }
 .listViewItem .listViewItemImg {
   height: 2rem;
