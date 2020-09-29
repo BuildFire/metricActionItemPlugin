@@ -59,6 +59,7 @@ class ListViewItem {
     this.description = obj.description;
     this.value = obj.value || 0;
     this.data = obj.data;
+    this.order = obj.order || null;
     this.previousVal = obj.previousVal;
     this.actionItem = obj.actionItem;
   }
@@ -71,6 +72,7 @@ class ListViewItem {
       description: this.description,
       value: this.value,
       data: this.data,
+      order: this.order,
       previousVal: this.previousVal,
       actionItem: this.actionItem,
     };

@@ -82,6 +82,9 @@ const renderInit = () => {
         console.log("nodeSelector", nodeSelector);
         renderInit();
         // pushBreadcrumb(item.title, { nodeSelector });
+      } else {
+        listViewContainer.style.display = "none";
+        updateHistoryContainer.style.display = "block";
       }
     };
     currentMetricList.push(listItem);
@@ -104,36 +107,35 @@ const renderInit = () => {
   listViewDiv.loadListViewItems(currentMetricList);
 };
 
-
 // updateMetricHistory progress bar
-var bar = new ProgressBar.SemiCircle('#updateHistoryContainer', {
+var bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
   strokeWidth: 6,
-  color: '#FFEA82',
-  trailColor: '#eee',
+  color: "#FFEA82",
+  trailColor: "#eee",
   trailWidth: 1,
-  easing: 'easeInOut',
+  easing: "easeInOut",
   duration: 1400,
   svgStyle: null,
   text: {
-    value: '',
-    alignToBottom: false
+    value: "",
+    alignToBottom: true,
   },
-  from: {color: '#FFEA82'},
-  to: {color: '#ED6A5A'},
+  from: { color: "#FFEA82" },
+  to: { color: "#ED6A5A" },
   // Set default step function for all animate calls
   step: (state, bar) => {
-    bar.path.setAttribute('stroke', state.color);
+    bar.path.setAttribute("stroke", state.color);
     var value = Math.round(bar.value() * 100);
     if (value === 0) {
-      bar.setText('');
+      bar.setText("");
     } else {
       bar.setText(value);
     }
 
     bar.text.style.color = state.color;
-  }
+  },
 });
 bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-bar.text.style.fontSize = '2rem';
+bar.text.style.fontSize = "2rem";
 
-bar.animate(1.0);  // Number from 0.0 to 1.0
+bar.animate(0.8); // Number from 0.0 to 1.0

@@ -7,14 +7,14 @@ class Settings {
 
   static load() {
     return new Promise((resolve, reject) => {
-      buildfire.datastore.get("settings", (err, data) => {
+      buildfire.datastore.get("settings", (err, result) => {
         if (err) reject(err);
         else {
-          this.sortBy = data.data.sortBy;
-          this.tags = data.data.tags;
+          this.sortBy = result.data.sortBy;
+          this.tags = result.data.tags;
           this.showSummary =
-            data.data.showSummary === false ? data.data.showSummary : true;
-          resolve(data);
+            result.data.showSummary === false ? result.data.showSummary : true;
+          resolve(result);
         }
       });
     });
