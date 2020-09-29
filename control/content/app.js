@@ -19,8 +19,7 @@ authManager.getCurrentUser().then((user) => {
 
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
-
-  // Metrics.getHistoryValue(metrics);
+  
   console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
@@ -276,6 +275,7 @@ const renderInit = (elementId) => {
   // Prepare metrics to be rendered (Object to Array)
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
+    Metric.getHistoryValue(metricsChildren[metricId]);
     currentMetricList.push(metricsChildren[metricId]);
   }
 

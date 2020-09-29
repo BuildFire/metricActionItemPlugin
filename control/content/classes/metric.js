@@ -16,4 +16,31 @@ class Metric {
     this.lastUpdatedOn = data.lastUpdatedOn || null;
     this.lastUpdatedBy = data.lastUpdatedBy || null;
   }
+
+  static getHistoryValue(metric) {
+    if (metric.type === "metric") {
+      let val = metric.history[metric.history.length - 1]
+        ? metric.history[metric.history.length - 1].value
+        : 0;
+      // Get metric Previous value
+      let previousVal = metric.history[metric.history.length - 2]
+        ? metric.history[metric.history.length - 2].value
+        : 0;
+      // TODO: check if we can delete value from Metric class if not needed
+      metric.value = val;
+      metric.previousVal = previousVal;
+      return val;
+    } else if (metric.type === "parent" || !metric.type) {
+      if (metric.metrics) {
+        let sum = 0;
+        for (let key in metric.metrics) {
+          sum += this.getHistoryValue(metric.metrics[key]);
+        }
+        let avg = sum / Object.keys(metric.metrics).length;
+        metric.value = avg;
+        return avg;
+      }
+    }
+  }
+  
 }

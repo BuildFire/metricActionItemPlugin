@@ -4,7 +4,7 @@ const initSettingsFields = () => {
     showSummary.checked = Settings.showSummary;
     sortBy.value = Settings.sortBy;
 
-    initTags();
+    renderTags();
   });
 };
 
@@ -22,10 +22,39 @@ const setTags = () => {
   return new Promise((resolve, reject) => {
     buildfire.auth.showTagsSearchDialog({}, (err, tags) => {
       if (err) reject(err);
-      Settings.tags = tags || [];
-      initTags();
+
+      let currentTags = {};
+      Settings.tags.forEach((tag) => {
+        currentTags[tag.id] = tag.id;
+      });
+
+      tags.forEach((tag) => {
+        if (!currentTags[tag.id]) Settings.tags.push(tag);
+      });
+
+      renderTags();
       resolve(updateSettings());
     });
+  });
+};
+
+const deleteTag = (index, name) => {
+  return new Promise((resolve, reject) => {
+    buildfire.notifications.confirm(
+      {
+        message: `Are you sure you want to delete ${name}?`,
+        confirmButton: { text: "Delete", key: "y", type: "danger" },
+        cancelButton: { text: "Cancel", key: "n", type: "default" },
+      },
+      (err, data) => {
+        if (err) reject(err);
+        if (data.selectedButton.key == "y") {
+          Settings.tags.splice(index, 1);
+          renderTags();
+          resolve(updateSettings());
+        }
+      }
+    );
   });
 };
 
@@ -39,7 +68,7 @@ const updateSettings = () => {
   });
 };
 
-const initTags = () => {
+const renderTags = () => {
   document.getElementById("tag-chips").innerHTML = "";
   if (Settings.tags.length > 0) {
     Settings.tags.forEach((tag, i) => {
@@ -50,6 +79,7 @@ const initTags = () => {
         <span role="radio" tabindex="${i}" aria-checked="true" class="mdc-chip__primary-action">
           <span class="mdc-chip__text">${tag.tagName}</span>
         </span>
+        <i class="material-icons mdc-chip__icon mdc-chip__icon--trailing" tabindex="-1" role="button" onclick="deleteTag(${i}, '${tag.tagName}')">cancel</i>
       </span>
     </div>
     `;

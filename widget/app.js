@@ -7,17 +7,24 @@ authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
 
-var e = buildfire.publicData.onUpdate((event) => {
+let publicDataUpdate = buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
     metrics = event.data;
     renderInit();
   }
 });
 
+let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
+  if (event.tag === "settings") {
+    Settings.load().then(() => {
+      renderInit();
+    });
+  }
+});
+
 Metrics.getMetrics().then(async (data) => {
   metrics = data;
 
-  console.log("laslalss", metrics);
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
       renderInit();
@@ -84,5 +91,49 @@ const renderInit = () => {
     sum / Object.keys(metricsChildren).length
   }%`;
 
+  console.log("currentMetricList", currentMetricList);
+
+  if (Settings.sortBy === "highest") {
+    currentMetricList.sort((a, b) => b.value - a.value);
+  } else if (Settings.sortBy === "lowest") {
+    currentMetricList.sort((a, b) => a.value - b.value);
+  } else {
+    currentMetricList.sort((a, b) => a.order - b.order);
+  }
+
   listViewDiv.loadListViewItems(currentMetricList);
 };
+
+
+// updateMetricHistory progress bar
+var bar = new ProgressBar.SemiCircle('#updateHistoryContainer', {
+  strokeWidth: 6,
+  color: '#FFEA82',
+  trailColor: '#eee',
+  trailWidth: 1,
+  easing: 'easeInOut',
+  duration: 1400,
+  svgStyle: null,
+  text: {
+    value: '',
+    alignToBottom: false
+  },
+  from: {color: '#FFEA82'},
+  to: {color: '#ED6A5A'},
+  // Set default step function for all animate calls
+  step: (state, bar) => {
+    bar.path.setAttribute('stroke', state.color);
+    var value = Math.round(bar.value() * 100);
+    if (value === 0) {
+      bar.setText('');
+    } else {
+      bar.setText(value);
+    }
+
+    bar.text.style.color = state.color;
+  }
+});
+bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+bar.text.style.fontSize = '2rem';
+
+bar.animate(1.0);  // Number from 0.0 to 1.0
