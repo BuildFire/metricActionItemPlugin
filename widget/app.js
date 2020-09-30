@@ -81,7 +81,7 @@ const renderInit = () => {
         nodeSelector += `.${metricId}.metrics`;
         buildfire.history.push(metricsChildren[metricId].title, {
           nodeSelector,
-          metricType: metricsChildren[metricId].type,
+          // metricType: metricsChildren[metricId].type,
           showLabelInTitlebar: true,
         });
         buildfire.messaging.sendMessageToControl({
@@ -99,7 +99,7 @@ const renderInit = () => {
 
         buildfire.history.push(`Update ${metricsChildren[metricId].title}`, {
           nodeSelector,
-          metricType: metricsChildren[metricId].type,
+          // metricType: metricsChildren[metricId].type,
           showLabelInTitlebar: true,
         });
         // nodeSelector += `.${metricId}`;
@@ -197,8 +197,7 @@ bar.text.style.fontSize = "2rem";
 
 buildfire.history.onPop((breadcrumb) => {
   // Show / Hide views
-  // if (breadcrumb.options.metricType === "metric") {
-  //   renderInit();
+
   console.log("bredacrumb ;lalalala", breadcrumb);
   if (Object.keys(breadcrumb.options).length > 0) {
     metricsScreen.style.display = "block";
@@ -213,6 +212,11 @@ buildfire.history.onPop((breadcrumb) => {
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log("Message has been received", message);
   nodeSelector = message.nodeSelector;
+  buildfire.history.push(message.title, {
+    nodeSelector,
+    // metricType: metricsChildren[metricId].type,
+    showLabelInTitlebar: true,
+  });
   renderInit();
   metricsScreen.style.display = "block";
   progressbarContainer.style.display = "none";

@@ -313,7 +313,10 @@ const render = (items) => {
         renderInit("metricsList");
       }
       pushBreadcrumb(item.title, { nodeSelector });
-      buildfire.messaging.sendMessageToWidget({ nodeSelector });
+      buildfire.messaging.sendMessageToWidget({
+        title: item.title,
+        nodeSelector,
+      });
     }
   };
   // Overwrite the generic method (onDeleteItem)
@@ -377,11 +380,11 @@ buildfire.messaging.onReceivedMessage = (message) => {
     nodeSelector = message.nodeSelector;
     pushBreadcrumb(message.title, { nodeSelector });
   } else {
-    // if (nodeSelector !== message.nodeSelector) {
-    nodeSelector = message.nodeSelector;
-    bread.removeChild(bread.lastChild);
-    breadcrumbsHistory.pop();
-    // }
+    if (nodeSelector !== message.nodeSelector) {
+      nodeSelector = message.nodeSelector;
+      bread.removeChild(bread.lastChild);
+      breadcrumbsHistory.pop();
+    }
   }
   renderInit("metricsList");
   goToMetricspage();
