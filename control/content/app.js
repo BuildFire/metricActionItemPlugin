@@ -19,7 +19,7 @@ authManager.getCurrentUser().then((user) => {
 
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
-  
+
   console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
@@ -255,6 +255,8 @@ const pushBreadcrumb = (breadcrumb, data) => {
         breadcrumbsHistory.pop();
       }
       nodeSelector = data.nodeSelector;
+      buildfire.messaging.sendMessageToWidget({ nodeSelector });
+
       if (typeof Sortable !== "undefined") {
         renderInit("metricsList");
       }
@@ -311,6 +313,7 @@ const render = (items) => {
         renderInit("metricsList");
       }
       pushBreadcrumb(item.title, { nodeSelector });
+      buildfire.messaging.sendMessageToWidget({ nodeSelector });
     }
   };
   // Overwrite the generic method (onDeleteItem)
@@ -361,4 +364,25 @@ const render = (items) => {
       updateMetrics(item);
     };
   };
+};
+
+buildfire.messaging.onReceivedMessage = (message) => {
+  console.log(
+    "Message has been received",
+    message.nodeSelector,
+    breadcrumbsHistory,
+    nodeSelector
+  );
+  if (message.title) {
+    nodeSelector = message.nodeSelector;
+    pushBreadcrumb(message.title, { nodeSelector });
+  } else {
+    // if (nodeSelector !== message.nodeSelector) {
+    nodeSelector = message.nodeSelector;
+    bread.removeChild(bread.lastChild);
+    breadcrumbsHistory.pop();
+    // }
+  }
+  renderInit("metricsList");
+  goToMetricspage();
 };

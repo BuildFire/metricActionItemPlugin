@@ -30,7 +30,7 @@ class Metrics {
     });
   }
 
-  static updateMetricHistory({ nodeSelector, metricsId }, value) {
+  static updateMetricHistory({ nodeSelector, metricsId }, value, id) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -38,12 +38,12 @@ class Metrics {
       if (!metricsId) reject("metricsId not provided");
 
       buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]: absoluteDate },
+        { [`${nodeSelector}.${id}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${nodeSelector}.history.$.value`]: value,
-            [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${nodeSelector}.${id}.history.$.value`]: value,
+            [`${nodeSelector}.${id}.history.$.lastUpdatedOn`]: new Date(),
+            [`${nodeSelector}.${id}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -54,7 +54,7 @@ class Metrics {
               metricsId,
               {
                 $push: {
-                  [`${nodeSelector}.history`]: {
+                  [`${nodeSelector}.${id}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
                     createdBy: "currentUser.username",
@@ -81,8 +81,7 @@ class Metrics {
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
 
           await Metrics.getMetrics().then((result) => {
-            result.id = result.id;
-            resolve(result.data);
+            resolve(result);
           });
         }
       );

@@ -21,3 +21,65 @@ span {
 #progressbarContainer .form-group button {
   padding: 25px 20px;
 }
+
+.listViewContainer {
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+.listViewItem {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(50, 50, 50, 0.2);
+  margin-bottom: 0.75rem;
+  height: 3.75rem;
+}
+.listViewItem .listViewItemImg {
+  height: 2rem;
+  width: 2rem;
+  margin: 0.5rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.listViewItem > .listViewItemCopy {
+  flex: auto;
+}
+
+.listViewItem .toolbarBadge {
+  background-color: red;
+  border-radius: 50%;
+  color: white;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+}
+
+.listViewItem .toolbarShare {
+  background-color: blue;
+  border-radius: 50%;
+  color: white;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+}
+
+.listViewItem .value {
+  font-size: 18px;
+  margin: 0 10px 0 3px;
+}
+
+.listViewItem .material-icons {
+  display: inline;
+  vertical-align: bottom;
+  font-size: 20px;
+}
+
+.summary-card .card__title {
+  font-size: 1.25rem;
+  line-height: 2rem;
+  font-weight: 500;
+}

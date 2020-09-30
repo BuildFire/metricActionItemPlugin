@@ -10,6 +10,7 @@ authManager.getCurrentUser().then((user) => {
 let publicDataUpdate = buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
     metrics = event.data;
+    metrics.id = event.id;
     renderInit();
   }
 });
@@ -24,6 +25,7 @@ let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
 
 Metrics.getMetrics().then(async (data) => {
   metrics = data;
+  console.log("!!!!!!!!!!!!!!!!!!!!!!", metrics);
 
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
@@ -33,7 +35,6 @@ Metrics.getMetrics().then(async (data) => {
     buildfire.history.push("Home", {
       nodeSelector,
       showLabelInTitlebar: true,
-      elementToShow: "#2014Top10",
     });
   });
 });
@@ -59,7 +60,7 @@ if (typeof ListView !== "undefined") {
 
 const renderInit = () => {
   listViewContainer.innerHTML = "";
-
+  console.log("Hello everybody", nodeSelector, metrics);
   let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
   let currentMetricList = [];
   console.log("please", metricsChildren);
@@ -71,30 +72,58 @@ const renderInit = () => {
     metricsChildren[metricId].id = metricId;
     let newMetric = new Metric(metricsChildren[metricId]);
     Metric.getHistoryValue(newMetric);
+    console.log("newMetric", newMetric);
 
     sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
     listItem.onToolbarClicked = (e) => {
       if (metricsChildren[metricId].type === "parent") {
         nodeSelector += `.${metricId}.metrics`;
+        buildfire.history.push(metricsChildren[metricId].title, {
+          nodeSelector,
+          metricType: metricsChildren[metricId].type,
+          showLabelInTitlebar: true,
+        });
+        buildfire.messaging.sendMessageToControl({
+          title: metricsChildren[metricId].title,
+          nodeSelector,
+        });
         console.log("nodeSelector", nodeSelector);
         renderInit();
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
-        listViewContainer.style.display = "none";
+        metricsScreen.style.display = "none";
         progressbarContainer.style.display = "block";
+        console.log("metrics wowowowo", metrics);
+        nodeSelector += `.${metricId}.metrics`;
 
-        nodeSelector += `.${metricId}`;
+        buildfire.history.push(`Update ${metricsChildren[metricId].title}`, {
+          nodeSelector,
+          metricType: metricsChildren[metricId].type,
+          showLabelInTitlebar: true,
+        });
+        // nodeSelector += `.${metricId}`;
 
         updateHistoryBtn.onclick = function (event) {
+          console.log("metrics lalalalala", metrics);
+
           console.log("newMetric", newMetric);
           const value = Math.round(bar.value() * 100); // the value of the progressbar
           console.log("value", value);
           console.log("bar.value()", bar.value());
           // return;
+          console.log(
+            "qwqweeqweqweqeqweqweqweqwe",
+            nodeSelector,
+            metrics.id,
+            value,
+            newMetric.id
+          );
+
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
-            value
+            value,
+            newMetric.id
           ).then((result) => {
             metrics = result;
             console.log("AFTER UPDATE nodeSelector", nodeSelector);
@@ -105,7 +134,7 @@ const renderInit = () => {
             console.log("AFTER UPDATE nodeSelector", nodeSelector);
 
             renderInit();
-            listViewContainer.style.display = "block";
+            metricsScreen.style.display = "block";
             progressbarContainer.style.display = "none";
           });
         };
@@ -115,9 +144,12 @@ const renderInit = () => {
     currentMetricList.push(listItem);
   }
 
-  document.getElementById("summaryValue").innerText = `${
-    sum / Object.keys(metricsChildren).length
-  }%`;
+  if (Object.keys(metricsChildren).length !== 0) {
+    let avg = (sum / Object.keys(metricsChildren).length).toPrecision(3);
+    summaryValue.innerText = `${avg}%`;
+  } else {
+    summaryValue.innerText = "0%";
+  }
 
   console.log("currentMetricList", currentMetricList);
 
@@ -162,3 +194,26 @@ let bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
 });
 bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
 bar.text.style.fontSize = "2rem";
+
+buildfire.history.onPop((breadcrumb) => {
+  // Show / Hide views
+  // if (breadcrumb.options.metricType === "metric") {
+  //   renderInit();
+  console.log("bredacrumb ;lalalala", breadcrumb);
+  if (Object.keys(breadcrumb.options).length > 0) {
+    metricsScreen.style.display = "block";
+    progressbarContainer.style.display = "none";
+    nodeSelector = breadcrumb.options.nodeSelector;
+    buildfire.messaging.sendMessageToControl({ nodeSelector });
+
+    renderInit();
+  }
+});
+
+buildfire.messaging.onReceivedMessage = (message) => {
+  console.log("Message has been received", message);
+  nodeSelector = message.nodeSelector;
+  renderInit();
+  metricsScreen.style.display = "block";
+  progressbarContainer.style.display = "none";
+};

@@ -31,13 +31,17 @@ class Metric {
       metric.previousVal = previousVal;
       return val;
     } else if (metric.type === "parent" || !metric.type) {
+      if (Object.keys(metric.metrics).length === 0) {
+        metric.value = 0;
+        return 0;
+      }
       if (metric.metrics) {
         let sum = 0;
         for (let key in metric.metrics) {
           sum += this.getHistoryValue(metric.metrics[key]);
         }
         let avg = sum / Object.keys(metric.metrics).length;
-        metric.value = avg;
+        metric.value = parseFloat(avg.toPrecision(3));
         return avg;
       }
     }
