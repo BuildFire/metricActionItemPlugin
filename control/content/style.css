@@ -1,3 +1,12 @@
+.spinner {
+  padding: 30px 4px;
+  font-size: 18px;
+}
+
+.spinner.loaded {
+  padding: 0 !important;
+}
+
 #metricForm .form-group .form-control {
   display: block;
   width: 100%;
@@ -55,7 +64,6 @@ input:disabled {
 #metricsList.draggable-list-view .d-item span.icon-menu {
   cursor: grab;
 }
-
 
 #metricsList.draggable-list-view.disabledDrag .d-item span.icon-menu {
   cursor: not-allowed !important;

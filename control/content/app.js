@@ -289,9 +289,16 @@ const renderInit = (elementId) => {
     currentMetricList.push(metricsChildren[metricId]);
   }
 
+  let spinner = document.getElementById("spinner");
   if (currentMetricList.length === 0) {
-    metricsContainer.innerHTML = "No items have been added yet.";
-  } else metricsContainer.innerHTML = "";
+    spinner.innerHTML = "No items have been added yet.";
+    spinner.classList.remove("loaded");
+    metricsContainer.innerHTML = "";
+  } else {
+    spinner.innerHTML = "";
+    spinner.classList.add("loaded");
+    metricsContainer.innerHTML = "";
+  }
 
   // Sort metrics based metricsSortBy value
   if (metricsSortBy === "highest") {

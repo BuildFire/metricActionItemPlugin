@@ -5,15 +5,14 @@ const helpers = {
   // Return absolute date
   getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
   nodeSplitter: (nodeSelector, metrics) => {
-    // If we are at the home page (top of the object)
-    if (nodeSelector === "metrics") {
-      metricsSortBy = metrics.sortBy;
-    }
-
     let splittedNode = nodeSelector.split(".");
     let metricsChildren = metrics;
 
     splittedNode.forEach((item, i) => {
+      // If we are at the home page (top of the object)
+      if (nodeSelector === "metrics") {
+        metricsSortBy = metrics.sortBy;
+      }
       // Assign the parent metric sortBy value (If we are in parent metric);
       if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
         metricsSortBy = metricsChildren[item].sortBy;
