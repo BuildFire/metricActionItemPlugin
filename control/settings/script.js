@@ -2,8 +2,6 @@ const initSettingsFields = () => {
   Settings.load().then(() => {
     // Use element id and assign the new data to it's value
     showSummary.checked = Settings.showSummary;
-    sortBy.value = Settings.sortBy;
-
     renderTags();
   });
 };
@@ -11,10 +9,7 @@ const initSettingsFields = () => {
 const onFieldChange = (field) => {
   if (field === "showSummary") {
     Settings[field] = document.getElementById(field).checked;
-  } else if (field === "sortBy") {
-    Settings[field] = document.getElementById(field).value;
   }
-
   updateSettings();
 };
 

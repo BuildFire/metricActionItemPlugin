@@ -46,3 +46,17 @@
 input:disabled {
   background: lightgray !important;
 }
+
+#metricsMain button {
+  margin-left: 10px;
+  margin-bottom: 2.5px;
+}
+
+#metricsList.draggable-list-view .d-item span.icon-menu {
+  cursor: grab;
+}
+
+
+#metricsList.draggable-list-view.disabledDrag .d-item span.icon-menu {
+  cursor: not-allowed !important;
+}

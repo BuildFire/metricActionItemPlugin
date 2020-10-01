@@ -1,8 +1,15 @@
 let metrics = {};
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
+
 let currentUser;
+
 let listViewDiv;
+
+let metricsSortBy = "manual";
+
+progressbarVal = 0;
+
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
@@ -25,7 +32,6 @@ let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
 
 Metrics.getMetrics().then(async (data) => {
   metrics = data;
-  console.log("!!!!!!!!!!!!!!!!!!!!!!", metrics);
 
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
@@ -93,7 +99,7 @@ const renderInit = () => {
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
         metricsScreen.style.display = "none";
-        progressbarContainer.style.display = "block";
+        updateHistoryContainer.style.display = "block";
         console.log("metrics wowowowo", metrics);
         nodeSelector += `.${metricId}.metrics`;
 
@@ -135,10 +141,13 @@ const renderInit = () => {
 
             renderInit();
             metricsScreen.style.display = "block";
-            progressbarContainer.style.display = "none";
+            updateHistoryContainer.style.display = "none";
           });
         };
         bar.animate(Math.round(newMetric.value) / 100);
+
+        // Assign global progressbar value
+        progressbarVal = Math.round(newMetric.value) / 100;
       }
     };
     currentMetricList.push(listItem);
@@ -153,9 +162,9 @@ const renderInit = () => {
 
   console.log("currentMetricList", currentMetricList);
 
-  if (Settings.sortBy === "highest") {
+  if (metricsSortBy === "highest") {
     currentMetricList.sort((a, b) => b.value - a.value);
-  } else if (Settings.sortBy === "lowest") {
+  } else if (metricsSortBy === "lowest") {
     currentMetricList.sort((a, b) => a.value - b.value);
   } else {
     currentMetricList.sort((a, b) => a.order - b.order);
@@ -165,7 +174,7 @@ const renderInit = () => {
 };
 
 // updateMetricHistory progress bar
-let bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
+let bar = new ProgressBar.SemiCircle("#progressbar-container", {
   strokeWidth: 10,
   color: "#FFEA82",
   trailColor: "#eee",
@@ -195,13 +204,37 @@ let bar = new ProgressBar.SemiCircle("#updateHistoryContainer", {
 bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
 bar.text.style.fontSize = "2rem";
 
+// Init hammerJs gesture detection on element
+
+let updateHistoryContainer = document.getElementById("updateHistoryContainer");
+// create a simple instance of Hammer
+let hammer = new Hammer(updateHistoryContainer);
+
+hammer.get("pan").set({ direction: Hammer.DIRECTION_VERTICAL, threshold: 25 });
+
+// listen to events...
+hammer.on("panup pandown", (ev) => {
+  if (Math.round(ev.distance) % 10 === 0) {
+    // console.log(Math.round(ev.distance));
+    changeProgressbarValue(ev.type);
+  }
+});
+
+const changeProgressbarValue = (direction) => {
+  if (direction === "pandown" && progressbarVal >= 0) {
+    bar.animate(progressbarVal - 0.01);
+    progressbarVal -= 0.01;
+  } else if (direction === "panup" && progressbarVal <= 1) {
+    bar.animate(progressbarVal + 0.01);
+    progressbarVal += 0.01;
+  }
+};
+
 buildfire.history.onPop((breadcrumb) => {
   // Show / Hide views
-
-  console.log("bredacrumb ;lalalala", breadcrumb);
   if (Object.keys(breadcrumb.options).length > 0) {
     metricsScreen.style.display = "block";
-    progressbarContainer.style.display = "none";
+    updateHistoryContainer.style.display = "none";
     nodeSelector = breadcrumb.options.nodeSelector;
     buildfire.messaging.sendMessageToControl({ nodeSelector });
 
@@ -219,5 +252,5 @@ buildfire.messaging.onReceivedMessage = (message) => {
   });
   renderInit();
   metricsScreen.style.display = "block";
-  progressbarContainer.style.display = "none";
+  updateHistoryContainer.style.display = "none";
 };

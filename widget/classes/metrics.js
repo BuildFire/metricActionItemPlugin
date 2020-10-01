@@ -10,7 +10,7 @@ class Metrics {
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
             await buildfire.publicData.save(
-              { metrics: {} },
+              { metrics: {}, sortBy: "manual" },
               "metrics",
               async (err, result) => {
                 if (err) reject(err);

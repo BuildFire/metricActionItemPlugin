@@ -10,6 +10,7 @@ class Metric {
     this.order = data.order || null;
     this.metrics = data.metrics || {};
     this.history = data.history || [];
+    this.sortBy = this.sortBy || "manual";
     this.createdOn = data.createdOn || null;
     this.createdBy = data.createdBy || null;
     this.lastUpdatedOn = data.lastUpdatedOn || null;

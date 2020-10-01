@@ -45,6 +45,13 @@
       <div id="metricsList">Loading...</div>
 
       <div>
+        <label for="cars">Sort By:</label>
+
+        <select id="sortBy" onchange="onSortByChange()">
+          <option value="manual">Manual</option>
+          <option value="highest">Heighest</option>
+          <option value="lowest">Lowest</option>
+        </select>
         <button
           class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
           onclick="goToAddItem()"

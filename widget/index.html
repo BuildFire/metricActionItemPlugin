@@ -24,7 +24,9 @@
     <!-- build:bundleWidgetBFMinJS  -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
+
     <script src="js/lib/progressbar.js"></script>
+    <script src="js/lib/hammer.min.js"></script>
 
     <!-- build:bundleSharedJSFiles  -->
     <script src="js/shared/infoCard.class.js"></script>
@@ -58,8 +60,10 @@
       <div id="listViewContainer"></div>
     </div>
 
-    <div id="progressbarContainer">
-      <div id="updateHistoryContainer"></div>
+    <div id="updateHistoryContainer">
+      <div>
+        <div id="progressbar-container"></div>
+      </div>
 
       <div class="form-group">
         <button class="mdc-button mdc-button--raised" id="updateHistoryBtn">

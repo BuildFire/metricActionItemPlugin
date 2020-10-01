@@ -1,6 +1,5 @@
 class Settings {
   constructor() {
-    this.sortBy;
     this.showSummary;
     this.tags;
   }
@@ -10,7 +9,6 @@ class Settings {
       buildfire.datastore.get("settings", (err, result) => {
         if (err) reject(err);
         else {
-          this.sortBy = result.data.sortBy;
           this.tags = result.data.tags;
           this.showSummary =
             result.data.showSummary === false ? result.data.showSummary : true;
@@ -23,7 +21,6 @@ class Settings {
   static save() {
     let settings = {
       tags: this.tags,
-      sortBy: this.sortBy,
       showSummary: this.showSummary,
     };
 

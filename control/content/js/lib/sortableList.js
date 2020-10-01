@@ -133,7 +133,7 @@ buildfire.components.SortableList = class SortableList {
 
     // initialize the sort on the container of the items
     me.sortableList = Sortable.create(me.element, {
-      animation: 150,
+      animation: 250,
       onUpdate: function (evt) {
         var newIndex = me._getSortableItemIndex(evt.item);
         var tmp = me.items.splice(oldIndex, 1)[0];

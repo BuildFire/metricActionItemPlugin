@@ -8,6 +8,8 @@ let breadcrumbsHistory = [];
 let metricFields;
 let currentUser = {};
 
+let metricsSortBy = "manual";
+
 // SortableList variables (used to manage draggable list)
 let sortableList = null;
 let metricsContainer = null;
@@ -273,6 +275,7 @@ const renderInit = (elementId) => {
   metricsContainer = document.getElementById(elementId);
   // Extract the desired metrics (children) from the big object using nodeSelector
   let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+
   let currentMetricList = [];
   // Prepare metrics to be rendered (Object to Array)
   for (let metricId in metricsChildren) {
@@ -285,11 +288,10 @@ const renderInit = (elementId) => {
     metricsContainer.innerHTML = "No items have been added yet.";
   } else metricsContainer.innerHTML = "";
 
-  console.log("Settings.sortBy", Settings.sortBy);
-
-  if (Settings.sortBy === "highest") {
+  // Sort metrics based metricsSortBy value
+  if (metricsSortBy === "highest") {
     currentMetricList.sort((a, b) => b.value - a.value);
-  } else if (Settings.sortBy === "lowest") {
+  } else if (metricsSortBy === "lowest") {
     currentMetricList.sort((a, b) => a.value - b.value);
   } else {
     currentMetricList.sort((a, b) => a.order - b.order);
@@ -304,6 +306,18 @@ const render = (items) => {
     metricsContainer,
     items || []
   );
+
+  let dragableListView = document.getElementById("metricsList");
+
+  // Disable or enable list drag
+  if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
+    // Disable manual sorting
+    sortableList.sortableList.options.disabled = true;
+    dragableListView.classList.add("disabledDrag");
+    // Remove on update functionality
+  } else {
+    dragableListView.classList.remove("disabledDrag");
+  }
 
   // Overwrite the generic method (onItemClick) (on metric's title click)
   sortableList.onItemClick = (item, divRow) => {
@@ -388,4 +402,21 @@ buildfire.messaging.onReceivedMessage = (message) => {
   }
   renderInit("metricsList");
   goToMetricspage();
+};
+
+const onSortByChange = () => {
+  let sortBy = document.getElementById("sortBy").value;
+  Metrics.sortBy(
+    {
+      nodeSelector,
+      metricsId: metrics.id,
+    },
+    sortBy
+  ).then((result) => {
+    metrics = result;
+    if (typeof Sortable !== "undefined") {
+      metricsSortBy = sortBy;
+      renderInit("metricsList");
+    }
+  });
 };

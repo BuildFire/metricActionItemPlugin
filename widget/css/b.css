@@ -2,23 +2,28 @@ span {
   font-size: x-large;
 }
 
-#progressbarContainer {
-  padding: 40px;
-}
 #updateHistoryContainer {
+  padding: 20px 40px;
+  height: 100%;
+  position: relative;
+}
+#progressbar-container {
   width: 100%;
 }
 
-#progressbarContainer {
+#updateHistoryContainer {
   display: none;
 }
 
-#progressbarContainer .form-group {
+#updateHistoryContainer .form-group {
   text-align: center;
   padding: 40px 0 0 0;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
 }
 
-#progressbarContainer .form-group button {
+#updateHistoryContainer .form-group button {
   padding: 25px 20px;
 }
 

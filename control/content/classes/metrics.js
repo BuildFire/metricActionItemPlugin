@@ -11,7 +11,7 @@ class Metrics {
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
             await buildfire.publicData.save(
-              { metrics: {} },
+              { metrics: {}, sortBy: "manual" },
               "metrics",
               async (err, result) => {
                 if (err) reject(err);
@@ -163,9 +163,9 @@ class Metrics {
           updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
           // Track action
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
+
           await Metrics.getMetrics().then((result) => {
-            result.id = result.id;
-            resolve(result.data);
+            resolve(result);
           });
         }
       );
@@ -190,7 +190,38 @@ class Metrics {
           if (err) reject(err);
           else {
             result.data.id = metricsId;
-            resolve(result);
+            resolve(result.data);
+          }
+        }
+      );
+    });
+  }
+
+  static sortBy({ nodeSelector, metricsId }, sortBy) {
+    return new Promise((resolve, reject) => {
+      if (!nodeSelector) reject("nodeSelector not provided");
+      if (!metricsId) reject("metricsId not provided");
+
+      let _set = {};
+      if (nodeSelector === "metrics") {
+        // If it's the main metrics
+        _set.sortBy = sortBy;
+      } else {
+        // If the metrics was a parent
+        let selector = nodeSelector.split(".");
+        selector = selector.slice(0, selector.length - 1).join(".");
+        _set[`${selector}.sortBy`] = sortBy;
+      }
+
+      buildfire.publicData.update(
+        metricsId,
+        { $set: _set },
+        "metrics",
+        (err, result) => {
+          if (err) reject(err);
+          else {
+            result.data.id = metricsId;
+            resolve(result.data);
           }
         }
       );

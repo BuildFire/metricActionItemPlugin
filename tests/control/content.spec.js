@@ -161,12 +161,7 @@ describe("Test The Control Side", () => {
         { id: "5f56bb9355f6b40645e2daeb", tagName: "admin" },
         { id: "5f56bb9355f6b40635e2daeb", tagName: "user" },
       ];
-      Settings.sortBy = "lowest";
       Settings.showSummary = false;
-    });
-
-    it("Should instantiate an object correctly", () => {
-      expect(Settings.sortBy).toBe("lowest");
     });
 
     it("Should save new settings in the datastore", async () => {
