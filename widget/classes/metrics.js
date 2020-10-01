@@ -30,7 +30,7 @@ class Metrics {
     });
   }
 
-  static updateMetricHistory({ nodeSelector, metricsId }, value, id) {
+  static updateMetricHistory({ nodeSelector, metricsId }, value) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -38,12 +38,12 @@ class Metrics {
       if (!metricsId) reject("metricsId not provided");
 
       buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.${id}.history.date`]: absoluteDate },
+        { [`${nodeSelector}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${nodeSelector}.${id}.history.$.value`]: value,
-            [`${nodeSelector}.${id}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.${id}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${nodeSelector}.history.$.value`]: value,
+            [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
           },
         },
         "metrics",
@@ -54,7 +54,7 @@ class Metrics {
               metricsId,
               {
                 $push: {
-                  [`${nodeSelector}.${id}.history`]: {
+                  [`${nodeSelector}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
                     createdBy: "currentUser.username",

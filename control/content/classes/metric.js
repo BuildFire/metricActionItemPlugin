@@ -24,11 +24,9 @@ class Metric {
         : 0;
       // TODO: check if we can delete value from Metric class if not needed
       metric.value = val;
-      console.log("getHistoryValue metric", metric);
 
       return val;
     } else if (metric.type === "parent" || !metric.type) {
-      console.log("getHistoryValue metric", metric);
       if (Object.keys(metric.metrics).length === 0) {
         metric.value = 0;
         return 0;

@@ -42,9 +42,10 @@
     <br />
     <h1>Metrics</h1>
     <div id="metricsMain">
-      <div id="metricsList">Loading...</div>
+      <div class="spinner">Loading...</div>
 
-      <div>
+      <div id="metricsList"></div>
+      <div class="metric-actions">
         <label for="cars">Sort By:</label>
 
         <select id="sortBy" onchange="onSortByChange()">
@@ -191,13 +192,13 @@
     <script>
       //location = "samples/sortableList/sortableList.html";
     </script>
-    <script src="js/helpers/helpers.js"></script>
+    <script src="js/helper.js"></script>
     <script src="classes/analytics.js"></script>
     <script src="classes/metric.js"></script>
     <script src="classes/metrics.js"></script>
 
     <script src="js/lib/sortableList.js"></script>
-    <script src="js/shared/authManager.js"></script>
+    <script src="js/authManager.js"></script>
     <script src="../settings/js/classes/settings.js"></script>
 
     <script src="app.js"></script>

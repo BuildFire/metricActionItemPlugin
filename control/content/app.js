@@ -243,6 +243,7 @@ const pushBreadcrumb = (breadcrumb, data) => {
     crumb.style.cursor = "pointer";
     crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
     crumb.onclick = () => {
+      // This condition is to prevent clicking the breadcrumb that we are already inside
       if (data.nodeSelector === nodeSelector) {
         return;
       }
@@ -256,8 +257,12 @@ const pushBreadcrumb = (breadcrumb, data) => {
         bread.removeChild(bread.lastChild);
         breadcrumbsHistory.pop();
       }
+
+      buildfire.messaging.sendMessageToWidget({
+        numberOfPops: breadLength - 1 - +crumb.getAttribute("arrayIndex"),
+        nodeSelector,
+      });
       nodeSelector = data.nodeSelector;
-      buildfire.messaging.sendMessageToWidget({ nodeSelector });
 
       if (typeof Sortable !== "undefined") {
         renderInit("metricsList");

@@ -8,28 +8,31 @@ let listViewDiv;
 
 let metricsSortBy = "manual";
 
-progressbarVal = 0;
+let progressbarVal = 0;
 
+let bar = {};
+let numberOfPops = 0;
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
 
-let publicDataUpdate = buildfire.publicData.onUpdate((event) => {
-  if (event.data && event.id) {
-    metrics = event.data;
-    metrics.id = event.id;
-    renderInit();
-  }
-});
-
-let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
-  if (event.tag === "settings") {
-    Settings.load().then(() => {
+if (typeof ListView !== "undefined") {
+  let publicDataUpdate = buildfire.publicData.onUpdate((event) => {
+    if (event.data && event.id) {
+      metrics = event.data;
+      metrics.id = event.id;
       renderInit();
-    });
-  }
-});
+    }
+  });
 
+  let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
+    if (event.tag === "settings") {
+      Settings.load().then(() => {
+        renderInit();
+      });
+    }
+  });
+}
 Metrics.getMetrics().then(async (data) => {
   metrics = data;
 
@@ -78,7 +81,6 @@ const renderInit = () => {
     metricsChildren[metricId].id = metricId;
     let newMetric = new Metric(metricsChildren[metricId]);
     Metric.getHistoryValue(newMetric);
-    console.log("newMetric", newMetric);
 
     sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
@@ -101,19 +103,18 @@ const renderInit = () => {
         metricsScreen.style.display = "none";
         updateHistoryContainer.style.display = "block";
         console.log("metrics wowowowo", metrics);
-        nodeSelector += `.${metricId}.metrics`;
+        // nodeSelector += `.${metricId}.metrics`;
 
         buildfire.history.push(`Update ${metricsChildren[metricId].title}`, {
           nodeSelector,
           // metricType: metricsChildren[metricId].type,
           showLabelInTitlebar: true,
         });
-        // nodeSelector += `.${metricId}`;
+        nodeSelector += `.${metricId}`;
 
         updateHistoryBtn.onclick = function (event) {
           console.log("metrics lalalalala", metrics);
 
-          console.log("newMetric", newMetric);
           const value = Math.round(bar.value() * 100); // the value of the progressbar
           console.log("value", value);
           console.log("bar.value()", bar.value());
@@ -128,8 +129,7 @@ const renderInit = () => {
 
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
-            value,
-            newMetric.id
+            value
           ).then((result) => {
             metrics = result;
             console.log("AFTER UPDATE nodeSelector", nodeSelector);
@@ -142,6 +142,7 @@ const renderInit = () => {
             renderInit();
             metricsScreen.style.display = "block";
             updateHistoryContainer.style.display = "none";
+            buildfire.history.pop();
           });
         };
         bar.animate(Math.round(newMetric.value) / 100);
@@ -173,84 +174,122 @@ const renderInit = () => {
   listViewDiv.loadListViewItems(currentMetricList);
 };
 
-// updateMetricHistory progress bar
-let bar = new ProgressBar.SemiCircle("#progressbar-container", {
-  strokeWidth: 10,
-  color: "#FFEA82",
-  trailColor: "#eee",
-  trailWidth: 10,
-  easing: "easeInOut",
-  duration: 1400,
-  svgStyle: null,
-  text: {
-    value: "",
-    alignToBottom: true,
-  },
-  from: { color: "#FFEA82" },
-  to: { color: "#ED6A5A" },
-  // Set default step function for all animate calls
-  step: (state, bar) => {
-    bar.path.setAttribute("stroke", state.color);
-    var value = Math.round(bar.value() * 100);
-    if (value === 0) {
-      bar.setText(0);
-    } else {
-      bar.setText(value);
+if (typeof ProgressBar !== "undefined") {
+  // updateMetricHistory progress bar
+  bar = new ProgressBar.SemiCircle("#progressbar-container", {
+    strokeWidth: 10,
+    color: "#FFEA82",
+    trailColor: "#eee",
+    trailWidth: 10,
+    easing: "easeInOut",
+    duration: 1400,
+    svgStyle: null,
+    text: {
+      value: "",
+      alignToBottom: true,
+    },
+    from: { color: "#FFEA82" },
+    to: { color: "#ED6A5A" },
+    // Set default step function for all animate calls
+    step: (state, bar) => {
+      bar.path.setAttribute("stroke", state.color);
+      var value = Math.round(bar.value() * 100);
+      if (value === 0) {
+        bar.setText(0);
+      } else {
+        bar.setText(value);
+      }
+
+      bar.text.style.color = state.color;
+    },
+  });
+  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+  bar.text.style.fontSize = "2rem";
+
+  // Init hammerJs gesture detection on element
+
+  let updateHistoryContainer = document.getElementById(
+    "updateHistoryContainer"
+  );
+  // create a simple instance of Hammer
+  let hammer = new Hammer(updateHistoryContainer);
+
+  hammer
+    .get("pan")
+    .set({ direction: Hammer.DIRECTION_VERTICAL, threshold: 25 });
+
+  // listen to events...
+  hammer.on("panup pandown", (ev) => {
+    if (Math.round(ev.distance) % 10 === 0) {
+      // console.log(Math.round(ev.distance));
+      changeProgressbarValue(ev.type);
     }
+  });
 
-    bar.text.style.color = state.color;
-  },
-});
-bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-bar.text.style.fontSize = "2rem";
+  const changeProgressbarValue = (direction) => {
+    if (direction === "pandown" && progressbarVal >= 0) {
+      bar.animate(progressbarVal - 0.01);
+      progressbarVal -= 0.01;
+    } else if (direction === "panup" && progressbarVal <= 1) {
+      bar.animate(progressbarVal + 0.01);
+      progressbarVal += 0.01;
+    }
+  };
 
-// Init hammerJs gesture detection on element
+  buildfire.history.onPop((breadcrumb) => {
+    // Show / Hide views
+    if (numberOfPops) {
+      --numberOfPops;
+      nodeSelector = breadcrumb.options.nodeSelector;
 
-let updateHistoryContainer = document.getElementById("updateHistoryContainer");
-// create a simple instance of Hammer
-let hammer = new Hammer(updateHistoryContainer);
+      metricsScreen.style.display = "block";
+      updateHistoryContainer.style.display = "none";
+      renderInit();
 
-hammer.get("pan").set({ direction: Hammer.DIRECTION_VERTICAL, threshold: 25 });
+      if (numberOfPops) {
+        buildfire.history.pop();
+      }
+    } else {
+      console.log("it shouldn't be");
+      //  This condition is for preventing the control side from going back (when clicking back in widget)
+      // when we are at the home, which would lead to an error
+      if (Object.keys(breadcrumb.options).length > 0) {
+        metricsScreen.style.display = "block";
+        updateHistoryContainer.style.display = "none";
+        nodeSelector = breadcrumb.options.nodeSelector;
+        buildfire.messaging.sendMessageToControl({ nodeSelector });
 
-// listen to events...
-hammer.on("panup pandown", (ev) => {
-  if (Math.round(ev.distance) % 10 === 0) {
-    // console.log(Math.round(ev.distance));
-    changeProgressbarValue(ev.type);
-  }
-});
-
-const changeProgressbarValue = (direction) => {
-  if (direction === "pandown" && progressbarVal >= 0) {
-    bar.animate(progressbarVal - 0.01);
-    progressbarVal -= 0.01;
-  } else if (direction === "panup" && progressbarVal <= 1) {
-    bar.animate(progressbarVal + 0.01);
-    progressbarVal += 0.01;
-  }
-};
-
-buildfire.history.onPop((breadcrumb) => {
-  // Show / Hide views
-  if (Object.keys(breadcrumb.options).length > 0) {
-    metricsScreen.style.display = "block";
-    updateHistoryContainer.style.display = "none";
-    nodeSelector = breadcrumb.options.nodeSelector;
-    buildfire.messaging.sendMessageToControl({ nodeSelector });
-
-    renderInit();
-  }
-});
-
+        renderInit();
+      }
+    }
+  });
+}
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log("Message has been received", message);
-  nodeSelector = message.nodeSelector;
-  buildfire.history.push(message.title, {
-    nodeSelector,
-    // metricType: metricsChildren[metricId].type,
-    showLabelInTitlebar: true,
-  });
-  renderInit();
-  metricsScreen.style.display = "block";
-  updateHistoryContainer.style.display = "none";
+  console.log(
+    "message.nodeSelector, nodeSelector",
+    message.nodeSelector,
+    "lallloooosh",
+    nodeSelector
+  );
+
+  if (message.numberOfPops) {
+    numberOfPops = message.numberOfPops;
+    // To check if the the screens in both sides (control & widget) are the same
+    // (For example, if the widget on the update history value screen (which is not existed in the cotrol);
+    // So we have to pop another time to sync between the two sides
+    if (message.nodeSelector !== nodeSelector) {
+      numberOfPops++;
+    }
+    buildfire.history.pop();
+  } else {
+    nodeSelector = message.nodeSelector;
+    buildfire.history.push(message.title, {
+      nodeSelector,
+      showLabelInTitlebar: true,
+    });
+    renderInit();
+    metricsScreen.style.display = "block";
+    updateHistoryContainer.style.display = "none";
+  }
 };
