@@ -76,7 +76,9 @@ const renderInit = () => {
 
   let sum = 0;
   console.log("metrics widget", metrics);
-
+  if (Object.keys(metricsChildren).length === 0) {
+    listViewContainer.innerHTML = `<div style="text-align:center" >No metrics have been added yet</div>`;
+  }
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
     let newMetric = new Metric(metricsChildren[metricId]);
@@ -138,10 +140,6 @@ const renderInit = () => {
             // nodeSelector = tempNode.join(".");
 
             console.log("AFTER UPDATE nodeSelector", nodeSelector);
-
-            renderInit();
-            metricsScreen.style.display = "block";
-            updateHistoryContainer.style.display = "none";
             buildfire.history.pop();
           });
         };
@@ -182,7 +180,7 @@ if (typeof ProgressBar !== "undefined") {
     trailColor: "#eee",
     trailWidth: 10,
     easing: "easeInOut",
-    duration: 1400,
+    duration: 500,
     svgStyle: null,
     text: {
       value: "",
@@ -220,7 +218,7 @@ if (typeof ProgressBar !== "undefined") {
 
   // listen to events...
   hammer.on("panup pandown", (ev) => {
-    if (Math.round(ev.distance) % 10 === 0) {
+    if (Math.round(ev.distance) % 5 === 0) {
       // console.log(Math.round(ev.distance));
       changeProgressbarValue(ev.type);
     }
@@ -228,10 +226,10 @@ if (typeof ProgressBar !== "undefined") {
 
   const changeProgressbarValue = (direction) => {
     if (direction === "pandown" && progressbarVal >= 0) {
-      bar.animate(progressbarVal - 0.01);
+      bar.set(progressbarVal - 0.01);
       progressbarVal -= 0.01;
     } else if (direction === "panup" && progressbarVal <= 1) {
-      bar.animate(progressbarVal + 0.01);
+      bar.set(progressbarVal + 0.01);
       progressbarVal += 0.01;
     }
   };

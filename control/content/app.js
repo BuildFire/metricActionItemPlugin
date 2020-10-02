@@ -26,7 +26,7 @@ Metrics.getMetrics().then(async (result) => {
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
     await Settings.load().then(() => {
-      renderInit("metricsList");
+      renderInit();
       pushBreadcrumb("Home", { nodeSelector });
     });
   }
@@ -141,7 +141,7 @@ const createMetric = () => {
     ).then((result) => {
       metrics = result;
       if (typeof Sortable !== "undefined") {
-        renderInit("metricsList");
+        renderInit();
       }
       goToMetricspage();
     });
@@ -211,7 +211,7 @@ const updateMetrics = (item) => {
     ).then((result) => {
       metrics = result;
       if (typeof Sortable !== "undefined") {
-        renderInit("metricsList");
+        renderInit();
       }
       goToMetricspage();
     });
@@ -232,52 +232,14 @@ const addActionItem = (actionItem = {}) => {
   });
 };
 
-// Handle Breadcrumbs
-const pushBreadcrumb = (breadcrumb, data) => {
-  return new Promise((resolve, reject) => {
-    // buildfire.history.push(breadcrumb, data);
-    breadcrumbsHistory.push(breadcrumb);
-    let crumb = document.createElement("span");
-    crumb.innerHTML =
-      breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
-    crumb.style.cursor = "pointer";
-    crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
-    crumb.onclick = () => {
-      // This condition is to prevent clicking the breadcrumb that we are already inside
-      if (data.nodeSelector === nodeSelector) {
-        return;
-      }
-      let breadLength = breadcrumbsHistory.length;
-      console.log("go to ", +crumb.getAttribute("arrayIndex"));
-      for (
-        let i = 0;
-        i < breadLength - 1 - +crumb.getAttribute("arrayIndex");
-        i++
-      ) {
-        bread.removeChild(bread.lastChild);
-        breadcrumbsHistory.pop();
-      }
-
-      buildfire.messaging.sendMessageToWidget({
-        numberOfPops: breadLength - 1 - +crumb.getAttribute("arrayIndex"),
-        nodeSelector,
-      });
-      nodeSelector = data.nodeSelector;
-
-      if (typeof Sortable !== "undefined") {
-        renderInit("metricsList");
-      }
-      goToMetricspage();
-    };
-    bread.appendChild(crumb);
-    resolve(true);
-  });
-};
+function pushBreadcrumb(breadcrumb, data) {
+  breadcrumbsManager.breadcrumb(breadcrumb, data);
+}
 
 // SortableList component
 // To initialize and prepare metrics to be rendered
-const renderInit = (elementId) => {
-  metricsContainer = document.getElementById(elementId);
+const renderInit = () => {
+  metricsContainer = metricsList;
   // Extract the desired metrics (children) from the big object using nodeSelector
   let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
 
@@ -291,7 +253,7 @@ const renderInit = (elementId) => {
 
   let spinner = document.getElementById("spinner");
   if (currentMetricList.length === 0) {
-    spinner.innerHTML = "No items have been added yet.";
+    spinner.innerHTML = "No metrics have been added yet.";
     spinner.classList.remove("loaded");
     metricsContainer.innerHTML = "";
   } else {
@@ -318,9 +280,7 @@ const render = (items) => {
     metricsContainer,
     items || []
   );
-
-  let dragableListView = document.getElementById("metricsList");
-
+  let dragableListView = metricsList;
   // Disable or enable list drag
   if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
     // Disable manual sorting
@@ -330,70 +290,87 @@ const render = (items) => {
   } else {
     dragableListView.classList.remove("disabledDrag");
   }
-
   // Overwrite the generic method (onItemClick) (on metric's title click)
   sortableList.onItemClick = (item, divRow) => {
-    if (item.type === "parent") {
-      nodeSelector += `.${item.id}.metrics`;
-      if (typeof Sortable !== "undefined") {
-        renderInit("metricsList");
-      }
-      pushBreadcrumb(item.title, { nodeSelector });
-      buildfire.messaging.sendMessageToWidget({
-        title: item.title,
-        nodeSelector,
-      });
-    }
+    clickItem(item);
   };
   // Overwrite the generic method (onDeleteItem)
   sortableList.onDeleteItem = (item, index, callback) => {
-    buildfire.notifications.confirm(
-      {
-        message: "Are you sure you want to delete " + item.title + "?",
-        confirmButton: { text: "Delete", key: "y", type: "danger" },
-        cancelButton: { text: "Cancel", key: "n", type: "default" },
-      },
-      (e, data) => {
-        if (e) console.error(e);
-        if (data.selectedButton.key == "y") {
-          sortableList.items.splice(index, 1);
-          Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
-            (result) => {
-              metrics = result;
-              callback(metrics);
-            }
-          );
-        }
-      }
-    );
+    deleteItem(item, index, callback);
   };
   // Overwrite the generic method (onOrderChange)
   sortableList.onOrderChange = (item, oldIndex, newIndex) => {
-    let orderObj = {};
-    metricsContainer.childNodes.forEach((e) => {
-      const metricId = e.getAttribute("id"),
-        index = parseInt(e.getAttribute("arrayIndex"));
-      orderObj[metricId] = index;
-    });
-    Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
-      .then((result) => {
-        metrics = result;
-      })
-      .catch(console.log);
+    orderChange();
   };
 
   sortableList.onUpdateItem = (item, index) => {
-    item.lastUpdatedBy = currentUser.firstName;
-    initMetricFields(item);
-    metricForm.style.display = "block";
-    updateMetric.style.display = "inline";
-    createAMetric.style.display = "none";
-    metricsMain.style.display = "none";
-    updateMetric.onclick = () => {
-      updateMetrics(item);
-    };
+    updateItem(item);
   };
 };
+
+function clickItem(item) {
+  if (item.type === "parent") {
+    nodeSelector += `.${item.id}.metrics`;
+    if (typeof Sortable !== "undefined") {
+      renderInit();
+    }
+    pushBreadcrumb(item.title, { nodeSelector });
+    buildfire.messaging.sendMessageToWidget({
+      title: item.title,
+      nodeSelector,
+    });
+  }
+}
+
+function deleteItem(item, index, callback) {
+  buildfire.notifications.confirm(
+    {
+      message: "Are you sure you want to delete " + item.title + "?",
+      confirmButton: { text: "Delete", key: "y", type: "danger" },
+      cancelButton: { text: "Cancel", key: "n", type: "default" },
+    },
+    (e, data) => {
+      if (e) console.error(e);
+      if (data.selectedButton.key == "y") {
+        sortableList.items.splice(index, 1);
+        Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id)
+          .then((result) => {
+            metrics = result;
+            callback(metrics);
+          })
+          .finally(() => {
+            renderInit();
+          });
+      }
+    }
+  );
+}
+
+function orderChange() {
+  let orderObj = {};
+  metricsContainer.childNodes.forEach((e) => {
+    const metricId = e.getAttribute("id"),
+      index = parseInt(e.getAttribute("arrayIndex"));
+    orderObj[metricId] = index;
+  });
+  Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
+    .then((result) => {
+      metrics = result;
+    })
+    .catch(console.log);
+}
+
+function updateItem(item) {
+  item.lastUpdatedBy = currentUser.firstName;
+  initMetricFields(item);
+  metricForm.style.display = "block";
+  updateMetric.style.display = "inline";
+  createAMetric.style.display = "none";
+  metricsMain.style.display = "none";
+  updateMetric.onclick = () => {
+    updateMetrics(item);
+  };
+}
 
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log(
@@ -412,7 +389,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
       breadcrumbsHistory.pop();
     }
   }
-  renderInit("metricsList");
+  renderInit();
   goToMetricspage();
 };
 
@@ -428,7 +405,7 @@ const onSortByChange = () => {
     metrics = result;
     if (typeof Sortable !== "undefined") {
       metricsSortBy = sortBy;
-      renderInit("metricsList");
+      renderInit();
     }
   });
 };

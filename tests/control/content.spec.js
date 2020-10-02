@@ -129,10 +129,6 @@ describe("Test The Control Side", () => {
       await expect(Object.keys(metrics.metrics).length).toBe(3);
     });
 
-    xit("Should calculate the value of the big object correctly", async () => {
-      await expect(Metrics.getHistoryValue(metrics)).toBe(40);
-    });
-
     it("Should update a metric's title without any errors", async () => {
       nodeSelector = "metrics";
       await expectAsync(

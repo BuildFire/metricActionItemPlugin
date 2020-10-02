@@ -54,9 +54,6 @@ describe("Test the Settings class", () => {
       expect(result.data.showSummary).toBeFalse();
     });
   });
-  it("Should instantiate an object correctly", () => {
-    expect(Settings.sortBy).toBe("lowest");
-  });
 });
 
 describe("Test users' permissions in the widget", () => {
