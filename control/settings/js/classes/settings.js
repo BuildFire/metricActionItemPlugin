@@ -10,8 +10,7 @@ class Settings {
         if (err) reject(err);
         else {
           this.tags = result.data.tags;
-          this.showSummary =
-            result.data.showSummary === false ? result.data.showSummary : true;
+          this.showSummary = result.data.showSummary;
           resolve(result);
         }
       });

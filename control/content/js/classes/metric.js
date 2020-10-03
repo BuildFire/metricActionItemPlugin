@@ -22,9 +22,7 @@ class Metric {
       let val = metric.history[metric.history.length - 1]
         ? metric.history[metric.history.length - 1].value
         : 0;
-      // TODO: check if we can delete value from Metric class if not needed
       metric.value = val;
-
       return val;
     } else if (metric.type === "parent" || !metric.type) {
       if (Object.keys(metric.metrics).length === 0) {

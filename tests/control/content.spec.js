@@ -110,7 +110,6 @@ describe("Test The Control Side", () => {
     });
 
     it("Should save metrics correctly", async () => {
-      // console.log("metrics IDDDDDDDD", metrics);
       await expectAsync(
         Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric1)
       ).toBeResolved();
@@ -127,6 +126,10 @@ describe("Test The Control Side", () => {
 
     it("Should have the correct number of children", async () => {
       await expect(Object.keys(metrics.metrics).length).toBe(3);
+    });
+
+    it("Should calculate the value of the big object correctly", async () => {
+      await expect(Metric.getHistoryValue(metrics)).toBe(40);
     });
 
     it("Should update a metric's title without any errors", async () => {

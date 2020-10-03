@@ -6,13 +6,12 @@ class Settings {
 
   static load() {
     return new Promise((resolve, reject) => {
-      buildfire.datastore.get("settings", (err, data) => {
+      buildfire.datastore.get("settings", (err, result) => {
         if (err) reject(err);
         else {
-          this.tags = data.data.tags;
-          this.showSummary =
-            data.data.showSummary === false ? data.data.showSummary : true;
-          resolve(data);
+          this.tags = result.data.tags;
+          this.showSummary = result.data.showSummary;
+          resolve(result);
         }
       });
     });

@@ -1,10 +1,8 @@
-const initSettingsFields = () => {
-  Settings.load().then(() => {
-    // Use element id and assign the new data to it's value
-    showSummary.checked = Settings.showSummary;
-    renderTags();
-  });
-};
+Settings.load().then(() => {
+  // Use element id and assign the new data to it's value
+  showSummary.checked = Settings.showSummary;
+  renderTags();
+});
 
 const onFieldChange = (field) => {
   if (field === "showSummary") {
@@ -17,18 +15,19 @@ const setTags = () => {
   return new Promise((resolve, reject) => {
     buildfire.auth.showTagsSearchDialog({}, (err, tags) => {
       if (err) reject(err);
+      if (tags) {
+        let currentTags = {};
+        Settings.tags.forEach((tag) => {
+          currentTags[tag.id] = tag.id;
+        });
 
-      let currentTags = {};
-      Settings.tags.forEach((tag) => {
-        currentTags[tag.id] = tag.id;
-      });
+        tags.forEach((tag) => {
+          if (!currentTags[tag.id]) Settings.tags.push(tag);
+        });
 
-      tags.forEach((tag) => {
-        if (!currentTags[tag.id]) Settings.tags.push(tag);
-      });
-
-      renderTags();
-      resolve(updateSettings());
+        renderTags();
+        resolve(updateSettings());
+      }
     });
   });
 };
@@ -92,8 +91,6 @@ const renderTags = () => {
     </div>
         `;
 
-    document.getElementById("tag-chips").innerHTML += chip;
+    document.getElementById("tag-chips").innerHTML = chip;
   }
 };
-
-initSettingsFields();

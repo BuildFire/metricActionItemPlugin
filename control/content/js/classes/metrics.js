@@ -112,66 +112,7 @@ class Metrics {
     });
   }
 
-  // For testing only (It should be just in the widget's code)
-  static updateMetricHistory({ nodeSelector, metricsId }, value) {
-    const absoluteDate = helpers.getAbsoluteDate();
-
-    return new Promise((resolve, reject) => {
-      if (!nodeSelector) reject("nodeSelector not provided");
-      if (!metricsId) reject("metricsId not provided");
-
-      buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]: absoluteDate },
-        {
-          $set: {
-            [`${nodeSelector}.history.$.value`]: value,
-            [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
-          },
-        },
-        "metrics",
-        async (err, data) => {
-          if (err) reject(err);
-
-          if (data.nModified === 0) {
-            buildfire.publicData.update(
-              metricsId,
-              {
-                $push: {
-                  [`${nodeSelector}.history`]: {
-                    date: absoluteDate,
-                    createdOn: new Date(),
-                    createdBy: "currentUser.username",
-                    lastUpdatedOn: new Date(),
-                    lastUpdatedBy: "currentUser.username",
-                    value,
-                  },
-                },
-              },
-              "metrics",
-              async (err, result) => {
-                if (err) reject(err);
-                else {
-                  result.data.id = result.id;
-                  resolve(result.data);
-                }
-              }
-            );
-          }
-          // Extract metric id from nodeSelector
-          let updatedMetricId = nodeSelector.split(".");
-          updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
-          // Track action
-          Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
-
-          await Metrics.getMetrics().then((result) => {
-            resolve(result);
-          });
-        }
-      );
-    });
-  }
-
+  // To save the new order of the metrics (when sorting manually)
   static order({ nodeSelector, metricsId }, orderObj) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
@@ -197,6 +138,7 @@ class Metrics {
     });
   }
 
+  // To update the way that the metrics should be sorted by
   static sortBy({ nodeSelector, metricsId }, sortBy) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
