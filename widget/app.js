@@ -10,6 +10,8 @@ let metricsSortBy = "manual";
 
 let progressbarVal = 0;
 
+let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 let bar = {};
 let numberOfPops = 0;
 authManager.getCurrentUser().then((user) => {
@@ -147,6 +149,75 @@ const renderInit = () => {
     };
     currentMetricList.push(listItem);
   }
+
+  const getRandomColor = () => {
+    var letters = "0123456789ABCDEF";
+    var color = "#";
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const initChart = () => {
+    const ctx = document.getElementById("chart").getContext("2d");
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: days,
+        datasets: [
+          {
+            label: "Metrics One Name",
+            data: [12, 19, 3, 15, 2, 3, 15],
+            backgroundColor: "transparent",
+            borderColor: getRandomColor(),
+            borderWidth: 2,
+          },
+          {
+            label: "Metrics Two Name",
+            data: [2, 3, 15, 4, 18, 8, 12],
+            backgroundColor: "transparent",
+            borderColor: getRandomColor(),
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+              },
+            },
+          ],
+        },
+      },
+    });
+  };
+  console.log("CONSOLE>LOG metricsChildren", metricsChildren);
+  let datasets = [];
+
+  for (let key in metricsChildren) {
+    let data = [];
+    if (metricsChildren[key].type === "metric") {
+      metricsChildren[key].history.map((his) => {
+        // let hisDate = new Date(his.date);
+        data.push(his.value);
+      });
+
+      datasets.push({
+        label: `${metricsChildren[key].title} Metric`,
+        data,
+        backgroundColor: "transparent",
+        borderColor: getRandomColor(),
+        borderWidth: 2,
+      });
+    }
+  }
+  initChart();
 
   if (Object.keys(metricsChildren).length !== 0) {
     let avg = (sum / Object.keys(metricsChildren).length).toPrecision(3);

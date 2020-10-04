@@ -24,7 +24,8 @@
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <script src="js/lib/progressbar.js"></script>
+    <script src="js/lib/chart.bundle.min.js"></script>
+    <script src="js/lib/progressbar.min.js"></script>
     <script src="js/lib/hammer.min.js"></script>
 
     <!-- build:bundleSharedJSFiles  -->
@@ -39,6 +40,7 @@
 
     <!-- build:bundleCSSFiles  -->
     <!-- <link rel="stylesheet" type="text/css" href="css/a.css" /> -->
+    <link rel="stylesheet" type="text/css" href="css/chart.min.css" />
     <link rel="stylesheet" type="text/css" href="css/b.css" />
 
     <!-- endbuild -->
@@ -52,6 +54,9 @@
         >
           <div class="mdc-card-wrapper__text-section">
             <div class="card__title" id="summaryValue"></div>
+
+            <canvas id="chart" width="400" height="400"></canvas>
+
           </div>
         </div>
       </div>
