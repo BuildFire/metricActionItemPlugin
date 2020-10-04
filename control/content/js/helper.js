@@ -30,4 +30,15 @@ const helpers = {
   inputAlert: (message) => {
     buildfire.notifications.alert({ message });
   },
+  sortMetrics: (currentMetricList, sortBy) => {
+    // Sort metrics based sortBy value
+    if (sortBy === "highest") {
+      currentMetricList.sort((a, b) => b.value - a.value);
+    } else if (sortBy === "lowest") {
+      currentMetricList.sort((a, b) => a.value - b.value);
+    } else {
+      currentMetricList.sort((a, b) => a.order - b.order);
+    }
+    return currentMetricList;
+  },
 };

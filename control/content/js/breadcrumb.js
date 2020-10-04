@@ -3,6 +3,7 @@ const breadcrumbsManager = {
   breadcrumb: (breadcrumb, data) => {
     return new Promise((resolve, reject) => {
       // buildfire.history.push(breadcrumb, data);
+      // Used the global variable (breadcrumbsHistory)
       breadcrumbsHistory.push(breadcrumb);
       let crumb = document.createElement("span");
       crumb.innerHTML =
@@ -11,6 +12,7 @@ const breadcrumbsManager = {
       crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
       crumb.onclick = () => {
         // This condition is to prevent clicking the breadcrumb that we are already inside
+        // Used the global variable (nodeSelector)
         if (data.nodeSelector === nodeSelector) {
           return;
         }

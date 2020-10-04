@@ -13,40 +13,43 @@
       href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
       rel="stylesheet"
     />
-    <!-- Material Icons -->
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
-    <link rel="stylesheet" href="css/sortableList.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="../../../../styles/helper.css"
-    />
-    <link rel="stylesheet" href="../assets/base.css" />
-    <link rel="stylesheet" href="style.css" />
-
-    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
     <script
       src="../../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
       type="text/javascript"
     ></script>
 
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <!-- Template generic Icons -->
+    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
+
+    <!-- Sortable list css & js  -->
+    <link rel="stylesheet" href="css/sortableList.css" />
     <script src="../../../../scripts/sortable.min.js"></script>
+
+    <!-- Template base stylesheet -->
+    <link rel="stylesheet" href="../assets/base.css" />
+
+    <!-- Custom style's stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Import the thumbnail component -->
+    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
   </head>
+
   <body>
     <div id="bread" class="mdc-typography--headline6"></div>
     <br />
     <h1>Metrics</h1>
     <div id="metricsMain">
-      <div class="spinner" id="spinner">Loading...</div>
+      <div id="spinner" class="spinner">Loading...</div>
 
       <div id="metricsList"></div>
       <div class="metric-actions">
-        <label for="cars">Sort By:</label>
+        <label for="metrics">Sort By:</label>
 
         <select id="sortBy" onchange="onSortByChange()">
           <option value="manual">Manual</option>
@@ -179,19 +182,6 @@
       </button>
     </div>
 
-    <!-- <h3 class="section__title">StarterKit Sample Pages</h3>
-    <ul>
-      <li onclick="location='samples/sortableList/sortableList.html'">
-        Draggable List
-      </li>
-      <li onclick="location='samples/subPage/index.html'">Sub Screen</li>
-      <li onclick="location='samples/searchTable/searchTable.html'">
-        Search Table
-      </li>
-    </ul> -->
-    <script>
-      //location = "samples/sortableList/sortableList.html";
-    </script>
     <script src="js/helper.js"></script>
     <script src="js/classes/analytics.js"></script>
     <script src="js/classes/metric.js"></script>

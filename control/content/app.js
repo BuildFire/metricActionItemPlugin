@@ -4,8 +4,9 @@ let metrics = {};
 let nodeSelector = "metrics";
 // To save breadcrumb related data
 let breadcrumbsHistory = [];
-// Initialize metric fields (For add/edit pages' forms)
+// Used to Initialize metric fields (For add/edit pages' forms)
 let metricFields;
+
 let currentUser = {};
 
 let metricsSortBy = "manual";
@@ -19,16 +20,20 @@ authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
 
+// Used to refresh (Reset) the widget if the user go to another tab (in control side) then return to the content tab
+// Where moving from a tab to another will reset these tabs
+buildfire.messaging.sendMessageToWidget({
+  cmd: "refresh",
+});
+
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
 
   console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
-    await Settings.load().then(() => {
-      renderInit();
-      pushBreadcrumb("Home", { nodeSelector });
-    });
+    renderInit();
+    pushBreadcrumb("Home", { nodeSelector });
   }
 });
 // Initialize add/edit Forms' Fields
@@ -41,7 +46,9 @@ const initMetricFields = (data = {}) => {
     actionItem: data.actionItem || {},
     type: data.type || "",
   };
+  // Initialize metric's icon
   initIconComponent(data.icon);
+
   title.value = metricFields.title;
   min.value = metricFields.min;
   max.value = metricFields.max;
@@ -81,23 +88,37 @@ const initIconComponent = (imageUrl = "") => {
   };
 };
 
+const addActionItem = (actionItem = {}) => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      showIcon: false,
+      allowNoAction: true,
+    };
+    buildfire.actionItems.showDialog(actionItem, options, (err, data) => {
+      if (err) reject(err);
+
+      metricFields["actionItem"] = data || {};
+    });
+  });
+};
+
 // Go to Add metric's form page
-function goToAddItem() {
+const goToAddItem = () => {
   metricForm.style.display = "block";
   metricsMain.style.display = "none";
   createAMetric.style.display = "inline";
   updateMetric.style.display = "none";
   // Reset input field to it's initial values
   initMetricFields();
-}
+};
 
 // Go to metrics page from add/edit pages
-function goToMetricspage() {
+const goToMetricspage = () => {
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
-}
+};
 
 // Handle Input fields values' changes
 const onFieldChange = (ele) => {
@@ -140,9 +161,40 @@ const createMetric = () => {
       new Metric(metricFields)
     ).then((result) => {
       metrics = result;
-      if (typeof Sortable !== "undefined") {
-        renderInit();
+      renderInit();
+      goToMetricspage();
+    });
+  }
+};
+
+const updateMetrics = (item) => {
+  // Metric fields validation
+  if (inputValidation()) {
+    let updateObj = {};
+    for (let prop in metricFields) {
+      // To determine what fileds are needed to be updated
+      if (metricFields[prop] !== item[prop]) {
+        updateObj[prop] = metricFields[prop];
+        console.log("thus is", prop, metricFields[prop]);
       }
+    }
+    if (
+      updateObj.type === "parent" ||
+      (updateObj.type !== "metric" && item.type === "parent")
+    ) {
+      delete metricFields.min;
+      delete metricFields.max;
+    } else if (updateObj.type === "metric" && item.type === "parent") {
+      updateObj.max = item.type.max;
+      updateObj.min = item.type.min;
+    }
+    Metrics.update(
+      { nodeSelector, metricsId: metrics.id },
+      updateObj,
+      item.id
+    ).then((result) => {
+      metrics = result;
+      renderInit();
       goToMetricspage();
     });
   }
@@ -183,59 +235,6 @@ const inputValidation = () => {
   return true;
 };
 
-const updateMetrics = (item) => {
-  // Metric fields validation
-  if (inputValidation()) {
-    let updateObj = {};
-    for (let prop in metricFields) {
-      // To determine what fileds are needed to be updated
-      if (metricFields[prop] !== item[prop]) {
-        updateObj[prop] = metricFields[prop];
-        console.log("thus is", prop, metricFields[prop]);
-      }
-    }
-    if (
-      updateObj.type === "parent" ||
-      (updateObj.type !== "metric" && item.type === "parent")
-    ) {
-      delete metricFields.min;
-      delete metricFields.max;
-    } else if (updateObj.type === "metric" && item.type === "parent") {
-      updateObj.max = item.type.max;
-      updateObj.min = item.type.min;
-    }
-    Metrics.update(
-      { nodeSelector, metricsId: metrics.id },
-      updateObj,
-      item.id
-    ).then((result) => {
-      metrics = result;
-      if (typeof Sortable !== "undefined") {
-        renderInit();
-      }
-      goToMetricspage();
-    });
-  }
-};
-
-const addActionItem = (actionItem = {}) => {
-  return new Promise((resolve, reject) => {
-    const options = {
-      showIcon: false,
-      allowNoAction: true,
-    };
-    buildfire.actionItems.showDialog(actionItem, options, (err, data) => {
-      if (err) reject(err);
-
-      metricFields["actionItem"] = data || {};
-    });
-  });
-};
-
-function pushBreadcrumb(breadcrumb, data) {
-  breadcrumbsManager.breadcrumb(breadcrumb, data);
-}
-
 // SortableList component
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
@@ -262,14 +261,7 @@ const renderInit = () => {
     metricsContainer.innerHTML = "";
   }
 
-  // Sort metrics based metricsSortBy value
-  if (metricsSortBy === "highest") {
-    currentMetricList.sort((a, b) => b.value - a.value);
-  } else if (metricsSortBy === "lowest") {
-    currentMetricList.sort((a, b) => a.value - b.value);
-  } else {
-    currentMetricList.sort((a, b) => a.order - b.order);
-  }
+  currentMetricList = helpers.sortMetrics(currentMetricList, metricsSortBy);
 
   render(currentMetricList);
 };
@@ -280,15 +272,14 @@ const render = (items) => {
     metricsContainer,
     items || []
   );
-  let dragableListView = metricsList;
-  // Disable or enable list drag
+
   if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
     // Disable manual sorting
     sortableList.sortableList.options.disabled = true;
-    dragableListView.classList.add("disabledDrag");
+    metricsList.classList.add("disabledDrag");
     // Remove on update functionality
   } else {
-    dragableListView.classList.remove("disabledDrag");
+    metricsList.classList.remove("disabledDrag");
   }
   // Overwrite the generic method (onItemClick) (on metric's title click)
   sortableList.onItemClick = (item, divRow) => {
@@ -308,21 +299,20 @@ const render = (items) => {
   };
 };
 
-function clickItem(item) {
+const clickItem = (item) => {
+  // If it is parent then go to its children
   if (item.type === "parent") {
     nodeSelector += `.${item.id}.metrics`;
-    if (typeof Sortable !== "undefined") {
-      renderInit();
-    }
+    renderInit();
     pushBreadcrumb(item.title, { nodeSelector });
     buildfire.messaging.sendMessageToWidget({
       title: item.title,
       nodeSelector,
     });
   }
-}
+};
 
-function deleteItem(item, index, callback) {
+const deleteItem = (item, index, callback) => {
   buildfire.notifications.confirm(
     {
       message: "Are you sure you want to delete " + item.title + "?",
@@ -344,9 +334,9 @@ function deleteItem(item, index, callback) {
       }
     }
   );
-}
+};
 
-function orderChange() {
+const orderChange = () => {
   let orderObj = {};
   metricsContainer.childNodes.forEach((e) => {
     const metricId = e.getAttribute("id"),
@@ -358,9 +348,9 @@ function orderChange() {
       metrics = result;
     })
     .catch(console.log);
-}
+};
 
-function updateItem(item) {
+const updateItem = (item) => {
   item.lastUpdatedBy = currentUser.firstName;
   initMetricFields(item);
   metricForm.style.display = "block";
@@ -370,7 +360,11 @@ function updateItem(item) {
   updateMetric.onclick = () => {
     updateMetrics(item);
   };
-}
+};
+
+const pushBreadcrumb = (breadcrumb, data) => {
+  breadcrumbsManager.breadcrumb(breadcrumb, data);
+};
 
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log(
@@ -379,9 +373,11 @@ buildfire.messaging.onReceivedMessage = (message) => {
     breadcrumbsHistory,
     nodeSelector
   );
+  // If message has title then it is a push breacrumb
   if (message.title) {
     nodeSelector = message.nodeSelector;
     pushBreadcrumb(message.title, { nodeSelector });
+    // If it is not then it is a backward breadcrumb
   } else {
     if (nodeSelector !== message.nodeSelector) {
       nodeSelector = message.nodeSelector;
@@ -403,9 +399,11 @@ const onSortByChange = () => {
     sortBy
   ).then((result) => {
     metrics = result;
-    if (typeof Sortable !== "undefined") {
-      metricsSortBy = sortBy;
-      renderInit();
+    metricsSortBy = sortBy;
+    if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
+      // Disable manual sorting
+      sortableList.sortableList.options.disabled = true;
     }
+    renderInit();
   });
 };

@@ -47,11 +47,7 @@ Metrics.getMetrics().then(async (data) => {
     });
   });
 });
-buildfire.messaging.onReceivedMessage = (msg) => {
-  if (msg.cmd == "refresh")
-    /// message comes from the strings page on the control side
-    location.reload();
-};
+
 if (typeof ListView !== "undefined") {
   listViewDiv = new ListView("listViewContainer", {
     enableAddButton: true,
@@ -191,7 +187,7 @@ if (typeof ProgressBar !== "undefined") {
     // Set default step function for all animate calls
     step: (state, bar) => {
       bar.path.setAttribute("stroke", state.color);
-      var value = Math.round(bar.value() * 100);
+      var value = Math.round(bar.value() * 300);
       if (value === 0) {
         bar.setText(0);
       } else {
@@ -218,7 +214,7 @@ if (typeof ProgressBar !== "undefined") {
 
   // listen to events...
   hammer.on("panup pandown", (ev) => {
-    if (Math.round(ev.distance) % 5 === 0) {
+    if (Math.round(ev.distance) % 1 === 0) {
       // console.log(Math.round(ev.distance));
       changeProgressbarValue(ev.type);
     }
@@ -271,7 +267,11 @@ buildfire.messaging.onReceivedMessage = (message) => {
     nodeSelector
   );
 
-  if (message.numberOfPops) {
+  if (message.cmd == "refresh") {
+    if (nodeSelector != "metrics") {
+      location.reload();
+    }
+  } else if (message.numberOfPops) {
     numberOfPops = message.numberOfPops;
     // To check if the the screens in both sides (control & widget) are the same
     // (For example, if the widget on the update history value screen (which is not existed in the cotrol);
