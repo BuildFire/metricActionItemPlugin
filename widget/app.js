@@ -13,7 +13,11 @@ let progressbarVal = 0;
 let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 let bar = {};
+
+let newChart = {};
+
 let numberOfPops = 0;
+
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
 });
@@ -68,7 +72,16 @@ if (typeof ListView !== "undefined") {
 const renderInit = () => {
   listViewContainer.innerHTML = "";
   console.log("Hello everybody", nodeSelector, metrics);
-  let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+  let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+  let metricsChildren = readyMetrics.metricsChildren;
+  metricsSortBy = readyMetrics.metricsSortBy;
+  if (Object.keys(newChart).length !== 0) {
+    console.log("new Chart", newChart);
+    // newChart.destroy();
+  }
+
+  initChart2(readyMetrics.metricsParent);
+
   let currentMetricList = [];
   console.log("please", metricsChildren);
 
@@ -85,6 +98,8 @@ const renderInit = () => {
     sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
     listItem.onToolbarClicked = (e) => {
+      newChart.destroy();
+
       if (metricsChildren[metricId].type === "parent") {
         nodeSelector += `.${metricId}.metrics`;
         buildfire.history.push(metricsChildren[metricId].title, {
@@ -97,11 +112,13 @@ const renderInit = () => {
           nodeSelector,
         });
         console.log("nodeSelector", nodeSelector);
+        // newChart.destroy();
         renderInit();
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
         metricsScreen.style.display = "none";
         updateHistoryContainer.style.display = "block";
+
         console.log("metrics wowowowo", metrics);
         // nodeSelector += `.${metricId}.metrics`;
 
@@ -138,86 +155,22 @@ const renderInit = () => {
             // nodeSelector = tempNode.join(".");
 
             console.log("AFTER UPDATE nodeSelector", nodeSelector);
+            // newChart.destroy();
+
             buildfire.history.pop();
           });
         };
-        bar.animate(Math.round(newMetric.value) / 100);
-
-        // Assign global progressbar value
-        progressbarVal = Math.round(newMetric.value) / 100;
+        if (Object.keys(bar).length !== 0) {
+          console.log("Bar On Pop", bar);
+          bar.destroy();
+        }
+        initProgressBar(newMetric);
       }
     };
     currentMetricList.push(listItem);
   }
 
-  const getRandomColor = () => {
-    var letters = "0123456789ABCDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
-  const initChart = () => {
-    const ctx = document.getElementById("chart").getContext("2d");
-
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: days,
-        datasets: [
-          {
-            label: "Metrics One Name",
-            data: [12, 19, 3, 15, 2, 3, 15],
-            backgroundColor: "transparent",
-            borderColor: getRandomColor(),
-            borderWidth: 2,
-          },
-          {
-            label: "Metrics Two Name",
-            data: [2, 3, 15, 4, 18, 8, 12],
-            backgroundColor: "transparent",
-            borderColor: getRandomColor(),
-            borderWidth: 2,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-            },
-          ],
-        },
-      },
-    });
-  };
   console.log("CONSOLE>LOG metricsChildren", metricsChildren);
-  let datasets = [];
-
-  for (let key in metricsChildren) {
-    let data = [];
-    if (metricsChildren[key].type === "metric") {
-      metricsChildren[key].history.map((his) => {
-        // let hisDate = new Date(his.date);
-        data.push(his.value);
-      });
-
-      datasets.push({
-        label: `${metricsChildren[key].title} Metric`,
-        data,
-        backgroundColor: "transparent",
-        borderColor: getRandomColor(),
-        borderWidth: 2,
-      });
-    }
-  }
-  initChart();
 
   if (Object.keys(metricsChildren).length !== 0) {
     let avg = (sum / Object.keys(metricsChildren).length).toPrecision(3);
@@ -228,48 +181,100 @@ const renderInit = () => {
 
   console.log("currentMetricList", currentMetricList);
 
-  if (metricsSortBy === "highest") {
-    currentMetricList.sort((a, b) => b.value - a.value);
-  } else if (metricsSortBy === "lowest") {
-    currentMetricList.sort((a, b) => a.value - b.value);
-  } else {
-    currentMetricList.sort((a, b) => a.order - b.order);
-  }
+  currentMetricList = helpers.sortMetrics(currentMetricList, metricsSortBy);
 
   listViewDiv.loadListViewItems(currentMetricList);
 };
 
-if (typeof ProgressBar !== "undefined") {
-  // updateMetricHistory progress bar
-  bar = new ProgressBar.SemiCircle("#progressbar-container", {
-    strokeWidth: 10,
-    color: "#FFEA82",
-    trailColor: "#eee",
-    trailWidth: 10,
-    easing: "easeInOut",
-    duration: 500,
-    svgStyle: null,
-    text: {
-      value: "",
-      alignToBottom: true,
-    },
-    from: { color: "#FFEA82" },
-    to: { color: "#ED6A5A" },
-    // Set default step function for all animate calls
-    step: (state, bar) => {
-      bar.path.setAttribute("stroke", state.color);
-      var value = Math.round(bar.value() * 300);
-      if (value === 0) {
-        bar.setText(0);
-      } else {
-        bar.setText(value);
-      }
+const getRandomColor = () => {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
 
-      bar.text.style.color = state.color;
+const initChart = (datasets) => {
+  const ctx = document.getElementById("chart").getContext("2d");
+
+  newChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: days,
+      datasets,
+    },
+    options: {
+      responsive: true,
+      scales: {
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+            },
+          },
+        ],
+      },
     },
   });
-  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-  bar.text.style.fontSize = "2rem";
+};
+
+const initChart2 = (metric) => {
+  let datasets = [];
+  let title = !metric.title ? `Home History` : `${metric.title} History`;
+  let historyValues = [];
+  for (var i = 1; i <= 7; i++) {
+    historyValues.unshift(historyValue(metric, i));
+  }
+  console.log("aksflakflsklgekhtr", historyValues, metric);
+  datasets.push({
+    label: title,
+    data: historyValues,
+    backgroundColor: "transparent",
+    borderColor: getRandomColor(),
+    borderWidth: 2,
+  });
+  initChart(datasets);
+};
+const initProgressBar = (newMetric) => {
+  if (typeof ProgressBar !== "undefined") {
+    // updateMetricHistory progress bar
+    bar = new ProgressBar.SemiCircle("#progressbar-container", {
+      strokeWidth: 10,
+      color: "#FFEA82",
+      trailColor: "#eee",
+      trailWidth: 10,
+      easing: "easeInOut",
+      duration: 500,
+      svgStyle: null,
+      text: {
+        value: "",
+        alignToBottom: true,
+      },
+      from: { color: "#FFEA82" },
+      to: { color: "#ED6A5A" },
+      // Set default step function for all animate calls
+      step: (state, bar) => {
+        bar.path.setAttribute("stroke", state.color);
+        var value = Math.round(bar.value() * (newMetric.max - newMetric.min));
+        if (value === 0) {
+          bar.setText(0);
+        } else {
+          bar.setText(value);
+        }
+
+        bar.text.style.color = state.color;
+      },
+    });
+    bar.set(Math.round(newMetric.value) / 100);
+    let progressText = document.getElementsByClassName("progressbar-text")[0];
+    progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
+    // Assign global progressbar value
+    progressbarVal = Math.round(newMetric.value) / 100;
+
+    bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    bar.text.style.fontSize = "2rem";
+  }
 
   // Init hammerJs gesture detection on element
 
@@ -292,43 +297,48 @@ if (typeof ProgressBar !== "undefined") {
   });
 
   const changeProgressbarValue = (direction) => {
-    if (direction === "pandown" && progressbarVal >= 0) {
+    let progressText = document.getElementsByClassName("progressbar-text")[0];
+    if (direction === "pandown" && progressbarVal >= 0.000001) {
       bar.set(progressbarVal - 0.01);
       progressbarVal -= 0.01;
-    } else if (direction === "panup" && progressbarVal <= 1) {
+      progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
+    } else if (direction === "panup" && progressbarVal <= 0.9999999) {
       bar.set(progressbarVal + 0.01);
       progressbarVal += 0.01;
+      progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
     }
   };
+};
 
-  buildfire.history.onPop((breadcrumb) => {
-    // Show / Hide views
+buildfire.history.onPop((breadcrumb) => {
+  // Show / Hide views
+
+  if (numberOfPops) {
+    --numberOfPops;
+    nodeSelector = breadcrumb.options.nodeSelector;
+
+    metricsScreen.style.display = "block";
+    updateHistoryContainer.style.display = "none";
+    renderInit();
+
     if (numberOfPops) {
-      --numberOfPops;
-      nodeSelector = breadcrumb.options.nodeSelector;
-
+      buildfire.history.pop();
+    }
+  } else {
+    console.log("it shouldn't be");
+    //  This condition is for preventing the control side from going back (when clicking back in widget)
+    // when we are at the home, which would lead to an error
+    if (Object.keys(breadcrumb.options).length > 0) {
       metricsScreen.style.display = "block";
       updateHistoryContainer.style.display = "none";
+      nodeSelector = breadcrumb.options.nodeSelector;
+      buildfire.messaging.sendMessageToControl({ nodeSelector });
+
       renderInit();
-
-      if (numberOfPops) {
-        buildfire.history.pop();
-      }
-    } else {
-      console.log("it shouldn't be");
-      //  This condition is for preventing the control side from going back (when clicking back in widget)
-      // when we are at the home, which would lead to an error
-      if (Object.keys(breadcrumb.options).length > 0) {
-        metricsScreen.style.display = "block";
-        updateHistoryContainer.style.display = "none";
-        nodeSelector = breadcrumb.options.nodeSelector;
-        buildfire.messaging.sendMessageToControl({ nodeSelector });
-
-        renderInit();
-      }
     }
-  });
-}
+  }
+});
+
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log("Message has been received", message);
   console.log(
@@ -362,3 +372,25 @@ buildfire.messaging.onReceivedMessage = (message) => {
     updateHistoryContainer.style.display = "none";
   }
 };
+
+function historyValue(metric, inde) {
+  if (metric.type === "metric") {
+    let val = metric.history[metric.history.length - inde]
+      ? metric.history[metric.history.length - inde].value
+      : 0;
+
+    return val;
+  } else if (metric.type === "parent" || !metric.type) {
+    if (Object.keys(metric.metrics).length === 0) {
+      return 0;
+    }
+    if (metric.metrics) {
+      let sum = 0;
+      for (let key in metric.metrics) {
+        sum += historyValue(metric.metrics[key], inde);
+      }
+      let avg = sum / Object.keys(metric.metrics).length;
+      return avg;
+    }
+  }
+}

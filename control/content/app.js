@@ -122,6 +122,11 @@ const goToMetricspage = () => {
 
 // Handle Input fields values' changes
 const onFieldChange = (ele) => {
+  if (ele.id === "min" || ele.id === "max") {
+    metricFields[ele.id] = parseInt(ele.value);
+    return;
+  }
+
   metricFields[ele.id] = ele.value;
 };
 
