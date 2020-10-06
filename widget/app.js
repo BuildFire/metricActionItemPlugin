@@ -10,13 +10,13 @@ let metricsSortBy = "manual";
 
 let progressbarVal = 0;
 
-let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 let bar = {};
 
 let newChart = {};
 
 let numberOfPops = 0;
+
+let userPass = false;
 
 authManager.getCurrentUser().then((user) => {
   currentUser = user;
@@ -44,6 +44,8 @@ Metrics.getMetrics().then(async (data) => {
 
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
+      checkUser();
+
       renderInit();
     }
 
@@ -70,6 +72,14 @@ if (typeof ListView !== "undefined") {
 }
 
 const renderInit = () => {
+  if (nodeSelector.slice(-7) !== "metrics") {
+    return;
+  }
+  if (nodeSelector === "metrics" && !Settings.showSummary) {
+    summary.style.display = "none";
+  } else {
+    summary.style.display = "block";
+  }
   listViewContainer.innerHTML = "";
   console.log("Hello everybody", nodeSelector, metrics);
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
@@ -77,7 +87,7 @@ const renderInit = () => {
   metricsSortBy = readyMetrics.metricsSortBy;
   if (Object.keys(newChart).length !== 0) {
     console.log("new Chart", newChart);
-    // newChart.destroy();
+    newChart.destroy();
   }
 
   initChart2(readyMetrics.metricsParent);
@@ -98,7 +108,7 @@ const renderInit = () => {
     sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
     listItem.onToolbarClicked = (e) => {
-      newChart.destroy();
+      // newChart.destroy();
 
       if (metricsChildren[metricId].type === "parent") {
         nodeSelector += `.${metricId}.metrics`;
@@ -116,55 +126,57 @@ const renderInit = () => {
         renderInit();
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
-        metricsScreen.style.display = "none";
-        updateHistoryContainer.style.display = "block";
+        if (currentUser && userPass) {
+          metricsScreen.style.display = "none";
+          updateHistoryContainer.style.display = "block";
 
-        console.log("metrics wowowowo", metrics);
-        // nodeSelector += `.${metricId}.metrics`;
+          console.log("metrics wowowowo", metrics);
+          // nodeSelector += `.${metricId}.metrics`;
 
-        buildfire.history.push(`Update ${metricsChildren[metricId].title}`, {
-          nodeSelector,
-          // metricType: metricsChildren[metricId].type,
-          showLabelInTitlebar: true,
-        });
-        nodeSelector += `.${metricId}`;
-
-        updateHistoryBtn.onclick = function (event) {
-          console.log("metrics lalalalala", metrics);
-
-          const value = Math.round(bar.value() * 100); // the value of the progressbar
-          console.log("value", value);
-          console.log("bar.value()", bar.value());
-          // return;
-          console.log(
-            "qwqweeqweqweqeqweqweqweqwe",
+          buildfire.history.push(`Update ${metricsChildren[metricId].title}`, {
             nodeSelector,
-            metrics.id,
-            value,
-            newMetric.id
-          );
-
-          Metrics.updateMetricHistory(
-            { nodeSelector, metricsId: metrics.id },
-            value
-          ).then((result) => {
-            metrics = result;
-            console.log("AFTER UPDATE nodeSelector", nodeSelector);
-            // let tempNode = nodeSelector.split(".");
-            // tempNode.split(".").pop();
-            // nodeSelector = tempNode.join(".");
-
-            console.log("AFTER UPDATE nodeSelector", nodeSelector);
-            // newChart.destroy();
-
-            buildfire.history.pop();
+            // metricType: metricsChildren[metricId].type,
+            showLabelInTitlebar: true,
           });
-        };
-        if (Object.keys(bar).length !== 0) {
-          console.log("Bar On Pop", bar);
-          bar.destroy();
+          nodeSelector += `.${metricId}`;
+
+          updateHistoryBtn.onclick = function (event) {
+            console.log("metrics lalalalala", metrics);
+
+            const value = Math.round(bar.value() * 100); // the value of the progressbar
+            console.log("value", value);
+            console.log("bar.value()", bar.value());
+            // return;
+            console.log(
+              "qwqweeqweqweqeqweqweqweqwe",
+              nodeSelector,
+              metrics.id,
+              value,
+              newMetric.id
+            );
+
+            Metrics.updateMetricHistory(
+              { nodeSelector, metricsId: metrics.id },
+              value
+            ).then((result) => {
+              metrics = result;
+              console.log("AFTER UPDATE nodeSelector", nodeSelector);
+              // let tempNode = nodeSelector.split(".");
+              // tempNode.split(".").pop();
+              // nodeSelector = tempNode.join(".");
+
+              console.log("AFTER UPDATE nodeSelector", nodeSelector);
+              // newChart.destroy();
+
+              buildfire.history.pop();
+            });
+          };
+          if (Object.keys(bar).length !== 0) {
+            console.log("Bar On Pop", bar);
+            bar.destroy();
+          }
+          initProgressBar(newMetric);
         }
-        initProgressBar(newMetric);
       }
     };
     currentMetricList.push(listItem);
@@ -201,7 +213,7 @@ const initChart = (datasets) => {
   newChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: days,
+      labels: helpers.getLast7Days(),
       datasets,
     },
     options: {
@@ -223,9 +235,12 @@ const initChart2 = (metric) => {
   let datasets = [];
   let title = !metric.title ? `Home History` : `${metric.title} History`;
   let historyValues = [];
-  for (var i = 1; i <= 7; i++) {
-    historyValues.unshift(historyValue(metric, i));
+  for (var i = 7; i > 0; i--) {
+    historyValues.push(historyValue(metric, i));
   }
+  // for (var i = 1; i <= 7; i++) {
+  //   historyValues.unshift(historyValue(metric, i));
+  // }
   console.log("aksflakflsklgekhtr", historyValues, metric);
   datasets.push({
     label: title,
@@ -310,6 +325,19 @@ const initProgressBar = (newMetric) => {
   };
 };
 
+const checkUser = () => {
+  let currentTags = {};
+  Settings.tags.forEach((tag) => {
+    currentTags[tag.tagName] = tag.tagName;
+  });
+
+  currentUser.tags[Object.keys(currentUser.tags)[0]].forEach((tag) => {
+    if (currentTags[tag.tagName]) {
+      userPass = true;
+    }
+  });
+};
+
 buildfire.history.onPop((breadcrumb) => {
   // Show / Hide views
 
@@ -375,22 +403,80 @@ buildfire.messaging.onReceivedMessage = (message) => {
 
 function historyValue(metric, inde) {
   if (metric.type === "metric") {
-    let val = metric.history[metric.history.length - inde]
-      ? metric.history[metric.history.length - inde].value
-      : 0;
+    let todayDate = helpers.getAbsoluteDate();
 
-    return val;
+    // console.log(
+    //   "whole time of pain",
+    //   todayDate.getDate(),
+    //   new Date(metric.history[0].date),
+    //   inde
+    // );
+    for (var i = 1; i <= 7; i++) {
+      if (metric.history[metric.history.length - i]) {
+        // if (inde === 3) {
+        //   console.log(
+        //     "laloosh0",
+        //     new Date(
+        //       todayDate -
+        //         new Date(metric.history[metric.history.length - i].date)
+        //     ).getDate(),
+        //     inde
+        //   );
+        // }
+        if (
+          new Date(
+            todayDate - new Date(metric.history[metric.history.length - i].date)
+          ).getDate() >= inde
+        ) {
+          let val = metric.history[metric.history.length - i].value;
+          return val;
+        }
+      }
+    }
+    // let val = metric.history[metric.history.length - inde]
+    //   ? metric.history[metric.history.length - inde].value
+    //   : "false";
+
+    return "false";
   } else if (metric.type === "parent" || !metric.type) {
     if (Object.keys(metric.metrics).length === 0) {
       return 0;
     }
     if (metric.metrics) {
       let sum = 0;
+      let numberChildren = 0;
       for (let key in metric.metrics) {
-        sum += historyValue(metric.metrics[key], inde);
+        if (historyValue(metric.metrics[key], inde) !== "false") {
+          numberChildren++;
+
+          sum += historyValue(metric.metrics[key], inde);
+        }
       }
-      let avg = sum / Object.keys(metric.metrics).length;
+      let avg = sum / numberChildren;
+
       return avg;
     }
   }
 }
+
+// function historyValue(metric, inde) {
+//   if (metric.type === "metric") {
+//     let val = metric.history[metric.history.length - inde]
+//       ? metric.history[metric.history.length - inde].value
+//       : 0;
+
+//     return val;
+//   } else if (metric.type === "parent" || !metric.type) {
+//     if (Object.keys(metric.metrics).length === 0) {
+//       return 0;
+//     }
+//     if (metric.metrics) {
+//       let sum = 0;
+//       for (let key in metric.metrics) {
+//         sum += historyValue(metric.metrics[key], inde);
+//       }
+//       let avg = sum / Object.keys(metric.metrics).length;
+//       return avg;
+//     }
+//   }
+// }

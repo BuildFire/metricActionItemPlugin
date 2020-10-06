@@ -37,12 +37,22 @@ const helpers = {
     }
     return currentMetricList;
   },
+  getLast7Days: () => {
+    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let result = [];
+    let date = helpers.getAbsoluteDate();
+    result.push(days[date.getDay()]);
+
+    for (i = 1; i <= 6; i++) {
+      let copiedDate = new Date(date);
+      copiedDate.setDate(date.getDate() - i);
+      result.push(days[copiedDate.getDay()]);
+    }
+    return result.reverse();
+  },
 };
 
-
 let last7Days = ["7/9", "6/9", "5/9", "4/9", "3/9", "2/9", "1/9"];
-
-
 
 // if (histry["1/9"]) {
 //   value = history.value
@@ -97,20 +107,22 @@ while (loop < 7) {
 }
 
 console.log(dataset);
+let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-let test = [];
 function getLast7Days() {
+  let test = [];
   let date = helpers.getAbsoluteDate();
-  test.push({ date, value: 0 });
+  test.push(days[date.getDay()]);
 
   for (i = 1; i <= 6; i++) {
     let copiedDate = new Date(date);
     copiedDate.setDate(date.getDate() - i);
-    test.push({ date: copiedDate, value: 0 });
+    test.push(days[copiedDate.getDay()]);
   }
+  console.log("test.reverse()", test.reverse());
+  return test.reverse();
 }
 getLast7Days();
-console.log(test);
 
 ("7/9"); // => value 23
 ("6/9"); // => value 14 "The value of the previous date (5/9)"
