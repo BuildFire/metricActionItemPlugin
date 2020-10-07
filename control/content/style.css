@@ -68,3 +68,17 @@ input:disabled {
 #metricsList.draggable-list-view.disabledDrag .d-item span.icon-menu {
   cursor: not-allowed !important;
 }
+
+#showActionItem {
+  padding: 5px 15px;
+}
+
+#bread .crumb {
+  cursor: pointer;
+  color: lightblue;
+}
+
+#bread .crumb:last-child {
+  cursor: default;
+  color: black;
+}

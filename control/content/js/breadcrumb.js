@@ -7,8 +7,8 @@ const breadcrumbsManager = {
       breadcrumbsHistory.push(breadcrumb);
       let crumb = document.createElement("span");
       crumb.innerHTML =
-        breadcrumb === "Home" ? `${breadcrumb}` : ` / ${breadcrumb}`;
-      crumb.style.cursor = "pointer";
+        breadcrumb === "Home" ? `${breadcrumb}` : `${breadcrumb}`;
+      crumb.classList.add("crumb");
       crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
       crumb.onclick = () => {
         // This condition is to prevent clicking the breadcrumb that we are already inside
@@ -24,6 +24,7 @@ const breadcrumbsManager = {
           i++
         ) {
           bread.removeChild(bread.lastChild);
+          bread.removeChild(bread.lastChild);
           breadcrumbsHistory.pop();
         }
 
@@ -38,6 +39,11 @@ const breadcrumbsManager = {
         }
         goToMetricspage();
       };
+      if (breadcrumb !== "Home") {
+        const slash = document.createElement("span");
+        slash.innerHTML += " / ";
+        bread.appendChild(slash);
+      }
       bread.appendChild(crumb);
       resolve(true);
     });

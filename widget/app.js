@@ -191,8 +191,12 @@ const renderInit = () => {
       }
     };
     currentMetricList.push(listItem);
-    summaryValue.innerText = newMetric.value ? `${newMetric.value}%` : "0%";
   }
+
+  // Add the summary value of the parent metric
+  summaryValue.innerText = readyMetrics.metricsParent.value
+    ? `${readyMetrics.metricsParent.value}%`
+    : "0%";
 
   console.log("CONSOLE>LOG metricsChildren", metricsChildren);
 
@@ -443,9 +447,9 @@ function historyValue(metric, inde) {
         ) {
           let val = metric.history[metric.history.length - i].value;
           if (inde === 1) {
-            metric.value = val;
+            metric.value = val || 0;
           } else if (inde === 2) {
-            metric.previousValue = val;
+            metric.previousValue = val || 0;
           }
           return val;
         }
@@ -472,9 +476,9 @@ function historyValue(metric, inde) {
       }
       let avg = sum / numberChildren;
       if (inde === 1) {
-        metric.value = parseFloat(avg.toPrecision(3));
+        metric.value = parseFloat(avg.toPrecision(3)) || 0;
       } else if (inde === 2) {
-        metric.previousValue = parseFloat(avg.toPrecision(3));
+        metric.previousValue = parseFloat(avg.toPrecision(3)) || 0;
       }
       return avg;
     }

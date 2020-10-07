@@ -16,9 +16,17 @@ let sortableList = null;
 let metricsContainer = null;
 
 // Get the logged in user
-authManager.getCurrentUser().then((user) => {
-  currentUser = user;
-});
+const getCurrentUser = () => {
+  return authManager.getCurrentUser().then((user) => {
+    currentUser = user;
+  });
+};
+
+getCurrentUser();
+
+// Login and Logout listners
+buildfire.auth.onLogin(() => getCurrentUser());
+buildfire.auth.onLogout(() => (currentUser = null));
 
 // Used to refresh (Reset) the widget if the user go to another tab (in control side) then return to the content tab
 // Where moving from a tab to another will reset these tabs
@@ -41,11 +49,18 @@ const initMetricFields = (data = {}) => {
   metricFields = {
     title: data.title || "",
     icon: data.icon || "",
-    min: data.min || "",
-    max: data.max || "",
+    min: data.min || (data.min !== 0 ? "" : 0),
+    max: data.max || (data.max !== 0 ? "" : 0),
     actionItem: data.actionItem || {},
     type: data.type || "",
   };
+
+  
+
+  if (Object.keys(metricFields.actionItem).length !== 0) {
+    helpers.getActionItem(data.actionItem.action);
+  }
+
   // Initialize metric's icon
   initIconComponent(data.icon);
 
@@ -94,10 +109,11 @@ const addActionItem = (actionItem = {}) => {
       showIcon: false,
       allowNoAction: true,
     };
+
     buildfire.actionItems.showDialog(actionItem, options, (err, data) => {
       if (err) reject(err);
-
-      metricFields["actionItem"] = data || {};
+      helpers.getActionItem(data.action);
+      if (data) metricFields["actionItem"] = data;
     });
   });
 };
@@ -386,6 +402,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
   } else {
     if (nodeSelector !== message.nodeSelector) {
       nodeSelector = message.nodeSelector;
+      bread.removeChild(bread.lastChild);
       bread.removeChild(bread.lastChild);
       breadcrumbsHistory.pop();
     }

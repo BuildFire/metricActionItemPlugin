@@ -41,4 +41,31 @@ const helpers = {
     }
     return currentMetricList;
   },
+
+  getActionItem(action) {
+    showActionItem.innerHTML = "";
+
+    const actions = {
+      linkToApp: "Link to app",
+      navigateToAppSettings: "Navigate To App Settings",
+      navigateToBookmarks: "Navigate To Bookmarks",
+      callNumber: "Call Number",
+      linkToSocialFacebook: "Link To Social Facebook",
+      linkToSocialInstagram: "Link To Social Instagram",
+      linkToSocialLinkedIn: "Link To Social LinkedIn",
+      navigateToLogin: "Navigate To Login",
+      navigateToAddress: "Navigate To Address",
+      noAction: "No Action",
+      navigateToNotes: "Navigate To Notes",
+      navigateToNotifications: "Navigate To Notifications",
+      sendEmail: "Send Email",
+      sendSms: "Send SMS",
+      linkToSocialTwitter: "Link To Social Twitter",
+      linkToWeb: "linkToWeb",
+      navigateToSearch: "Navigate To Search",
+      purchase: "Purchase",
+    };
+
+    showActionItem.innerHTML += actions[action] || "No Action Selected";
+  },
 };
