@@ -83,6 +83,10 @@ span {
   font-size: 20px;
 }
 
+.listViewItemToolbar {
+  padding-left: 25px;
+}
+
 .summary-card .card__title {
   font-size: 1.25rem;
   line-height: 2rem;

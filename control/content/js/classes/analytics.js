@@ -11,4 +11,8 @@ class Analytics {
       { silentNotification }
     );
   }
+
+  static unregisterEvent(id) {
+    buildfire.analytics.unregisterEvent(`METRIC_${id}_HISTORY_UPDATE`);
+  }
 }

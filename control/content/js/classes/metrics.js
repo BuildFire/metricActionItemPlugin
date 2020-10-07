@@ -104,6 +104,7 @@ class Metrics {
         (err, result) => {
           if (err) reject(err);
           else {
+            Analytics.unregisterEvent(id);
             result.data.id = metricsId;
             resolve(result.data);
           }
