@@ -47,6 +47,7 @@ if (typeof ListView !== "undefined") {
 }
 Metrics.getMetrics().then(async (data) => {
   metrics = data;
+  // historyValue(metrics);
 
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
@@ -101,7 +102,6 @@ const renderInit = () => {
   let currentMetricList = [];
   console.log("please", metricsChildren);
 
-  let sum = 0;
   console.log("metrics widget", metrics);
   if (Object.keys(metricsChildren).length === 0) {
     listViewContainer.innerHTML = `<div style="text-align:center" >No metrics have been added yet</div>`;
@@ -109,9 +109,7 @@ const renderInit = () => {
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
     let newMetric = new Metric(metricsChildren[metricId]);
-    Metric.getHistoryValue(newMetric);
 
-    sum += newMetric.value || 0;
     let listItem = new ListViewItem(newMetric);
     listItem.onToolbarClicked = (e) => {
       // newChart.destroy();
@@ -186,16 +184,10 @@ const renderInit = () => {
       }
     };
     currentMetricList.push(listItem);
+    summaryValue.innerText = newMetric.value ? `${newMetric.value}%` : "0%";
   }
 
   console.log("CONSOLE>LOG metricsChildren", metricsChildren);
-
-  if (Object.keys(metricsChildren).length !== 0) {
-    let avg = (sum / Object.keys(metricsChildren).length).toPrecision(3);
-    summaryValue.innerText = `${avg}%`;
-  } else {
-    summaryValue.innerText = "0%";
-  }
 
   console.log("currentMetricList", currentMetricList);
 
@@ -443,6 +435,11 @@ function historyValue(metric, inde) {
           ).getDate() >= inde
         ) {
           let val = metric.history[metric.history.length - i].value;
+          if (inde === 1) {
+            metric.value = val;
+          } else if (inde === 2) {
+            metric.previousValue = val;
+          }
           return val;
         }
       }
@@ -467,7 +464,11 @@ function historyValue(metric, inde) {
         }
       }
       let avg = sum / numberChildren;
-
+      if (inde === 1) {
+        metric.value = parseFloat(avg.toPrecision(3));
+      } else if (inde === 2) {
+        metric.previousValue = parseFloat(avg.toPrecision(3));
+      }
       return avg;
     }
   }

@@ -136,11 +136,13 @@ class ListViewItem {
         ui.create("i", listViewItemToolbar, "north", [
           "material-icons",
           "mdc-button__icon",
+          "mdc-theme--secondary",
         ]);
       } else if (this.value < this.previousValue) {
         ui.create("i", listViewItemToolbar, "south", [
           "material-icons",
           "mdc-button__icon",
+          "mdc-theme--error",
         ]);
       }
 

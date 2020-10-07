@@ -9,6 +9,9 @@ class Metric {
     this.type = data.type || "";
     this.order = data.order || null;
     this.metrics = data.metrics || {};
+    this.value = data.value || 0;
+    this.previousValue = data.previousValue || 0;
+
     this.history = data.history || [];
     this.createdOn = data.createdOn || null;
     this.createdBy = data.createdBy || null;
@@ -49,7 +52,7 @@ class Metric {
 
         metric.value = parseFloat(avg.toPrecision(3));
         metric.previousValue = parseFloat(avgPrev.toPrecision(3));
-        
+
         return avg;
       }
     }
