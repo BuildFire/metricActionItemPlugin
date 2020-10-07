@@ -32,20 +32,20 @@ describe("Test The Control Side", () => {
 
     let metric1 = new Metric({
       actionItem: {},
-      createdBy: "currentUser.username",
+      createdBy: "Amjad Hamza",
       createdOn: new Date(),
       history: [
         {
           date: helpers.getAbsoluteDate(),
           value: 56,
           createdOn: new Date(),
-          createdBy: "currentUser.username",
+          createdBy: "Amjad Hamza",
           lastUpdatedOn: new Date(),
-          lastUpdatedBy: "currentUser.username",
+          lastUpdatedBy: "Amjad Hamza",
         },
       ],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
-      lastUpdatedBy: "currentUser.username",
+      lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
       max: 78,
       min: 44,
@@ -57,20 +57,20 @@ describe("Test The Control Side", () => {
 
     let metric2 = new Metric({
       actionItem: {},
-      createdBy: "currentUser.username",
+      createdBy: "Amjad Hamza",
       createdOn: new Date(),
       history: [
         {
           date: helpers.getAbsoluteDate(),
           value: 41,
           createdOn: new Date(),
-          createdBy: "currentUser.username",
+          createdBy: "Amjad Hamza",
           lastUpdatedOn: new Date(),
-          lastUpdatedBy: "currentUser.username",
+          lastUpdatedBy: "Amjad Hamza",
         },
       ],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
-      lastUpdatedBy: "currentUser.username",
+      lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
       max: 96,
       min: 15,
@@ -82,20 +82,20 @@ describe("Test The Control Side", () => {
 
     let metric3 = new Metric({
       actionItem: {},
-      createdBy: "currentUser.username",
+      createdBy: "Amjad Hamza",
       createdOn: new Date(),
       history: [
         {
           date: helpers.getAbsoluteDate(),
           value: 23,
           createdOn: new Date(),
-          createdBy: "currentUser.username",
+          createdBy: "Amjad Hamza",
           lastUpdatedOn: new Date(),
-          lastUpdatedBy: "currentUser.username",
+          lastUpdatedBy: "Amjad Hamza",
         },
       ],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
-      lastUpdatedBy: "currentUser.username",
+      lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
       max: 95,
       min: 23,

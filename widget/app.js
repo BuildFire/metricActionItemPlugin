@@ -69,13 +69,13 @@ if (typeof ListView !== "undefined") {
     Title: "",
   });
 
-  listViewDiv.onItemClicked = (item) => {
-    if (Object.keys(item.actionItem).length > 0) {
-      buildfire.actionItems.execute(item.actionItem, () => {
-        console.log("DONE DSADSA");
-      });
-    }
-  };
+  // listViewDiv.onItemClicked = (item) => {
+  //   if (Object.keys(item.actionItem).length > 0) {
+  //     buildfire.actionItems.execute(item.actionItem, () => {
+  //       console.log("DONE DSADSA");
+  //     });
+  //   }
+  // };
 }
 
 const renderInit = () => {
@@ -111,6 +111,13 @@ const renderInit = () => {
     let newMetric = new Metric(metricsChildren[metricId]);
 
     let listItem = new ListViewItem(newMetric);
+    listItem.onIconTitleClick = (item) => {
+      if (Object.keys(item.actionItem).length > 0) {
+        buildfire.actionItems.execute(item.actionItem, () => {
+          console.log("DONE DSADSA");
+        });
+      }
+    };
     listItem.onToolbarClicked = (e) => {
       // newChart.destroy();
 

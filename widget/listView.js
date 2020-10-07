@@ -89,6 +89,12 @@ class ListViewItem {
     let imgContainer = ui.create("div", card, null, [
       "listViewItemImgContainer",
     ]);
+    imgContainer.onclick = (e) => {
+      this.onIconTitleClick(this);
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
     if (this.icon) {
       let img = ui.create("img", imgContainer, null, ["listViewItemImg"]);
 
@@ -109,7 +115,12 @@ class ListViewItem {
       "padded",
       "padded--m",
     ]);
-
+    listViewItemCopy.onclick = (e) => {
+      this.onIconTitleClick(this);
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
     ui.create("h5", listViewItemCopy, this.title, [
       "listViewItemTitle",
       "ellipsis",
@@ -164,6 +175,10 @@ class ListViewItem {
 
   onToolbarClicked(key, item) {
     console.log("come on", key, item);
+  }
+
+  onIconTitleClick(item) {
+    console.log("come on", item);
   }
 
   update() {

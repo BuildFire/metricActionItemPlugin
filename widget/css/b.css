@@ -92,3 +92,7 @@ span {
   line-height: 2rem;
   font-weight: 500;
 }
+
+.listViewItemToolbarItem {
+  padding: 10px !important;
+}
