@@ -60,7 +60,7 @@ class ListViewItem {
     this.value = obj.value || 0;
     this.data = obj.data;
     this.order = obj.order || null;
-    this.previousVal = obj.previousVal;
+    this.previousValue = obj.previousValue;
     this.actionItem = obj.actionItem;
   }
 
@@ -73,7 +73,7 @@ class ListViewItem {
       value: this.value,
       data: this.data,
       order: this.order,
-      previousVal: this.previousVal,
+      previousValue: this.previousValue,
       actionItem: this.actionItem,
     };
   }
@@ -132,12 +132,12 @@ class ListViewItem {
       ]);
 
       // Add icon
-      if (this.value > this.previousVal) {
+      if (this.value > this.previousValue) {
         ui.create("i", listViewItemToolbar, "north", [
           "material-icons",
           "mdc-button__icon",
         ]);
-      } else if (this.value < this.previousVal) {
+      } else if (this.value < this.previousValue) {
         ui.create("i", listViewItemToolbar, "south", [
           "material-icons",
           "mdc-button__icon",

@@ -9,8 +9,8 @@ class Settings {
       buildfire.datastore.get("settings", (err, result) => {
         if (err) reject(err);
         else {
-          this.tags = result.data.tags;
-          this.showSummary = result.data.showSummary;
+          this.tags = result.data.tags || [];
+          this.showSummary = result.data.showSummary === false ? false : true;
           resolve(result);
         }
       });

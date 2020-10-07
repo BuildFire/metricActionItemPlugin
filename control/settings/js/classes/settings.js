@@ -6,15 +6,9 @@ class Settings {
       buildfire.datastore.get("settings", (err, result) => {
         if (err) reject(err);
         else {
-          if (result.data.tags) {
-            this.tags = result.data.tags;
-            this.showSummary = result.data.showSummary;
-            resolve(result);
-          } else {
-            this.tags = [];
-            this.showSummary = true;
-            Settings.save();
-          }
+          this.tags = result.data.tags || [];
+          this.showSummary = result.data.showSummary === false ? false : true;
+          resolve(result);
         }
       });
     });

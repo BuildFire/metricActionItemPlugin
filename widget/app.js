@@ -16,14 +16,20 @@ let newChart = {};
 
 let numberOfPops = 0;
 
-let userPass = false;
+const getCurrentUser = () => {
+  return authManager.getCurrentUser().then((user) => {
+    currentUser = user;
+  });
+};
 
-authManager.getCurrentUser().then((user) => {
-  currentUser = user;
-});
+getCurrentUser();
+
+// Login and Logout listners
+buildfire.auth.onLogin(() => getCurrentUser());
+buildfire.auth.onLogout(() => (currentUser = null));
 
 if (typeof ListView !== "undefined") {
-  let publicDataUpdate = buildfire.publicData.onUpdate((event) => {
+  buildfire.publicData.onUpdate((event) => {
     if (event.data && event.id) {
       metrics = event.data;
       metrics.id = event.id;
@@ -31,7 +37,7 @@ if (typeof ListView !== "undefined") {
     }
   });
 
-  let dataStoreUpdate = buildfire.datastore.onUpdate((event) => {
+  buildfire.datastore.onUpdate((event) => {
     if (event.tag === "settings") {
       Settings.load().then(() => {
         renderInit();
@@ -44,8 +50,8 @@ Metrics.getMetrics().then(async (data) => {
 
   await Settings.load().then(() => {
     if (typeof ListView !== "undefined") {
-      checkUser();
-
+      // Check if the have the permission to update the metrics
+      isUserAuthorized();
       renderInit();
     }
 
@@ -90,7 +96,7 @@ const renderInit = () => {
     newChart.destroy();
   }
 
-  initChart2(readyMetrics.metricsParent);
+  initChart(readyMetrics.metricsParent);
 
   let currentMetricList = [];
   console.log("please", metricsChildren);
@@ -126,7 +132,7 @@ const renderInit = () => {
         renderInit();
         // pushBreadcrumb(item.title, { nodeSelector });
       } else {
-        if (currentUser && userPass) {
+        if (currentUser && isUserAuthorized()) {
           metricsScreen.style.display = "none";
           updateHistoryContainer.style.display = "block";
 
@@ -207,7 +213,7 @@ const getRandomColor = () => {
   return color;
 };
 
-const initChart = (datasets) => {
+const renderChart = (datasets) => {
   const ctx = document.getElementById("chart").getContext("2d");
 
   newChart = new Chart(ctx, {
@@ -231,12 +237,13 @@ const initChart = (datasets) => {
   });
 };
 
-const initChart2 = (metric) => {
+const initChart = (metric) => {
   let datasets = [];
   let title = !metric.title ? `Home History` : `${metric.title} History`;
   let historyValues = [];
-  for (var i = 7; i > 0; i--) {
-    historyValues.push(historyValue(metric, i));
+  for (let i = 7; i > 0; i--) {
+    let value = historyValue(metric, i) || 0;
+    historyValues.push(value);
   }
   // for (var i = 1; i <= 7; i++) {
   //   historyValues.unshift(historyValue(metric, i));
@@ -249,7 +256,7 @@ const initChart2 = (metric) => {
     borderColor: getRandomColor(),
     borderWidth: 2,
   });
-  initChart(datasets);
+  renderChart(datasets);
 };
 const initProgressBar = (newMetric) => {
   if (typeof ProgressBar !== "undefined") {
@@ -325,17 +332,24 @@ const initProgressBar = (newMetric) => {
   };
 };
 
-const checkUser = () => {
+const isUserAuthorized = () => {
+  let authorized = false;
   let currentTags = {};
+  if (Settings && Settings.tags && Settings.tags.length === 0)
+    authorized = true;
+
   Settings.tags.forEach((tag) => {
     currentTags[tag.tagName] = tag.tagName;
   });
 
-  currentUser.tags[Object.keys(currentUser.tags)[0]].forEach((tag) => {
-    if (currentTags[tag.tagName]) {
-      userPass = true;
-    }
-  });
+  if (currentUser && currentUser.tags) {
+    currentUser.tags[Object.keys(currentUser.tags)[0]].forEach((tag) => {
+      if (currentTags[tag.tagName]) {
+        authorized = true;
+      }
+    });
+  }
+  return authorized;
 };
 
 buildfire.history.onPop((breadcrumb) => {

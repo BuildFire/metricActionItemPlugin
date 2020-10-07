@@ -21,13 +21,17 @@ class Metric {
       let val = metric.history[metric.history.length - 1]
         ? metric.history[metric.history.length - 1].value
         : 0;
+
       // Get metric Previous value
-      let previousVal = metric.history[metric.history.length - 2]
+      let previousValue = metric.history[metric.history.length - 2]
         ? metric.history[metric.history.length - 2].value
         : 0;
+
       metric.value = val;
-      metric.previousVal = previousVal;
-      return val;
+
+      metric.previousValue = previousValue;
+
+      return { val, previousValue };
     } else if (metric.type === "parent" || !metric.type) {
       if (Object.keys(metric.metrics).length === 0) {
         metric.value = 0;
@@ -35,11 +39,17 @@ class Metric {
       }
       if (metric.metrics) {
         let sum = 0;
+        let prevSum = 0;
         for (let key in metric.metrics) {
-          sum += this.getHistoryValue(metric.metrics[key]);
+          sum += this.getHistoryValue(metric.metrics[key]).val;
+          prevSum += this.getHistoryValue(metric.metrics[key]).previousValue;
         }
         let avg = sum / Object.keys(metric.metrics).length;
+        let avgPrev = prevSum / Object.keys(metric.metrics).length;
+
         metric.value = parseFloat(avg.toPrecision(3));
+        metric.previousValue = parseFloat(avgPrev.toPrecision(3));
+        
         return avg;
       }
     }
