@@ -2,11 +2,14 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="buildfire" content="disableBootstrap, enableMDTheme" />
+    <meta name="buildfire" content="enableMDTheme" />
 
     <!-- build:bundleControlBFMinJS  -->
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
+
+    <!-- Template base stylesheet -->
+    <link rel="stylesheet" href="../assets/base.css" />
 
     <!-- Material Design css & js -->
     <link
@@ -23,15 +26,10 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-    <!-- Template generic Icons -->
-    <link rel="stylesheet" href="../assets/linearicons/cpIcons.css" />
 
     <!-- Sortable list css & js  -->
     <link rel="stylesheet" href="css/sortableList.css" />
     <script src="../../../../scripts/sortable.min.js"></script>
-
-    <!-- Template base stylesheet -->
-    <link rel="stylesheet" href="../assets/base.css" />
 
     <!-- Custom style's stylesheet -->
     <link rel="stylesheet" href="style.css" />
@@ -56,11 +54,14 @@
           <option value="highest">Highest</option>
           <option value="lowest">Lowest</option>
         </select>
+
         <button
           class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
           onclick="goToAddItem()"
         >
-          <span class="icon icon-plus"></span>Add
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+          <span class="mdc-button__label">Add</span>
         </button>
       </div>
     </div>

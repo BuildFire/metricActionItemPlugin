@@ -55,8 +55,6 @@ const initMetricFields = (data = {}) => {
     type: data.type || "",
   };
 
-  
-
   if (Object.keys(metricFields.actionItem).length !== 0) {
     helpers.getActionItem(data.actionItem.action);
   }
@@ -112,8 +110,10 @@ const addActionItem = (actionItem = {}) => {
 
     buildfire.actionItems.showDialog(actionItem, options, (err, data) => {
       if (err) reject(err);
-      helpers.getActionItem(data.action);
-      if (data) metricFields["actionItem"] = data;
+      if (data) {
+        helpers.getActionItem(data.action);
+        metricFields["actionItem"] = data;
+      }
     });
   });
 };

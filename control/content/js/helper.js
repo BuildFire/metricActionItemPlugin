@@ -66,6 +66,6 @@ const helpers = {
       purchase: "Purchase",
     };
 
-    showActionItem.innerHTML += actions[action] || "No Action Selected";
+    showActionItem.innerHTML = actions[action] || "No Action Selected";
   },
 };

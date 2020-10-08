@@ -1,3 +1,10 @@
+html,
+body {
+  height: 95%;
+  margin: 0;
+  padding: 0;
+}
+
 span {
   font-size: x-large;
 }
@@ -9,22 +16,11 @@ span {
 }
 #progressbar-container {
   width: 100%;
+  margin-top: 10%;
 }
 
 #updateHistoryContainer {
   display: none;
-}
-
-#updateHistoryContainer .form-group {
-  text-align: center;
-  padding: 40px 0 0 0;
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-
-#updateHistoryContainer .form-group button {
-  padding: 25px 20px;
 }
 
 .listViewContainer {
@@ -94,5 +90,22 @@ span {
 }
 
 .listViewItemToolbarItem {
-  padding: 10px !important;
+  padding: 10px;
+}
+
+.add-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 3.5rem;
+}
+
+.close-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 3.5rem;
+}
+
+.close-btn button {
+  color: black !important;
+  background: white !important;
 }

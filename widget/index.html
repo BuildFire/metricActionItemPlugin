@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="buildfire" content="disableBootstrap, enableMDTheme" />
+    <meta name="buildfire" content="enableMDTheme" />
 
     <!-- Material Design css & js -->
     <link
@@ -54,7 +54,10 @@
           style="padding: 20px; text-align: center"
         >
           <div class="mdc-card-wrapper__text-section">
-            <div class="card__title" id="summaryValue"></div>
+            <div
+              class="card__title mdc-theme--text-primary-on-background"
+              id="summaryValue"
+            ></div>
 
             <canvas id="chart" width="400" height="400"></canvas>
           </div>
@@ -67,15 +70,27 @@
     <div id="updateHistoryContainer">
       <div>
         <div id="progressbar-container"></div>
+        <div id="minMax"></div>
       </div>
 
-      <div class="form-group">
-        <button class="mdc-button mdc-button--raised" id="updateHistoryBtn">
-          <div class="mdc-button__ripple"></div>
-          <i class="material-icons mdc-button__icon" aria-hidden="true"
-            >system_update_alt</i
-          >
-          <span class="mdc-button__label">Update</span>
+      <div class="add-btn">
+        <button
+          id="updateHistoryBtn"
+          class="mdc-fab mdc-button--raised"
+          aria-label="Add"
+        >
+          <div class="mdc-fab__ripple"></div>
+          <span class="mdc-fab__icon material-icons">edit</span>
+        </button>
+      </div>
+      <div class="close-btn">
+        <button
+          id="updateHistoryBtn"
+          class="mdc-fab mdc-button--raised"
+          aria-label="Add"
+        >
+          <div class="mdc-fab__ripple"></div>
+          <span class="mdc-fab__icon material-icons">close</span>
         </button>
       </div>
     </div>

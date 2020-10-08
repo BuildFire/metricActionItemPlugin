@@ -6,8 +6,7 @@ const breadcrumbsManager = {
       // Used the global variable (breadcrumbsHistory)
       breadcrumbsHistory.push(breadcrumb);
       let crumb = document.createElement("span");
-      crumb.innerHTML =
-        breadcrumb === "Home" ? `${breadcrumb}` : `${breadcrumb}`;
+      crumb.innerHTML = breadcrumb;
       crumb.classList.add("crumb");
       crumb.setAttribute("arrayIndex", breadcrumbsHistory.length - 1);
       crumb.onclick = () => {

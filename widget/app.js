@@ -294,6 +294,7 @@ const initProgressBar = (newMetric) => {
     bar.set(Math.round(newMetric.value) / 100);
     let progressText = document.getElementsByClassName("progressbar-text")[0];
     progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
+    minMax.innerHTML = `Min ${newMetric.min} - Max ${newMetric.max}`;
     // Assign global progressbar value
     progressbarVal = Math.round(newMetric.value) / 100;
 

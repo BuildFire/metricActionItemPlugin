@@ -75,10 +75,10 @@ input:disabled {
 
 #bread .crumb {
   cursor: pointer;
-  color: lightblue;
+  color: #00a1f3;
 }
 
 #bread .crumb:last-child {
   cursor: default;
-  color: black;
+  color: #5f5f5f;
 }

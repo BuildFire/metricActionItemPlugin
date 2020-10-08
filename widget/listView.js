@@ -155,6 +155,11 @@ class ListViewItem {
           "mdc-button__icon",
           "mdc-theme--error",
         ]);
+      } else {
+        ui.create("i", listViewItemToolbar, "remove", [
+          "material-icons",
+          "mdc-button__icon",
+        ]);
       }
 
       ui.create("span", listViewItemToolbar, `${this.value}%`, [
