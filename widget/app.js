@@ -486,6 +486,10 @@ function historyValue(metric, inde) {
   }
 }
 
+const closeUpdateHistory = () => {
+  return buildfire.history.pop();
+};
+
 // function historyValue(metric, inde) {
 //   if (metric.type === "metric") {
 //     let val = metric.history[metric.history.length - inde]

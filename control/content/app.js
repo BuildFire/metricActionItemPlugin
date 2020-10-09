@@ -57,6 +57,8 @@ const initMetricFields = (data = {}) => {
 
   if (Object.keys(metricFields.actionItem).length !== 0) {
     helpers.getActionItem(data.actionItem.action);
+  } else {
+    showActionItem.innerHTML = "";
   }
 
   // Initialize metric's icon
@@ -92,6 +94,11 @@ const initIconComponent = (imageUrl = "") => {
     dimensionsLabel: "400x400",
   });
 
+  let thumbElement = document.getElementById("icon").getElementsByClassName("btn-delete-icon")[0];
+  thumbElement.classList.add("material-icons", "mdc-button__icon")
+  thumbElement.innerHTML = "close"
+
+  
   thumbnail.onChange = (url) => {
     metricFields.icon = url;
   };

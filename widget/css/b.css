@@ -109,3 +109,10 @@ span {
   color: black !important;
   background: white !important;
 }
+
+#minMax {
+  text-align: center;
+  margin-top: 150px;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
