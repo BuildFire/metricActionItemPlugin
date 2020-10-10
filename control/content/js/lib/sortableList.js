@@ -97,7 +97,14 @@ buildfire.components.SortableList = class SortableList {
         width: 16,
         height: 16,
       });
+      img.style.cursor = "pointer";
       divRow.appendChild(img);
+      img.onclick = () => {
+        let index = divRow.getAttribute("arrayIndex"); /// it may have bee reordered so get value of current property
+        index = parseInt(index);
+        this.onItemClick(item, index, divRow);
+        return false;
+      };
     }
     divRow.appendChild(title);
     divRow.appendChild(minMax);

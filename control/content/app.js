@@ -149,7 +149,6 @@ const onFieldChange = (ele) => {
     metricFields[ele.id] = parseInt(ele.value);
     return;
   }
-
   metricFields[ele.id] = ele.value;
 };
 
@@ -200,7 +199,7 @@ const updateMetrics = (item) => {
   if (inputValidation()) {
     let updateObj = {};
     for (let prop in metricFields) {
-      // To determine what fileds are needed to be updated
+      // To determine which fileds are needed to be updated
       if (metricFields[prop] !== item[prop]) {
         updateObj[prop] = metricFields[prop];
         console.log("thus is", prop, metricFields[prop]);
@@ -278,6 +277,7 @@ const renderInit = () => {
     currentMetricList.push(metricsChildren[metricId]);
   }
 
+  // To show messages while metrics being rendered or if there is no metrics at all
   let spinner = document.getElementById("spinner");
   if (currentMetricList.length === 0) {
     spinner.innerHTML = "No metrics have been added yet.";
@@ -327,6 +327,7 @@ const render = (items) => {
   };
 };
 
+// Trigered when a user click on the metric's title or icon
 const clickItem = (item) => {
   // If it is parent then go to its children
   if (item.type === "parent") {
@@ -340,6 +341,7 @@ const clickItem = (item) => {
   }
 };
 
+// Trigered when a user delete a metric
 const deleteItem = (item, index, callback) => {
   buildfire.notifications.confirm(
     {
@@ -349,7 +351,7 @@ const deleteItem = (item, index, callback) => {
     },
     (e, data) => {
       if (e) console.error(e);
-      if (data.selectedButton.key == "y") {
+      if (data && data.selectedButton.key == "y") {
         sortableList.items.splice(index, 1);
         Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id)
           .then((result) => {
@@ -364,6 +366,7 @@ const deleteItem = (item, index, callback) => {
   );
 };
 
+// Trigered when a user change the order of the metrics
 const orderChange = () => {
   let orderObj = {};
   metricsContainer.childNodes.forEach((e) => {
@@ -378,6 +381,7 @@ const orderChange = () => {
     .catch(console.log);
 };
 
+// Trigered when a user update a metric
 const updateItem = (item) => {
   item.lastUpdatedBy = currentUser.firstName;
   initMetricFields(item);
@@ -390,10 +394,12 @@ const updateItem = (item) => {
   };
 };
 
+// Manage breadcrumbs
 const pushBreadcrumb = (breadcrumb, data) => {
   breadcrumbsManager.breadcrumb(breadcrumb, data);
 };
 
+// To synchronize with the widget
 buildfire.messaging.onReceivedMessage = (message) => {
   console.log(
     "Message has been received",
@@ -418,6 +424,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
   goToMetricspage();
 };
 
+// To handle users' choices for sorting
 const onSortByChange = () => {
   let sortBy = document.getElementById("sortBy").value;
   Metrics.sortBy(

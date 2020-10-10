@@ -135,7 +135,6 @@ class ListViewItem {
       ]);
 
     let t = this;
-    console.log("this.value", this.value);
 
     if (this.value === 0 || this.value) {
       let listViewItemToolbar = ui.create("div", card, null, [
@@ -179,11 +178,9 @@ class ListViewItem {
   }
 
   onToolbarClicked(key, item) {
-    console.log("come on", key, item);
   }
 
   onIconTitleClick(item) {
-    console.log("come on", item);
   }
 
   update() {

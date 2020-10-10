@@ -51,7 +51,7 @@ describe("Test The Widget Side", () => {
 describe("Test the Settings class", () => {
   it("Should get settings from the datastore correctly", async () => {
     await Settings.load().then((result) => {
-      expect(result.data.showSummary).toBeFalse();
+      expect(result.data.showSummary).toBeTrue();
     });
   });
 });

@@ -4,6 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="buildfire" content="enableMDTheme" />
 
+
+    <!-- build:bundleWidgetBFMinJS  -->
+    <script src="../../../scripts/buildfire.js"></script>
+    <!-- endbuild -->
+
     <!-- Material Design css & js -->
     <link
       href="../../../styles/materialDesign/material-components-web@4.0.0.min.css"
@@ -20,30 +25,19 @@
       rel="stylesheet"
     />
 
-    <!-- build:bundleWidgetBFMinJS  -->
-    <script src="../../../scripts/buildfire.js"></script>
-    <!-- endbuild -->
-
+    <!-- Chart.js css & js -->
     <script src="js/lib/chart.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/chart.min.css" />
+
+    <!-- progressbar.js library -->
     <script src="js/lib/progressbar.min.js"></script>
+
+    <!-- hammer.js library -->
     <script src="js/lib/hammer.min.js"></script>
 
-    <!-- build:bundleSharedJSFiles  -->
-    <script src="js/shared/infoCard.class.js"></script>
-    <!-- <script src="js/shared/settings.class.js"></script> -->
-    <script src="js/shared/strings.js"></script>
-    <script src="js/shared/stringsConfig.js"></script>
-    <!-- endbuild -->
+    <!-- Custom style's stylesheet -->
+    <link rel="stylesheet" type="text/css" href="style.css" />
 
-    <!-- build:bundleJSFiles  -->
-    <!-- endbuild -->
-
-    <!-- build:bundleCSSFiles  -->
-    <!-- <link rel="stylesheet" type="text/css" href="css/a.css" /> -->
-    <link rel="stylesheet" type="text/css" href="css/chart.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/b.css" />
-
-    <!-- endbuild -->
   </head>
   <body>
     <div id="metricsScreen">
@@ -95,35 +89,17 @@
         </button>
       </div>
     </div>
-    <!-- <div class="padded">
-      <h3 bfString="screenOne.welcomeMessage">Widget - Hello, world!</h3>
-      <p>Samples</p>
-      <ul>
-        <li class="text-primary">
-          <a href="samples/listView/listView.html">List View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/gridView/gridView.html">Grid View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/detailView/detailView.html">Details View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/mapView/mapView.html">Map View</a>
-        </li>
-      </ul>
-    </div> -->
 
     <script src="js/shared/ui.js"></script>
-    <script src="listView.js"></script>
+    <script src="js/lib/listView.js"></script>
 
-    <script src="js/helpers/helper.js"></script>
-    <script src="classes/analytics.js"></script>
-    <script src="classes/metric.js"></script>
-    <script src="classes/metrics.js"></script>
-    <script src="classes/settings.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/classes/analytics.js"></script>
+    <script src="js/classes/metric.js"></script>
+    <script src="js/classes/metrics.js"></script>
+    <script src="js/classes/settings.js"></script>
 
-    <script src="js/shared/authManager.js"></script>
+    <script src="js/authManager.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

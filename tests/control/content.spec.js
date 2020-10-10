@@ -160,7 +160,7 @@ describe("Test The Control Side", () => {
         { id: "5f56bb9355f6b40645e2daeb", tagName: "admin" },
         { id: "5f56bb9355f6b40635e2daeb", tagName: "user" },
       ];
-      Settings.showSummary = false;
+      Settings.showSummary = true;
     });
 
     it("Should save new settings in the datastore", async () => {
@@ -171,7 +171,7 @@ describe("Test The Control Side", () => {
 
     it("Should get settings from the datastore correctly", async () => {
       await Settings.load().then((result) => {
-        expect(result.data.showSummary).toBeFalse();
+        expect(result.data.showSummary).toBeTrue();
       });
     });
   });
