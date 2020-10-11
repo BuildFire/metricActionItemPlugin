@@ -72,6 +72,14 @@ const initMetricFields = (data = {}) => {
   title.value = metricFields.title;
   min.value = metricFields.min;
   max.value = metricFields.max;
+
+  document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
+  document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
+  document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
+  document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
+  document.getElementById("title-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
+  document.getElementById("title-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
+
   let maxInput = document.getElementById("max"),
     minInput = document.getElementById("min");
   if (metricFields.type === "") {
@@ -87,10 +95,6 @@ const initMetricFields = (data = {}) => {
     // Reset min and max input fields 
     maxInput.value = "";
     minInput.value = "";
-    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
-    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
-    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
-    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
   } else {
     metricType.checked = true;
     maxInput.disabled = false;
@@ -179,10 +183,10 @@ const onRadioChange = (value) => {
     // Reset min and max input fields 
     maxInput.value = "";
     minInput.value = "";
-    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
-    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
-    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
-    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
+    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above');
+    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched');
+    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above');
+    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched');
   } else {
     maxInput.disabled = false;
     minInput.disabled = false;

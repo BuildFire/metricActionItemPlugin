@@ -187,6 +187,7 @@
           <span class="mdc-notched-outline__trailing"></span>
         </span>
       </label>
+
       <div class="mdc-text-field-helper-line">
         <div
           id="max-helper-text"
@@ -210,7 +211,7 @@
         <div class="mdc-text-field-helper-line">
           <div
             id="actionItem-helper-text"
-            class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg"
+            class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent mdc-text-field-helper-text--validation-msg"
             aria-hidden="true"
           >dsadasdsadsasdasdasdadasdasdsa</div>
         </div>
@@ -279,6 +280,7 @@
       document.querySelectorAll(".mdc-button").forEach((btn) => {
         mdc.ripple.MDCRipple.attachTo(btn);
       });
+
       document.querySelectorAll(".mdc-fab").forEach((btn) => {
         mdc.ripple.MDCRipple.attachTo(btn);
       });
