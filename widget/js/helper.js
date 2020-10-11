@@ -6,6 +6,12 @@ const helpers = {
   getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
+    if (splittedNode[splittedNode.length - 1] !== "metrics") {
+      splittedNode.pop();
+      nodeSelector = splittedNode.join(".");
+      buildfire.history.pop();
+    }
+    console.log("splittedNode", splittedNode);
     let metricsChildren = metrics;
     let metricsParent = null;
     let metricsSortBy = "";

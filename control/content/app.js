@@ -1,9 +1,12 @@
 // The big object that contains all the metrics
 let metrics = {};
+
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
+
 // To save breadcrumb related data
 let breadcrumbsHistory = [];
+
 // Used to Initialize metric fields (For add/edit pages' forms)
 let metricFields;
 
@@ -34,6 +37,7 @@ buildfire.messaging.sendMessageToWidget({
   cmd: "refresh",
 });
 
+// To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
 
@@ -44,6 +48,7 @@ Metrics.getMetrics().then(async (result) => {
     pushBreadcrumb("Home", { nodeSelector });
   }
 });
+
 // Initialize add/edit Forms' Fields
 const initMetricFields = (data = {}) => {
   metricFields = {
@@ -273,8 +278,9 @@ const renderInit = () => {
   // Prepare metrics to be rendered (Object to Array)
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
-    Metric.getHistoryValue(metricsChildren[metricId]);
-    currentMetricList.push(metricsChildren[metricId]);
+    let newMetric = new Metric(metricsChildren[metricId])
+    Metric.getHistoryValue(newMetric);
+    currentMetricList.push(newMetric);
   }
 
   // To show messages while metrics being rendered or if there is no metrics at all

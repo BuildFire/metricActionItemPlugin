@@ -41,22 +41,18 @@
   </head>
   <body>
     <div id="metricsScreen">
-      <div style="padding: 10px">
         <div
           id="summary"
           class="mdc-card summary-card"
-          style="padding: 20px; text-align: center"
         >
           <div class="mdc-card-wrapper__text-section">
-            <div
+            <div id="summaryValue"
               class="card__title mdc-theme--text-primary-on-background"
-              id="summaryValue"
             ></div>
 
             <canvas id="chart" width="400" height="400"></canvas>
           </div>
         </div>
-      </div>
 
       <div id="listViewContainer"></div>
     </div>
@@ -90,7 +86,7 @@
       </div>
     </div>
 
-    <script src="js/shared/ui.js"></script>
+    <script src="js/ui.js"></script>
     <script src="js/lib/listView.js"></script>
 
     <script src="js/helper.js"></script>

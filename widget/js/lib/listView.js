@@ -23,7 +23,11 @@ class ListView {
       //   addButton.onclick = this.onAddButtonClicked;
       // }
     }
-    items.forEach((item) => this.addItem(item));
+    if (items.length === 0) {
+      listViewContainer.innerHTML = `<div class="summary-card" >No metrics have been added yet.</div>`;
+    } else {
+      items.forEach((item) => this.addItem(item));
+    }
   }
 
   addItem(item) {

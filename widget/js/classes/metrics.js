@@ -87,4 +87,50 @@ class Metrics {
       );
     });
   }
+
+  static getHistoryValue(metric, inde) {
+    if (metric.type === "metric") {
+      let todayDate = helpers.getAbsoluteDate();
+      for (var i = 1; i <= 7; i++) {
+        if (metric.history[metric.history.length - i]) {
+          if (
+            new Date(
+              todayDate - new Date(metric.history[metric.history.length - i].date)
+            ).getDate() >= inde
+          ) {
+            let val = metric.history[metric.history.length - i].value;
+            if (inde === 1) {
+              metric.value = val || 0;
+            } else if (inde === 2) {
+              metric.previousValue = val || 0;
+            }
+            return val;
+          }
+        }
+      }
+      return "false";
+    } else if (metric.type === "parent" || !metric.type) {
+      if (Object.keys(metric.metrics).length === 0) {
+        return 0;
+      }
+      if (metric.metrics) {
+        let sum = 0;
+        let numberChildren = 0;
+        for (let key in metric.metrics) {
+          if (Metrics.getHistoryValue(metric.metrics[key], inde) !== "false") {
+            numberChildren++;
+  
+            sum += Metrics.getHistoryValue(metric.metrics[key], inde);
+          }
+        }
+        let avg = sum / numberChildren;
+        if (inde === 1) {
+          metric.value = parseFloat(avg.toPrecision(3)) || 0;
+        } else if (inde === 2) {
+          metric.previousValue = parseFloat(avg.toPrecision(3)) || 0;
+        }
+        return avg;
+      }
+    }
+  }
 }
