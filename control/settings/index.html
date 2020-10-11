@@ -83,5 +83,15 @@
 
     <script src="js/classes/settings.js"></script>
     <script src="script.js"></script>
+
+    <script>
+      document.querySelectorAll(".mdc-text-field").forEach((field) => {
+        mdc.textField.MDCTextField.attachTo(field);
+      });
+
+      document.querySelectorAll(".mdc-button").forEach((btn) => {
+        mdc.ripple.MDCRipple.attachTo(btn);
+      });
+    </script>
   </body>
 </html>

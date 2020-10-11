@@ -42,6 +42,7 @@
     <div id="bread" class="mdc-typography--headline6"></div>
     <br />
     <h1>Metrics</h1>
+
     <div id="metricsMain">
       <div id="spinner" class="spinner">Loading...</div>
 
@@ -56,7 +57,7 @@
         </select>
 
         <button
-          class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+          class="mdc-button mdc-button--raised btn"
           onclick="goToAddItem()"
         >
           <div class="mdc-button__ripple"></div>
@@ -148,7 +149,10 @@
       </div>
 
       <div class="form-group">
-        <button class="mdc-button mdc-button--raised" onclick="addActionItem()">
+        <button
+          class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+          onclick="addActionItem()"
+        >
           <div class="mdc-button__ripple"></div>
           <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
           <span class="mdc-button__label">Add Action Item</span>
@@ -162,21 +166,23 @@
 
       <button
         id="createAMetric"
-        class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+        class="mdc-button mdc-button--raised"
         onclick="createMetric()"
       >
+        <div class="mdc-button__ripple"></div>
         <i class="material-icons mdc-button__icon" aria-hidden="true">add</i
         >Create Metric
       </button>
-      <button
-        id="updateMetric"
-        class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
-      >
+      <button id="updateMetric" class="mdc-button mdc-button--raised">
+        <div class="mdc-button__ripple"></div>
+        <i class="material-icons mdc-button__icon" aria-hidden="true"
+          >save_alt</i
+        >
         Update Metric
       </button>
-     
+
       <button
-        class="mdc-button mdc-button--outlined custom-outlined-button"
+        class="mdc-button mdc-button--raised custom-raised-button"
         onclick="goToMetricspage()"
       >
         <div class="mdc-button__ripple"></div>
@@ -195,5 +201,15 @@
     <script src="js/breadcrumb.js"></script>
 
     <script src="app.js"></script>
+
+    <script>
+      document.querySelectorAll(".mdc-text-field").forEach((field) => {
+        mdc.textField.MDCTextField.attachTo(field);
+      });
+
+      document.querySelectorAll(".mdc-button").forEach((btn) => {
+        mdc.ripple.MDCRipple.attachTo(btn);
+      });
+    </script>
   </body>
 </html>
