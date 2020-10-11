@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="buildfire" content="enableMDTheme" />
 
-
     <!-- build:bundleWidgetBFMinJS  -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
@@ -37,22 +36,19 @@
 
     <!-- Custom style's stylesheet -->
     <link rel="stylesheet" type="text/css" href="style.css" />
-
   </head>
   <body>
     <div id="metricsScreen">
-        <div
-          id="summary"
-          class="mdc-card summary-card"
-        >
-          <div class="mdc-card-wrapper__text-section">
-            <div id="summaryValue"
-              class="card__title mdc-theme--text-primary-on-background"
-            ></div>
+      <div id="summary" class="mdc-card summary-card">
+        <div class="mdc-card-wrapper__text-section">
+          <div
+            id="summaryValue"
+            class="card__title mdc-theme--text-primary-on-background"
+          ></div>
 
-            <canvas id="chart" width="400" height="400"></canvas>
-          </div>
+          <canvas id="chart" width="400" height="400"></canvas>
         </div>
+      </div>
 
       <div id="listViewContainer"></div>
     </div>
@@ -103,8 +99,29 @@
         mdc.textField.MDCTextField.attachTo(field);
       });
 
+      document
+        .querySelectorAll(".mdc-text-field-helper-text")
+        .forEach((helperField) => {
+          mdc.textField.MDCTextFieldHelperText.attachTo(helperField);
+        });
+
       document.querySelectorAll(".mdc-button").forEach((btn) => {
         mdc.ripple.MDCRipple.attachTo(btn);
+      });
+      document.querySelectorAll(".mdc-fab").forEach((btn) => {
+        mdc.ripple.MDCRipple.attachTo(btn);
+      });
+
+      document.querySelectorAll(".mdc-radio").forEach((radio) => {
+        mdc.radio.MDCRadio.attachTo(radio);
+      });
+
+      document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
+        mdc.checkbox.MDCCheckbox.attachTo(checkbox);
+      });
+
+      document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
+        mdc.chips.MDCChip.attachTo(chip);
       });
     </script>
   </body>

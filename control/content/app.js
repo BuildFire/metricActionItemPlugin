@@ -57,7 +57,7 @@ const initMetricFields = (data = {}) => {
     min: data.min || (data.min !== 0 ? "" : 0),
     max: data.max || (data.max !== 0 ? "" : 0),
     actionItem: data.actionItem || {},
-    type: data.type || "",
+    type: data.type || "metric",
   };
 
   if (Object.keys(metricFields.actionItem).length !== 0) {
@@ -83,6 +83,14 @@ const initMetricFields = (data = {}) => {
     parentType.checked = true;
     maxInput.disabled = true;
     minInput.disabled = true;
+
+    // Reset min and max input fields 
+    maxInput.value = "";
+    minInput.value = "";
+    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
+    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
+    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
+    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
   } else {
     metricType.checked = true;
     maxInput.disabled = false;
@@ -99,11 +107,12 @@ const initIconComponent = (imageUrl = "") => {
     dimensionsLabel: "400x400",
   });
 
-  let thumbElement = document.getElementById("icon").getElementsByClassName("btn-delete-icon")[0];
-  thumbElement.classList.add("material-icons", "mdc-button__icon")
-  thumbElement.innerHTML = "close"
+  let thumbElement = document
+    .getElementById("icon")
+    .getElementsByClassName("btn-delete-icon")[0];
+  thumbElement.classList.add("material-icons", "mdc-button__icon");
+  thumbElement.innerHTML = "close";
 
-  
   thumbnail.onChange = (url) => {
     metricFields.icon = url;
   };
@@ -166,6 +175,14 @@ const onRadioChange = (value) => {
   if (value === "parent") {
     maxInput.disabled = true;
     minInput.disabled = true;
+
+    // Reset min and max input fields 
+    maxInput.value = "";
+    minInput.value = "";
+    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
+    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
+    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above')
+    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched')
   } else {
     maxInput.disabled = false;
     minInput.disabled = false;
@@ -236,7 +253,11 @@ const inputValidation = () => {
   const { title, icon, actionItem, min, max, type } = metricFields;
 
   if (!title) {
-    helpers.inputAlert("please add metric title");
+    helpers.inputError(
+      "title-lable",
+      "title-helper-text",
+      "Please add metric title"
+    );
     return false;
   }
   if (Object.keys(actionItem).length === 0) {
@@ -247,20 +268,25 @@ const inputValidation = () => {
     helpers.inputAlert("Please add icon");
     return false;
   }
-  if (!type) {
-    helpers.inputAlert("Please add metric type");
-    return false;
-  }
+
   if (type === "parent") {
     delete metricFields.min;
     delete metricFields.max;
   } else if (type === "metric") {
     if (min !== 0 && !min) {
-      helpers.inputAlert("Please add min value");
+      helpers.inputError(
+        "min-lable",
+        "min-helper-text",
+        "Please add min value"
+      );
       return false;
     }
     if (max !== 0 && !max) {
-      helpers.inputAlert("Please add max value");
+      helpers.inputError(
+        "max-lable",
+        "max-helper-text",
+        "Please add max value"
+      );
       return false;
     }
   }
@@ -278,7 +304,7 @@ const renderInit = () => {
   // Prepare metrics to be rendered (Object to Array)
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
-    let newMetric = new Metric(metricsChildren[metricId])
+    let newMetric = new Metric(metricsChildren[metricId]);
     Metric.getHistoryValue(newMetric);
     currentMetricList.push(newMetric);
   }

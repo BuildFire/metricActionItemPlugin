@@ -41,6 +41,7 @@
   <body>
     <div id="bread" class="mdc-typography--headline6"></div>
     <br />
+
     <h1>Metrics</h1>
 
     <div id="metricsMain">
@@ -82,6 +83,7 @@
               value="metric"
               id="metricType"
               name="metricTypes"
+              checked
             />
             <div class="mdc-radio__background">
               <div class="mdc-radio__outer-circle radio-outer-circle"></div>
@@ -112,40 +114,85 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Title</label
-        ><input
+      <label id="title-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
           onchange="onFieldChange(this)"
-          class="form-control"
           type="text"
           id="title"
           autocomplete="false"
-          placeholder="Title"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="title-helper-text"
+          aria-describedby="title-helper-text"
         />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Title</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="title-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
       </div>
 
-      <div class="form-group">
-        <label>Min</label
-        ><input
+      <label id="min-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
           onchange="onFieldChange(this)"
-          class="form-control"
-          type="number"
           id="min"
           autocomplete="false"
-          placeholder="Min"
+          type="number"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="min-helper-text"
+          aria-describedby="min-helper-text"
         />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Min</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="min-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
       </div>
 
-      <div class="form-group">
-        <label>Max</label
-        ><input
+      <label id="max-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
           onchange="onFieldChange(this)"
-          class="form-control"
-          type="number"
           id="max"
           autocomplete="false"
-          placeholder="Max"
+          type="number"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="max-helper-text"
+          aria-describedby="max-helper-text"
         />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Max</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="max-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
       </div>
 
       <div class="form-group">
@@ -159,9 +206,25 @@
         </button>
 
         <span id="showActionItem"></span>
+
+        <div class="mdc-text-field-helper-line">
+          <div
+            id="actionItem-helper-text"
+            class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg"
+            aria-hidden="true"
+          >dsadasdsadsasdasdasdadasdasdsa</div>
+        </div>
       </div>
+      
 
       <div id="icon"></div>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="icon-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
+      </div>
       <br />
 
       <button
@@ -207,8 +270,29 @@
         mdc.textField.MDCTextField.attachTo(field);
       });
 
+      document
+        .querySelectorAll(".mdc-text-field-helper-text")
+        .forEach((helperField) => {
+          mdc.textField.MDCTextFieldHelperText.attachTo(helperField);
+        });
+
       document.querySelectorAll(".mdc-button").forEach((btn) => {
         mdc.ripple.MDCRipple.attachTo(btn);
+      });
+      document.querySelectorAll(".mdc-fab").forEach((btn) => {
+        mdc.ripple.MDCRipple.attachTo(btn);
+      });
+
+      document.querySelectorAll(".mdc-radio").forEach((radio) => {
+        mdc.radio.MDCRadio.attachTo(radio);
+      });
+
+      document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
+        mdc.checkbox.MDCCheckbox.attachTo(checkbox);
+      });
+
+      document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
+        mdc.chips.MDCChip.attachTo(chip);
       });
     </script>
   </body>

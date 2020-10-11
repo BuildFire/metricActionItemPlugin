@@ -42,6 +42,12 @@ const helpers = {
     return currentMetricList;
   },
 
+  inputError: (inputID, textHelperID, errorMessage) => {
+    document.getElementById(inputID).classList.add("mdc-text-field--invalid");
+    document.getElementById(textHelperID).classList.add( "mdc-text-field-helper-text--validation-msg");
+    document.getElementById(textHelperID).innerHTML = errorMessage;
+  },
+
   getActionItem(action) {
     showActionItem.innerHTML = "";
 
