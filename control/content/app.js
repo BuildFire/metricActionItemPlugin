@@ -73,12 +73,15 @@ const initMetricFields = (data = {}) => {
   min.value = metricFields.min;
   max.value = metricFields.max;
 
-  document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
-  document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
-  document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
-  document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
-  document.getElementById("title-lable").querySelector(".mdc-floating-label").classList.add('mdc-floating-label--float-above');
-  document.getElementById("title-lable").querySelector(".mdc-notched-outline").classList.add('mdc-notched-outline--notched');
+  if(Object.keys(data).length !== 0) {
+    document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
+      ele.classList.add('mdc-floating-label--float-above')
+    });
+    document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
+      ele.classList.add('mdc-notched-outline--notched')
+    });
+  }
+ 
 
   let maxInput = document.getElementById("max"),
     minInput = document.getElementById("min");
@@ -91,7 +94,12 @@ const initMetricFields = (data = {}) => {
     parentType.checked = true;
     maxInput.disabled = true;
     minInput.disabled = true;
-
+    document.querySelectorAll("#min-lable .mdc-floating-label, #max-lable .mdc-floating-label").forEach((ele) => {
+      ele.classList.remove('mdc-floating-label--float-above')
+    });
+    document.querySelectorAll("#min-lable .mdc-notched-outline, #max-lable .mdc-notched-outline").forEach((ele) => {
+      ele.classList.remove('mdc-notched-outline--notched')
+    });
     // Reset min and max input fields 
     maxInput.value = "";
     minInput.value = "";
@@ -119,6 +127,9 @@ const initIconComponent = (imageUrl = "") => {
 
   thumbnail.onChange = (url) => {
     metricFields.icon = url;
+    iconInput.value = url;
+    iconInput.focus();
+    iconInput.blur();
   };
 
   thumbnail.onDelete = () => {
@@ -138,6 +149,9 @@ const addActionItem = (actionItem = {}) => {
       if (data) {
         helpers.getActionItem(data.action);
         metricFields["actionItem"] = data;
+        actionItemInput.value = data.action;
+        actionItemInput.focus();
+        actionItemInput.blur();
       }
     });
   });
@@ -155,10 +169,20 @@ const goToAddItem = () => {
 
 // Go to metrics page from add/edit pages
 const goToMetricspage = () => {
+  iconInput.focus();
+  actionItemInput.focus();
+  iconInput.blur();
+  actionItemInput.blur();
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
+  document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
+    ele.classList.remove('mdc-floating-label--float-above')
+  });
+  document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
+    ele.classList.remove('mdc-notched-outline--notched')
+  });
 };
 
 // Handle Input fields values' changes
@@ -183,10 +207,14 @@ const onRadioChange = (value) => {
     // Reset min and max input fields 
     maxInput.value = "";
     minInput.value = "";
-    document.getElementById("min-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above');
-    document.getElementById("min-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched');
-    document.getElementById("max-lable").querySelector(".mdc-floating-label").classList.remove('mdc-floating-label--float-above');
-    document.getElementById("max-lable").querySelector(".mdc-notched-outline").classList.remove('mdc-notched-outline--notched');
+
+    document.querySelectorAll("#min-lable .mdc-floating-label, #max-lable .mdc-floating-label").forEach((ele) => {
+      ele.classList.remove('mdc-floating-label--float-above')
+    });
+    document.querySelectorAll("#min-lable .mdc-notched-outline, #max-lable .mdc-notched-outline").forEach((ele) => {
+      ele.classList.remove('mdc-notched-outline--notched')
+    });
+  
   } else {
     maxInput.disabled = false;
     minInput.disabled = false;
@@ -263,13 +291,12 @@ const inputValidation = () => {
       "Please add metric title"
     );
     return false;
-  }
-  if (Object.keys(actionItem).length === 0) {
-    helpers.inputAlert("Please add an action item");
-    return false;
-  }
-  if (!icon) {
-    helpers.inputAlert("Please add icon");
+  } else if (title.length > 50) {
+    helpers.inputError(
+      "title-lable",
+      "title-helper-text",
+      "Metric's title must be less than 50 characters long"
+    );
     return false;
   }
 
@@ -293,7 +320,33 @@ const inputValidation = () => {
       );
       return false;
     }
+    if(max < min) {
+      helpers.inputError(
+        "min-lable",
+        "min-helper-text",
+        "Min value should be less than Max value"
+      );
+      return false;
+    }
   }
+  
+  if (Object.keys(actionItem).length === 0) {
+    helpers.inputError(
+      "actionItem-lable",
+      "actionItem-helper-text",
+      "Please add action item"
+    );
+    return false;
+  }
+  if (!icon) {
+    helpers.inputError(
+      "icon-lable",
+      "icon-helper-text",
+      "Please add icon"
+    );
+    return false;
+  }
+
   return true;
 };
 

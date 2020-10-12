@@ -14,21 +14,18 @@ const helpers = {
       // If we are at the home page (top of the object)
       if (nodeSelector === "metrics") {
         metricsSortBy = metrics.sortBy;
-        document.getElementById("sortBy").value = metricsSortBy;
+        document.getElementById("sortBy").value = metricsSortBy || "manual";
       }
       // Assign the parent metric sortBy value (If we are in parent metric);
       if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
         metricsSortBy = metricsChildren[item].sortBy;
-        document.getElementById("sortBy").value = metricsSortBy;
+        document.getElementById("sortBy").value = metricsSortBy || "manual";
       }
 
       metricsChildren = metricsChildren[item];
     });
 
     return metricsChildren;
-  },
-  inputAlert: (message) => {
-    buildfire.notifications.alert({ message });
   },
   sortMetrics: (currentMetricList, sortBy) => {
     // Sort metrics based sortBy value

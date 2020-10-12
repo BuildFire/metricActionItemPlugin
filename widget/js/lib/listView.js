@@ -100,7 +100,7 @@ class ListViewItem {
       return false;
     };
     if (this.icon) {
-      let img = ui.create("img", imgContainer, null, ["listViewItemImg"]);
+      let img = ui.create("img", imgContainer, null, ["listViewItemImg", "mdc-theme--text-primary-on-background"]);
 
       if (this.icon.indexOf("http") == 0)
         img.src = buildfire.imageLib.cropImage(this.icon, {
@@ -129,6 +129,7 @@ class ListViewItem {
       "listViewItemTitle",
       "ellipsis",
       "margin--0",
+      "mdc-theme--text-primary-on-background"
     ]);
 
     if (this.description)
@@ -168,6 +169,7 @@ class ListViewItem {
       ui.create("span", listViewItemToolbar, `${this.value}%`, [
         "listViewItemToolbarItem",
         "value",
+        "mdc-theme--text-primary-on-background"
       ]);
 
       listViewItemToolbar.onclick = (e) => {

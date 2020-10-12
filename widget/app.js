@@ -56,10 +56,7 @@ Metrics.getMetrics().then(async (result) => {
     if (typeof ListView !== "undefined") {
       // Check if the user have the permission to update metrics
       isUserAuthorized();
-      buildfire.history.push("Home", {
-        nodeSelector,
-        showLabelInTitlebar: true,
-      });
+      
       renderInit();
     }
   });
@@ -287,10 +284,10 @@ const InitHammerJS = (newMetric) => {
 
 const changeProgressbarValue = (direction, newMetric) => {
   let progressText = document.getElementsByClassName("progressbar-text")[0];
-  if (direction === "pandown" && bar.value() >= 0.000001) {
+  if (direction === "pandown" && bar.value() >= 0.0000000001) {
     bar.set(bar.value() - 0.01);
     progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
-  } else if (direction === "panup" && bar.value() <= 0.9999999) {
+  } else if (direction === "panup" && bar.value() <= 0.99999999999) {
     bar.set(bar.value() + 0.01);
     progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
   }
@@ -321,7 +318,7 @@ buildfire.history.onPop((breadcrumb) => {
   // It is a way to go back multiple times in widget when the control side go back multiple levels at once
   if (numberOfPops) {
     --numberOfPops;
-    nodeSelector = breadcrumb.options.nodeSelector;
+    nodeSelector = breadcrumb.options.nodeSelector || "metrics";
 
     metricsScreen.style.display = "block";
     updateHistoryContainer.style.display = "none";
@@ -333,13 +330,13 @@ buildfire.history.onPop((breadcrumb) => {
   } else {
     //  This condition is for preventing the control side from going back (when clicking back in widget)
     // when we are at the home, which would lead to an error
-    if (Object.keys(breadcrumb.options).length > 0) {
+    // if (Object.keys(breadcrumb.options).length > 0) {
       metricsScreen.style.display = "block";
       updateHistoryContainer.style.display = "none";
-      nodeSelector = breadcrumb.options.nodeSelector;
+      nodeSelector = breadcrumb.options.nodeSelector || "metrics";
       buildfire.messaging.sendMessageToControl({ nodeSelector });
       renderInit();
-    }
+    // }
   }
 });
 
@@ -357,7 +354,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
     if (message.nodeSelector !== nodeSelector) {
       numberOfPops++;
     }
-    buildfire.history.pop();
+      buildfire.history.pop();
   } else {
     nodeSelector = message.nodeSelector;
     buildfire.history.push(message.title, {
