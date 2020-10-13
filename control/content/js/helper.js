@@ -13,13 +13,13 @@ const helpers = {
     splittedNode.forEach((item, i) => {
       // If we are at the home page (top of the object)
       if (nodeSelector === "metrics") {
-        metricsSortBy = metrics.sortBy;
-        document.getElementById("sortBy").value = metricsSortBy || "manual";
+        metricsSortBy = metrics.sortBy || "manual";
+        document.getElementById("sortBy").value = metricsSortBy;
       }
       // Assign the parent metric sortBy value (If we are in parent metric);
       if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
-        metricsSortBy = metricsChildren[item].sortBy;
-        document.getElementById("sortBy").value = metricsSortBy || "manual";
+        metricsSortBy = metricsChildren[item].sortBy || "manual";
+        document.getElementById("sortBy").value = metricsSortBy;
       }
 
       metricsChildren = metricsChildren[item];

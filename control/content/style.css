@@ -64,13 +64,13 @@ input:disabled {
   margin-bottom: 2.5px;
 }
 
-#metricsList.draggable-list-view .d-item span.icon-menu {
+/* #metricsList.draggable-list-view .d-item span.icon-menu {
   cursor: grab;
 }
 
 #metricsList.draggable-list-view.disabledDrag .d-item span.icon-menu {
   cursor: not-allowed !important;
-}
+} */
 
 #showActionItem {
   padding: 5px 15px;
@@ -300,6 +300,9 @@ input:disabled {
 .mdc-text-field--focused .mdc-floating-label--float-above {
   color: #00a1f1 !important;
 }
+.mdc-text-field--invalid .mdc-floating-label--float-above {
+  color: red !important;
+}
 
 .secondary {
   text-align: center;
@@ -313,3 +316,10 @@ input:disabled {
   font-size: 18px;
   vertical-align: top;
 } */
+
+#metricsList.draggable-list-view button.cursor-grab {
+  cursor: grab;
+}
+#metricsList.draggable-list-view button.disabledDrag {
+  cursor: not-allowed !important;
+}

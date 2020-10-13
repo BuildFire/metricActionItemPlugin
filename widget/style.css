@@ -1,6 +1,6 @@
 html,
 body {
-  height: 95%;
+  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -97,14 +97,14 @@ span {
 
 .add-btn {
   position: fixed;
-  bottom: 1.5rem;
-  right: 3.5rem;
+  bottom: 5%;
+  right: 15%;
 }
 
 .close-btn {
   position: fixed;
-  bottom: 1.5rem;
-  left: 3.5rem;
+  bottom: 5%;
+  left: 15%;
 }
 
 .close-btn button {
@@ -114,7 +114,7 @@ span {
 
 #minMax {
   text-align: center;
-  margin-top: 150px;
+  margin-top: 25%;
   font-size: 1.6rem;
   font-weight: bold;
 }
