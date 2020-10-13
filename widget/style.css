@@ -9,11 +9,24 @@ span {
   font-size: x-large;
 }
 
+#metricsScreen {
+  padding: 10px;
+}
+
+#listViewContainer.empty {
+  background-image: url(./.images/empty_page.svg);
+  background-repeat: no-repeat;
+  background-attachment: absolute;
+  background-position: center;
+  height: 225px;
+}
+
 #updateHistoryContainer {
   padding: 20px 40px;
   height: 100%;
   position: relative;
 }
+
 #progressbar-container {
   width: 100%;
   margin-top: 10%;

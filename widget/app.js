@@ -148,7 +148,8 @@ const metricAsItemInit = (newMetric) => {
         
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
-            value
+            value,
+            `${currentUser.firstName} ${currentUser.lastName}`
           ).then((result) => {
             metrics = result;
             buildfire.history.pop();
