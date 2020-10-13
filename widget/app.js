@@ -29,6 +29,8 @@ getCurrentUser();
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
+if (typeof ListView !== "undefined") {
+
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
 buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
@@ -46,7 +48,7 @@ buildfire.datastore.onUpdate((event) => {
     });
   }
 });
-
+}
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
@@ -158,6 +160,7 @@ const metricAsItemInit = (newMetric) => {
           bar.destroy();
         }
         initProgressBar(newMetric);
+        document.body.scrollTop = 0;
       }
     }
   };
