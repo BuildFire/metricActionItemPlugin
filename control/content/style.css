@@ -7,6 +7,10 @@
   padding: 0 !important;
 }
 
+.sort-by-lable {
+  margin-right: 5px;
+}
+
 #metricForm .mdc-text-field {
   width: 98%;
 }
@@ -324,8 +328,23 @@ input:disabled {
   cursor: not-allowed !important;
 }
 
-
 .mdc-button i {
   margin-right: 2px !important;
   margin-top: 1px !important;
+}
+
+#showActionItem,
+#showActionItem .mdc-chip-set {
+  display: inline;
+  vertical-align: middle;
+}
+
+.mdc-icon-button.cursor-grab:not(.disabledDrag):hover {
+  color: var(--mdc-theme-secondary);
+}
+.mdc-icon-button.edit-btn:hover {
+  color: var(--mdc-theme-primary);
+}
+.mdc-icon-button.delete-btn:hover {
+  color: var(--mdc-theme-error);
 }

@@ -41,7 +41,9 @@ const helpers = {
 
   inputError: (inputID, textHelperID, errorMessage) => {
     document.getElementById(inputID).classList.add("mdc-text-field--invalid");
-    document.getElementById(textHelperID).classList.add( "mdc-text-field-helper-text--validation-msg");
+    document
+      .getElementById(textHelperID)
+      .classList.add("mdc-text-field-helper-text--validation-msg");
     document.getElementById(textHelperID).innerHTML = errorMessage;
   },
 
@@ -69,6 +71,29 @@ const helpers = {
       purchase: "Purchase",
     };
 
-    showActionItem.innerHTML = actions[action] || "No Action Selected";
+    if (actions[action]) {
+      showActionItem.innerHTML = `
+      <div class="mdc-chip-set mdc-chip-set--choice">
+        <div class="mdc-chip mdc-chip--selected" role="row">
+          <div class="mdc-chip__ripple"></div>
+          <span role="gridcell">
+            <span
+              role="radio"
+              tabindex="0"
+              aria-checked="true"
+              class="mdc-chip__primary-action"
+            >
+              <span class="mdc-chip__text">${actions[action]}</span>
+            </span>
+            <i class="material-icons mdc-chip__icon mdc-chip__icon--trailing" tabindex="-1" role="button" onclick="removeActionItem()">cancel</i>
+          </span>
+        </div>
+    </div>
+    `;
+
+      mdc.chips.MDCChip.attachTo(showActionItem.querySelector(".mdc-chip-set"));
+    } else {
+      showActionItem.innerHTML = `No Action Selected`;
+    }
   },
 };

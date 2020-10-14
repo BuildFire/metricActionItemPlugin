@@ -49,7 +49,7 @@
 
       <div id="metricsList"></div>
       <div class="metric-actions">
-        <label for="metrics">Sort By:</label>
+        <label for="metrics" class="sort-by-lable">Sort By: </label>
 
         <select id="sortBy" onchange="onSortByChange()">
           <option value="manual">Manual</option>
@@ -144,6 +144,7 @@
         <input
           onchange="onFieldChange(this)"
           id="min"
+          min="0"
           autocomplete="false"
           type="number"
           class="mdc-text-field__input"
@@ -171,6 +172,7 @@
         <input
           onchange="onFieldChange(this)"
           id="max"
+          min="0"
           autocomplete="false"
           type="number"
           class="mdc-text-field__input"

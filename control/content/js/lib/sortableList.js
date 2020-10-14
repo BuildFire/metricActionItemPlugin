@@ -78,11 +78,11 @@ buildfire.components.SortableList = class SortableList {
     divRow.className = "d-item clearfix";
     moveHandle.className = "mdc-icon-button material-icons cursor-grab";
     title.className = "title ellipsis item-title";
-    deleteButton.className = "mdc-icon-button material-icons";
-    editButton.className = "mdc-icon-button material-icons";
+    editButton.className = "mdc-icon-button material-icons edit-btn";
+    deleteButton.className = "mdc-icon-button material-icons delete-btn";
 
     moveHandle.innerHTML = "menu";
-    deleteButton.innerHTML = "delete_outline";
+    deleteButton.innerHTML = "close";
     editButton.innerHTML = "edit";
     title.innerHTML = item.title;
     minMax.innerHTML =

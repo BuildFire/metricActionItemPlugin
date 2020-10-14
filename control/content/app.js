@@ -54,8 +54,8 @@ const initMetricFields = (data = {}) => {
   metricFields = {
     title: data.title || "",
     icon: data.icon || "",
-    min: data.min || (data.min !== 0 ? "" : 0),
-    max: data.max || (data.max !== 0 ? "" : 0),
+    min: data.min || 0,
+    max: data.max || 100,
     actionItem: data.actionItem || {},
     type: data.type || "metric",
   };
@@ -70,17 +70,24 @@ const initMetricFields = (data = {}) => {
   initIconComponent(data.icon);
 
   title.value = metricFields.title;
-  min.value = metricFields.min;
-  max.value = metricFields.max;
-
-  if (Object.keys(data).length !== 0) {
-    document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
-      ele.classList.add("mdc-floating-label--float-above");
-    });
-    document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
-      ele.classList.add("mdc-notched-outline--notched");
-    });
+  if (metricFields.type === "metric") {
+    // document.getElementById('min-lable').style.display = "block";
+    // document.getElementById('max-lable').style.display = "block";
+    min.value = metricFields.min;
+    max.value = metricFields.max;
+  } else {
+    // document.getElementById('min-lable').style.display = "none";
+    // document.getElementById('max-lable').style.display = "none";
   }
+
+  // if (Object.keys(data).length !== 0) {
+  document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
+    ele.classList.add("mdc-floating-label--float-above");
+  });
+  document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
+    ele.classList.add("mdc-notched-outline--notched");
+  });
+  // }
 
   let maxInput = document.getElementById("max"),
     minInput = document.getElementById("min");
@@ -188,11 +195,14 @@ const addActionItem = (actionItem = {}) => {
       if (data) {
         helpers.getActionItem(data.action);
         metricFields["actionItem"] = data;
-      } else {
-        helpers.getActionItem();
       }
     });
   });
+};
+
+const removeActionItem = () => {
+  metricFields["actionItem"] = {};
+  helpers.getActionItem();
 };
 
 // Go to Add metric's form page
@@ -416,10 +426,10 @@ const renderInit = () => {
 };
 
 // To render metrics
-const render = (items) => {  
-  if(sortableList) {
+const render = (items) => {
+  if (sortableList) {
     sortableList.sortableList.destroy();
-  }    
+  }
 
   sortableList = new buildfire.components.SortableList(
     metricsContainer,
@@ -472,9 +482,13 @@ const clickItem = (item) => {
 
 // Trigered when a user delete a metric
 const deleteItem = (item, index, callback) => {
+  let message =
+    item.type === "metric"
+      ? `Are you sure you want to delete ${item.title}?`
+      : `<span class="text-danger">Warning: (Deleting this metric will also delete all of it's children).</span> <br> Are you sure you want to delete ${item.title}?`;
   buildfire.notifications.confirm(
     {
-      message: "Are you sure you want to delete " + item.title + "?",
+      message,
       confirmButton: { text: "Delete", key: "y", type: "danger" },
       cancelButton: { text: "Cancel", key: "n", type: "default" },
     },

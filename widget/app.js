@@ -9,12 +9,14 @@ let currentUser;
 // Reference to the progress bar in (update histroy value page)
 let bar = {};
 
-// Reference to the values chart in metrics lists' page 
+// Reference to hammer in (update histroy value page)
+let hammer = {};
+
+// Reference to the values chart in metrics lists' page
 let valuesChart = {};
 
-// A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once 
+// A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
-
 
 // Get the logged in user
 const getCurrentUser = () => {
@@ -30,24 +32,23 @@ buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
 if (typeof ListView !== "undefined") {
-
-// To sync betwwen the widget and the control when any change (in metrics) happened in the control side
-buildfire.publicData.onUpdate((event) => {
-  if (event.data && event.id) {
-    metrics = event.data;
-    metrics.id = event.id;
-    renderInit();
-  }
-});
-
-// To sync betwwen the widget and the control when any change (in settings) happened in the control side
-buildfire.datastore.onUpdate((event) => {
-  if (event.tag === "settings") {
-    Settings.load().then(() => {
+  // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
+  buildfire.publicData.onUpdate((event) => {
+    if (event.data && event.id) {
+      metrics = event.data;
+      metrics.id = event.id;
       renderInit();
-    });
-  }
-});
+    }
+  });
+
+  // To sync betwwen the widget and the control when any change (in settings) happened in the control side
+  buildfire.datastore.onUpdate((event) => {
+    if (event.tag === "settings") {
+      Settings.load().then(() => {
+        renderInit();
+      });
+    }
+  });
 }
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
@@ -58,7 +59,7 @@ Metrics.getMetrics().then(async (result) => {
     if (typeof ListView !== "undefined") {
       // Check if the user have the permission to update metrics
       isUserAuthorized();
-      
+
       renderInit();
     }
   });
@@ -79,24 +80,27 @@ const renderInit = () => {
   // Get metrics that should be rendered
   let metricsChildren = readyMetrics.metricsChildren;
   console.log("please", metricsChildren);
-  // Init metrics values' chart 
+  // Init metrics values' chart
   initChart(readyMetrics.metricsParent);
   console.log("metrics widget", metrics);
 
   let currentMetricList = [];
-    // Prepare metrics to be rendered in the ListView component
+  // Prepare metrics to be rendered in the ListView component
   for (let metricId in metricsChildren) {
     metricsChildren[metricId].id = metricId;
     let newMetric = new Metric(metricsChildren[metricId]);
     let InitMetricAsItem = metricAsItemInit(newMetric);
     currentMetricList.push(InitMetricAsItem);
   }
- // Add the summary value of the parent metric
- summaryValue.innerText = readyMetrics.metricsParent.value
- ? `${readyMetrics.metricsParent.value}%`
- : "0%";
+  // Add the summary value of the parent metric
+  summaryValue.innerText = readyMetrics.metricsParent.value
+    ? `${readyMetrics.metricsParent.value}%`
+    : "0%";
 
-  currentMetricList = helpers.sortMetrics(currentMetricList, readyMetrics.metricsSortBy);
+  currentMetricList = helpers.sortMetrics(
+    currentMetricList,
+    readyMetrics.metricsSortBy
+  );
   renderMetrics(currentMetricList);
 };
 
@@ -106,10 +110,10 @@ const renderMetrics = (metrics) => {
     enableAddButton: true,
     Title: "",
   });
-listViewDiv.loadListViewItems(metrics);
-}
+  listViewDiv.loadListViewItems(metrics);
+};
 
-// 
+//
 const metricAsItemInit = (newMetric) => {
   let listItem = new ListViewItem(newMetric);
   listItem.onIconTitleClick = (item) => {
@@ -131,7 +135,7 @@ const metricAsItemInit = (newMetric) => {
         title: newMetric.title,
         nodeSelector,
       });
-      
+
       renderInit();
     } else {
       if (currentUser && isUserAuthorized()) {
@@ -145,9 +149,9 @@ const metricAsItemInit = (newMetric) => {
           showLabelInTitlebar: true,
         });
 
-        updateHistoryBtn.onclick =  (event) => {
+        updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
-        
+
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
             value,
@@ -157,16 +161,13 @@ const metricAsItemInit = (newMetric) => {
             buildfire.history.pop();
           });
         };
-        if (Object.keys(bar).length !== 0) {
-          bar.destroy();
-        }
         initProgressBar(newMetric);
         document.body.scrollTop = 0;
       }
     }
   };
   return listItem;
-}
+};
 
 // Get a different a color of the chart every time the chart is rendered
 const getRandomColor = () => {
@@ -191,14 +192,16 @@ const initChart = (metric) => {
     let value = Metrics.getHistoryValue(metric, i) || 0;
     historyValues.push(value);
   }
-  
-  let datasets = [{
-    label: title,
-    data: historyValues,
-    backgroundColor: "transparent",
-    borderColor: getRandomColor(),
-    borderWidth: 2,
-  }];
+
+  let datasets = [
+    {
+      label: title,
+      data: historyValues,
+      backgroundColor: "transparent",
+      borderColor: getRandomColor(),
+      borderWidth: 2,
+    },
+  ];
   renderChart(datasets);
 };
 
@@ -227,52 +230,58 @@ const renderChart = (datasets) => {
 };
 
 const initProgressBar = (newMetric) => {
-    // updateMetricHistory progress bar
-    bar = new ProgressBar.SemiCircle("#progressbar-container", {
-      strokeWidth: 10,
-      color: "#FFEA82",
-      trailColor: "#eee",
-      trailWidth: 10,
-      easing: "easeInOut",
-      duration: 500,
-      svgStyle: null,
-      text: {
-        value: "",
-        alignToBottom: true,
-      },
-      from: { color: "#FFEA82" },
-      to: { color: "#ED6A5A" },
-      // Set default step function for all animate calls
-      step: (state, bar) => {
-        bar.path.setAttribute("stroke", state.color);
-        var value = Math.round(bar.value() * (newMetric.max - newMetric.min));
-        if (value === 0) {
-          bar.setText(0);
-        } else {
-          bar.setText(value);
-        }
-        bar.text.style.color = state.color;
-      },
-    });
+  if (Object.keys(bar).length !== 0) {
+    bar.destroy();
+  }
+  // updateMetricHistory progress bar
+  bar = new ProgressBar.SemiCircle("#progressbar-container", {
+    strokeWidth: 10,
+    color: "#FFEA82",
+    trailColor: "#eee",
+    trailWidth: 10,
+    easing: "easeInOut",
+    duration: 500,
+    svgStyle: null,
+    text: {
+      value: "",
+      alignToBottom: true,
+    },
+    from: { color: "#FCD12A" },
+    to: { color: "#4CAF50" },
+    // Set default step function for all animate calls
+    step: (state, bar) => {
+      bar.path.setAttribute("stroke", state.color);
+      var value = Math.round(bar.value() * (newMetric.max - newMetric.min));
+      if (value === 0) {
+        bar.setText(0);
+      } else {
+        bar.setText(value);
+      }
+      bar.text.style.color = state.color;
+    },
+  });
 
-    bar.set(Math.round(newMetric.value) / 100);
-    let progressText = document.getElementsByClassName("progressbar-text")[0];
-    progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
-    minMax.innerHTML = `Min ${newMetric.min} - Max ${newMetric.max}`;
+  bar.set(Math.round(newMetric.value) / 100);
+  let progressText = document.getElementsByClassName("progressbar-text")[0];
+  progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
+  minMax.innerHTML = `Min ${newMetric.min} - Max ${newMetric.max}`;
 
+  bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+  bar.text.style.fontSize = "2rem";
 
-    bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-    bar.text.style.fontSize = "2rem";
-
-    InitHammerJS(newMetric);
+  InitHammerJS(newMetric);
 };
 const InitHammerJS = (newMetric) => {
+  if (Object.keys(hammer).length !== 0) {
+    hammer.destroy();
+  }
+  
   // Init hammerJs gesture detection on element
   let updateHistoryContainer = document.getElementById(
     "updateHistoryContainer"
   );
   // create a simple instance of Hammer
-  let hammer = new Hammer(updateHistoryContainer);
+  hammer = new Hammer(updateHistoryContainer);
   hammer
     .get("pan")
     .set({ direction: Hammer.DIRECTION_VERTICAL, threshold: 25 });
@@ -284,7 +293,7 @@ const InitHammerJS = (newMetric) => {
       changeProgressbarValue(ev.type, newMetric);
     }
   });
-}
+};
 
 const changeProgressbarValue = (direction, newMetric) => {
   let progressText = document.getElementsByClassName("progressbar-text")[0];
@@ -306,7 +315,7 @@ const isUserAuthorized = () => {
     Settings.tags.forEach((tag) => {
       currentTags[tag.tagName] = tag.tagName;
     });
-  
+
     if (currentUser && currentUser.tags) {
       currentUser.tags[Object.keys(currentUser.tags)[0]].forEach((tag) => {
         if (currentTags[tag.tagName]) {
@@ -335,11 +344,11 @@ buildfire.history.onPop((breadcrumb) => {
     //  This condition is for preventing the control side from going back (when clicking back in widget)
     // when we are at the home, which would lead to an error
     // if (Object.keys(breadcrumb.options).length > 0) {
-      metricsScreen.style.display = "block";
-      updateHistoryContainer.style.display = "none";
-      nodeSelector = breadcrumb.options.nodeSelector || "metrics";
-      buildfire.messaging.sendMessageToControl({ nodeSelector });
-      renderInit();
+    metricsScreen.style.display = "block";
+    updateHistoryContainer.style.display = "none";
+    nodeSelector = breadcrumb.options.nodeSelector || "metrics";
+    buildfire.messaging.sendMessageToControl({ nodeSelector });
+    renderInit();
     // }
   }
 });
@@ -358,7 +367,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
     if (message.nodeSelector !== nodeSelector) {
       numberOfPops++;
     }
-      buildfire.history.pop();
+    buildfire.history.pop();
   } else {
     nodeSelector = message.nodeSelector;
     buildfire.history.push(message.title, {
