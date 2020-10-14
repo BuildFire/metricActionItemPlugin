@@ -107,6 +107,7 @@ class Metrics {
             return val;
           }
         }
+        return 0;
       }
       return "false";
     } else if (metric.type === "parent" || !metric.type) {

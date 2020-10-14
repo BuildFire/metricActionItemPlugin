@@ -416,7 +416,11 @@ const renderInit = () => {
 };
 
 // To render metrics
-const render = (items) => {
+const render = (items) => {  
+  if(sortableList) {
+    sortableList.sortableList.destroy();
+  }    
+
   sortableList = new buildfire.components.SortableList(
     metricsContainer,
     items || []
@@ -424,7 +428,7 @@ const render = (items) => {
 
   if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
     // Disable manual sorting
-    sortableList.sortableList.options.disabled = true;
+    sortableList.sortableList.option("disabled", true);
     metricsList.querySelectorAll("button.cursor-grab").forEach((btn) => {
       btn.classList.add("disabledDrag");
     });
@@ -563,7 +567,7 @@ const onSortByChange = () => {
     metricsSortBy = sortBy;
     if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
       // Disable manual sorting
-      sortableList.sortableList.options.disabled = true;
+      sortableList.sortableList.option("disabled", true);
     }
     renderInit();
   });
