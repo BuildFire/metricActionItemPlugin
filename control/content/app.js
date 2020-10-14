@@ -63,7 +63,7 @@ const initMetricFields = (data = {}) => {
   if (Object.keys(metricFields.actionItem).length !== 0) {
     helpers.getActionItem(data.actionItem.action);
   } else {
-    showActionItem.innerHTML = "";
+    showActionItem.innerHTML = "No Action Selected";
   }
 
   // Initialize metric's icon
@@ -188,9 +188,8 @@ const addActionItem = (actionItem = {}) => {
       if (data) {
         helpers.getActionItem(data.action);
         metricFields["actionItem"] = data;
-        actionItemInput.value = data.action;
-        actionItemInput.focus();
-        actionItemInput.blur();
+      } else {
+        helpers.getActionItem();
       }
     });
   });
@@ -209,9 +208,7 @@ const goToAddItem = () => {
 // Go to metrics page from add/edit pages
 const goToMetricspage = () => {
   iconInput.focus();
-  actionItemInput.focus();
   iconInput.blur();
-  actionItemInput.blur();
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
@@ -377,14 +374,6 @@ const inputValidation = () => {
     }
   }
 
-  if (Object.keys(actionItem).length === 0) {
-    helpers.inputError(
-      "actionItem-lable",
-      "actionItem-helper-text",
-      "Please add action item"
-    );
-    return false;
-  }
   if (!icon) {
     helpers.inputError("icon-lable", "icon-helper-text", "Please add icon");
     return false;
@@ -436,12 +425,12 @@ const render = (items) => {
   if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
     // Disable manual sorting
     sortableList.sortableList.options.disabled = true;
-    metricsList.querySelectorAll("button").forEach((btn) => {
+    metricsList.querySelectorAll("button.cursor-grab").forEach((btn) => {
       btn.classList.add("disabledDrag");
     });
     // Remove on update functionality
   } else {
-    metricsList.querySelectorAll("button").forEach((btn) => {
+    metricsList.querySelectorAll("button.cursor-grab").forEach((btn) => {
       btn.classList.remove("disabledDrag");
     });
   }

@@ -13,6 +13,11 @@ span {
   padding: 10px;
 }
 
+#summaryValue {
+  font-size: 35px;
+  margin-bottom: 12px;
+}
+
 #listViewContainer.empty {
   background-image: url(./.images/empty_page.svg);
   background-repeat: no-repeat;

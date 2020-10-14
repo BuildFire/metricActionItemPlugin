@@ -26,7 +26,7 @@ describe("Test The Widget Side", () => {
     });
 
     it("Should calculate the value of the big object correctly", async () => {
-      expect(Metric.getHistoryValue(metrics)).toBe(48.5);
+      expect(Metrics.getHistoryValue(metrics)).toBe(48.5);
     });
 
     it("Should update a metric history value without any errors", async () => {
@@ -36,7 +36,7 @@ describe("Test The Widget Side", () => {
       nodeSelector = "metrics." + metric2Id;
 
       await expectAsync(
-        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55)
+        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55, `${currentUser.firstName} ${currentUser.lastName}`)
       ).toBeResolved();
     });
 
