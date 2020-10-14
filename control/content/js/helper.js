@@ -46,7 +46,7 @@ const helpers = {
   },
 
   getActionItem(action) {
-    showActionItem.innerHTML = "";
+    showActionItem.innerHTML = "No Action Selected";
 
     const actions = {
       linkToApp: "Link to app",

@@ -1,5 +1,8 @@
 class Settings {
-  constructor() {}
+  constructor() {
+    this.showSummary;
+    this.tags;
+  }
 
   static load() {
     return new Promise((resolve, reject) => {
@@ -14,10 +17,12 @@ class Settings {
     });
   }
 
-  static save() {
+  static save(username) {
     let settings = {
       tags: this.tags,
       showSummary: this.showSummary,
+      lastUpdatedOn: new Date(),
+      lastUpdatedBy: username,
     };
 
     return new Promise((resolve, reject) => {

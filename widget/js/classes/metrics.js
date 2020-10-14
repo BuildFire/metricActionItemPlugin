@@ -30,7 +30,7 @@ class Metrics {
     });
   }
 
-  static updateMetricHistory({ nodeSelector, metricsId }, value) {
+  static updateMetricHistory({ nodeSelector, metricsId }, value, username) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ class Metrics {
           $set: {
             [`${nodeSelector}.history.$.value`]: value,
             [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: "currentUser.username",
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: username,
           },
         },
         "metrics",
@@ -57,9 +57,9 @@ class Metrics {
                   [`${nodeSelector}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
-                    createdBy: "currentUser.username",
+                    createdBy: username,
                     lastUpdatedOn: new Date(),
-                    lastUpdatedBy: "currentUser.username",
+                    lastUpdatedBy: username,
                     value,
                   },
                 },

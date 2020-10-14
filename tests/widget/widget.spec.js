@@ -36,7 +36,7 @@ describe("Test The Widget Side", () => {
       nodeSelector = "metrics." + metric2Id;
 
       await expectAsync(
-        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55)
+        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55, `${currentUser.firstName} ${currentUser.lastName}`)
       ).toBeResolved();
     });
 

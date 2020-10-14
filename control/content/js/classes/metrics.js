@@ -62,7 +62,7 @@ class Metrics {
   }
 
   // To update any metric properties but not historys' values (Control Panel Only)
-  static update({ nodeSelector, metricsId }, data, id) {
+  static update({ nodeSelector, metricsId }, data, id, username) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
@@ -71,6 +71,9 @@ class Metrics {
       for (let key in data) {
         _set[`${nodeSelector}.${id}.${key}`] = data[key];
       }
+
+      _set[`${nodeSelector}.${id}.lastUpdatedOn`] = new Date();
+      _set[`${nodeSelector}.${id}.lastUpdatedBy`] = username;
 
       buildfire.publicData.update(
         metricsId,

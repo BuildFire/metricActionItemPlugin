@@ -10,6 +10,7 @@ class ListView {
   clear() {
     this.container.innerHTML = "";
   }
+  
   loadListViewItems(items) {
     if (this.container.innerHTML == "") {
       // if (this.options.enableAddButton) {
@@ -24,8 +25,10 @@ class ListView {
       // }
     }
     if (items.length === 0) {
-      listViewContainer.innerHTML = `<div class="summary-card" >No metrics have been added yet.</div>`;
+      listViewContainer.classList.add('empty');
+      summary.style.display = "none";
     } else {
+      listViewContainer.classList.remove('empty');
       items.forEach((item) => this.addItem(item));
     }
   }

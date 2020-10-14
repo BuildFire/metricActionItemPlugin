@@ -1,3 +1,10 @@
+let currentUser = {};
+
+// Get current user
+authManager.getCurrentUser().then((user) => {
+  currentUser = user;
+});
+
 Settings.load().then(() => {
   // Use element id and assign the new data to it's value
   showSummary.checked = Settings.showSummary;
@@ -54,7 +61,7 @@ const deleteTag = (index, name) => {
 
 const updateSettings = () => {
   return new Promise((resolve, reject) => {
-    Settings.save()
+    Settings.save(`${currentUser.firstName} ${currentUser.lastName}`)
       .then(() => {
         resolve();
       })
