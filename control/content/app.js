@@ -269,13 +269,13 @@ const onRadioChange = (value) => {
         ele.classList.remove("mdc-notched-outline--notched");
       });
   } else {
+    minInput.focus();
+    maxInput.focus();
     maxInput.disabled = false;
     minInput.disabled = false;
-    metricFields["type"] = "metric";
     metricFields["min"] = 0;
-    minInput.focus();
     metricFields["max"] = 100;
-    maxInput.focus();
+
     initMetricFields(metricFields);
   }
 };
@@ -352,21 +352,21 @@ const updateMetrics = async (item) => {
 
 const inputValidation = () => {
   const { title, icon, actionItem, min, max, type } = metricFields;
-
+  let isValid = true;
   if (!title) {
     helpers.inputError(
       "title-lable",
       "title-helper-text",
       "Please add metric title"
     );
-    return false;
+    isValid = false;
   } else if (title.length > 50) {
     helpers.inputError(
       "title-lable",
       "title-helper-text",
       "Metric's title must be less than 50 characters long"
     );
-    return false;
+    isValid = false;
   }
 
   if (type === "parent") {
@@ -379,7 +379,7 @@ const inputValidation = () => {
         "min-helper-text",
         "Please add min value"
       );
-      return false;
+      isValid = false;
     }
     if (max !== 0 && !max) {
       helpers.inputError(
@@ -387,7 +387,7 @@ const inputValidation = () => {
         "max-helper-text",
         "Please add max value"
       );
-      return false;
+      isValid = false;
     }
     if (max < min) {
       helpers.inputError(
@@ -395,16 +395,18 @@ const inputValidation = () => {
         "min-helper-text",
         "Min value should be less than Max value"
       );
-      return false;
+      isValid = false;
     }
   }
 
   if (!icon) {
     helpers.inputError("icon-lable", "icon-helper-text", "Please add icon");
-    return false;
+    isValid = false;
   }
-
-  return true;
+  let invalidInput = document.querySelector(".mdc-text-field--invalid");
+  if (invalidInput)
+    invalidInput.scrollIntoView({ behavior: "smooth", block: "center" });
+  return isValid;
 };
 
 // SortableList component

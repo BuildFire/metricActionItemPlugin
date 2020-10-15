@@ -59,8 +59,8 @@
   display: none;
 }
 
-input:disabled {
-  background: lightgray !important;
+input:disabled + span {
+  background: lightgray;
 }
 
 #metricsMain button {
@@ -347,4 +347,12 @@ input:disabled {
 }
 .mdc-icon-button.delete-btn:hover {
   color: var(--mdc-theme-error);
+}
+
+input:disabled + span .mdc-notched-outline__notch {
+  min-width: 25vw;
+}
+
+.mdc-notched-outline__notch {
+  padding: 0 !important;
 }
