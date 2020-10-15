@@ -43,13 +43,13 @@ const deleteTag = (index, name) => {
   return new Promise((resolve, reject) => {
     buildfire.notifications.confirm(
       {
-        message: `Are you sure you want to delete ${name}?`,
+        message: `Are you sure you want to delete the ${name} tag?`,
         confirmButton: { text: "Delete", key: "y", type: "danger" },
         cancelButton: { text: "Cancel", key: "n", type: "default" },
       },
       (err, data) => {
         if (err) reject(err);
-        if (data.selectedButton.key == "y") {
+        if (data && data.selectedButton.key == "y") {
           Settings.tags.splice(index, 1);
           renderTags();
           resolve(updateSettings());

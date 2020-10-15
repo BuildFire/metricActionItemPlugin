@@ -271,6 +271,12 @@ const onRadioChange = (value) => {
   } else {
     maxInput.disabled = false;
     minInput.disabled = false;
+    metricFields["type"] = "metric";
+    metricFields["min"] = 0;
+    minInput.focus();
+    metricFields["max"] = 100;
+    maxInput.focus();
+    initMetricFields(metricFields);
   }
 };
 
@@ -301,7 +307,7 @@ const createMetric = () => {
   }
 };
 
-const updateMetrics = (item) => {
+const updateMetrics = async (item) => {
   // Metric fields validation
   if (inputValidation()) {
     let updateObj = {};
@@ -319,8 +325,17 @@ const updateMetrics = (item) => {
       delete metricFields.min;
       delete metricFields.max;
     } else if (updateObj.type === "metric" && item.type === "parent") {
-      updateObj.max = item.type.max;
-      updateObj.min = item.type.min;
+      // To ask the user if he really want to change the type of metric from (parent to metric),
+      // where this action is irreversable (it will delete al the children of the parent metric )
+      let isAccepted;
+      await askBeforeUpdate().then((result) => {
+        isAccepted = result;
+      });
+      if (isAccepted) {
+        updateObj.metrics = {};
+      } else {
+        return;
+      }
     }
     Metrics.update(
       { nodeSelector, metricsId: metrics.id },
@@ -535,6 +550,27 @@ const updateItem = (item) => {
   updateMetric.onclick = () => {
     updateMetrics(item);
   };
+};
+
+const askBeforeUpdate = () => {
+  return new Promise((resolve, reject) => {
+    let message = `<span class="text-danger">Warning: (Changing the type of this metric (parent to metric) will also delete all of it's children).</span> <br> Are you sure you want to update this metirc?`;
+    buildfire.notifications.confirm(
+      {
+        message,
+        confirmButton: { text: "Update", key: "y", type: "danger" },
+        cancelButton: { text: "Cancel", key: "n", type: "default" },
+      },
+      (e, data) => {
+        if (e) console.error(e);
+        if (data && data.selectedButton.key == "y") {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }
+    );
+  });
 };
 
 // Manage breadcrumbs

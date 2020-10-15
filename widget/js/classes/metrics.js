@@ -106,19 +106,19 @@ class Metrics {
             }
             return val;
           }
+          
         }
-        return 0;
       }
-      return "false";
+      return "No value";
     } else if (metric.type === "parent" || !metric.type) {
       if (Object.keys(metric.metrics).length === 0) {
-        return 0;
+        return "No value";
       }
       if (metric.metrics) {
         let sum = 0;
         let numberChildren = 0;
         for (let key in metric.metrics) {
-          if (Metrics.getHistoryValue(metric.metrics[key], inde) !== "false") {
+          if (Metrics.getHistoryValue(metric.metrics[key], inde) !== "No value") {
             numberChildren++;
   
             sum += Metrics.getHistoryValue(metric.metrics[key], inde);

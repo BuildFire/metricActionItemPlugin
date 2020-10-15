@@ -21,7 +21,6 @@ class Settings {
     let settings = {
       tags: this.tags,
       showSummary: this.showSummary,
-      lastUpdatedOn: new Date(),
       lastUpdatedBy: username,
     };
 

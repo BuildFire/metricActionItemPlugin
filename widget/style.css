@@ -32,7 +32,7 @@ span {
   background-repeat: no-repeat;
   background-attachment: absolute;
   background-position: center;
-  height: 225px;
+  height: 75vh;
 }
 
 #updateHistoryContainer {
@@ -145,7 +145,6 @@ span {
   font-size: 1.6rem;
   font-weight: bold;
 }
-
 
 /* #updateHistoryBtn:hover {
   color: var(--mdc-theme-primary);
