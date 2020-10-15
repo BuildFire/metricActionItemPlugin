@@ -79,10 +79,8 @@ const renderInit = () => {
   }
   // Get metrics that should be rendered
   let metricsChildren = readyMetrics.metricsChildren;
-  console.log("please", metricsChildren);
   // Init metrics values' chart
   initChart(readyMetrics.metricsParent);
-  console.log("metrics widget", metrics);
 
   let currentMetricList = [];
   // Prepare metrics to be rendered in the ListView component
@@ -93,9 +91,35 @@ const renderInit = () => {
     currentMetricList.push(InitMetricAsItem);
   }
   // Add the summary value of the parent metric
-  summaryValue.innerText = readyMetrics.metricsParent.value
-    ? `${readyMetrics.metricsParent.value}%`
-    : "0%";
+  summaryValue.innerText = `${readyMetrics.metricsParent.value}%`;
+
+  // Calculate the percentage increase or decreased compared to the previous value for the metric;
+  let didIncreased =
+    readyMetrics.metricsParent.value > readyMetrics.metricsParent.previousValue
+      ? true
+      : false;
+
+  // Calculation source: http://mathcentral.uregina.ca/qq/database/qq.09.06/h/other1.html
+  let percentage =
+    readyMetrics.metricsParent.value - readyMetrics.metricsParent.previousValue;
+
+  percentage /= didIncreased
+    ? readyMetrics.metricsParent.value
+    : readyMetrics.metricsParent.previousValue;
+
+  percentage *= 100;
+  percentage = percentage.toPrecision(3);
+
+  summaryPreviousValueContainer.innerHTML = `
+      <i
+      class="material-icons mdc-button__icon ${
+        didIncreased ? "mdc-theme--secondary" : "mdc-theme--error"
+      } trending-icon">${didIncreased ? "trending_up" : "trending_down"}</i >
+      <span id="summaryPreviousValue">${percentage}% of target</span>
+      `;
+
+  // Add the metric title to the summary card;
+  summaryTitle.innerHTML = readyMetrics.metricsParent.title || "Home";
 
   currentMetricList = helpers.sortMetrics(
     currentMetricList,
@@ -169,16 +193,6 @@ const metricAsItemInit = (newMetric) => {
   return listItem;
 };
 
-// Get a different a color of the chart every time the chart is rendered
-const getRandomColor = () => {
-  var letters = "0123456789ABCDEF";
-  var color = "#";
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
 const initChart = (metric) => {
   // To destroy (delete) any chart in the screen if exists
   if (Object.keys(valuesChart).length !== 0) {
@@ -197,9 +211,11 @@ const initChart = (metric) => {
     {
       label: title,
       data: historyValues,
-      backgroundColor: "transparent",
-      borderColor: getRandomColor(),
+      backgroundColor: "rgba(101, 116, 205, 0.1)",
+      borderColor: "rgba(101, 116, 205, 0.8)",
+      pointBackgroundColor: "rgba(255, 255, 255, 1)",
       borderWidth: 2,
+      fill: false,
     },
   ];
   renderChart(datasets);
@@ -215,13 +231,39 @@ const renderChart = (datasets) => {
       datasets,
     },
     options: {
-      responsive: true,
+      maintainAspectRatio: true,
+      spanGaps: false,
+      legend: {
+        display: false,
+      },
+      elements: {
+        point: {
+          radius: 3,
+          borderWidth: 3,
+          hoverRadius: 5,
+          hoverBorderWidth: 1,
+        },
+        line: {
+          tension: 0,
+        },
+      },
+      layout: {
+        padding: {
+          top: 5,
+          left: 10,
+          right: 10,
+          bottom: 5,
+        },
+      },
       scales: {
+        xAxes: [
+          {
+            display: false,
+          },
+        ],
         yAxes: [
           {
-            ticks: {
-              beginAtZero: true,
-            },
+            display: false,
           },
         ],
       },
@@ -275,7 +317,7 @@ const InitHammerJS = (newMetric) => {
   if (Object.keys(hammer).length !== 0) {
     hammer.destroy();
   }
-  
+
   // Init hammerJs gesture detection on element
   let updateHistoryContainer = document.getElementById(
     "updateHistoryContainer"

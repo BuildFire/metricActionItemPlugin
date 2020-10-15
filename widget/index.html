@@ -39,14 +39,28 @@
   </head>
   <body>
     <div id="metricsScreen">
-      <div id="summary" class="mdc-card summary-card">
+      <div
+        id="summary"
+        class="mdc-card mdc-card--outlined summary-card mdc-elevation--z1"
+      >
         <div class="mdc-card-wrapper__text-section">
           <div
-            id="summaryValue"
-            class="card__title mdc-theme--text-primary-on-background" 
+            id="summaryTitle"
+            class="card__subtitle mdc-theme--text-secondary-on-background"
           ></div>
+          <span
+            class="card__title mdc-theme--text-secomdary-on-background"
+            id="summaryValue"
+          ></span>
 
-          <canvas id="chart" width="400" height="400"></canvas>
+          <span
+            id="summaryPreviousValueContainer"
+            class="card__subtitle mdc-theme--text-secondary-on-background summary-previous-value"
+          >
+          </span>
+        </div>
+        <div class="mdc-card-wrapper__text-section">
+          <canvas id="chart" height="90"></canvas>
         </div>
       </div>
 
