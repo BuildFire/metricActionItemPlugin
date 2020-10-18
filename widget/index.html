@@ -49,7 +49,7 @@
             class="card__subtitle mdc-theme--text-secondary-on-background"
           ></div>
           <span
-            class="card__title mdc-theme--text-secomdary-on-background"
+            class="card__title mdc-theme--text-primary-on-background" 
             id="summaryValue"
           ></span>
 
@@ -63,6 +63,8 @@
           <canvas id="chart" height="90"></canvas>
         </div>
       </div>
+
+      <div id="my_container_div"></div>
 
       <div id="listViewContainer"></div>
     </div>
@@ -107,36 +109,5 @@
 
     <script src="js/authManager.js"></script>
     <script src="app.js"></script>
-
-    <script>
-      document.querySelectorAll(".mdc-text-field").forEach((field) => {
-        mdc.textField.MDCTextField.attachTo(field);
-      });
-
-      document
-        .querySelectorAll(".mdc-text-field-helper-text")
-        .forEach((helperField) => {
-          mdc.textField.MDCTextFieldHelperText.attachTo(helperField);
-        });
-
-      document.querySelectorAll(".mdc-button").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-      document.querySelectorAll(".mdc-fab").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-
-      document.querySelectorAll(".mdc-radio").forEach((radio) => {
-        mdc.radio.MDCRadio.attachTo(radio);
-      });
-
-      document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
-        mdc.checkbox.MDCCheckbox.attachTo(checkbox);
-      });
-
-      document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
-        mdc.chips.MDCChip.attachTo(chip);
-      });
-    </script>
   </body>
 </html>

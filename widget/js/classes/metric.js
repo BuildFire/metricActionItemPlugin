@@ -17,6 +17,7 @@ class Metric {
     this.createdBy = data.createdBy || null;
     this.lastUpdatedOn = data.lastUpdatedOn || null;
     this.lastUpdatedBy = data.lastUpdatedBy || null;
+    this.description = data.description || "";
   }
   // A recurcive function that calculates the average of each metric history
   // static getHistoryValue(metric) {

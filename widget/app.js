@@ -18,6 +18,12 @@ let valuesChart = {};
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
+// Get the app's theme to utilize its colors in design
+let appThemeObj = {};
+
+buildfire.appearance.getAppTheme(function (err, appTheme) {
+  appThemeObj = appTheme;
+});
 // Get the logged in user
 const getCurrentUser = () => {
   return authManager.getCurrentUser().then((user) => {
@@ -53,6 +59,7 @@ if (typeof ListView !== "undefined") {
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
+  initMaterialComponents();
 
   await Settings.load().then(() => {
     // To prevent Functional Tests from Applying these lines where it will cause some errors
@@ -81,6 +88,8 @@ const renderInit = () => {
   let metricsChildren = readyMetrics.metricsChildren;
   // Init metrics values' chart
   initChart(readyMetrics.metricsParent);
+  document.getElementById("my_container_div").innerHTML =
+    readyMetrics.metricsParent.description || "<p>Hello world</p>";
 
   let currentMetricList = [];
   // Prepare metrics to be rendered in the ListView component
@@ -93,33 +102,7 @@ const renderInit = () => {
   // Add the summary value of the parent metric
   summaryValue.innerText = `${readyMetrics.metricsParent.value}%`;
 
-  // Calculate the percentage increase or decreased compared to the previous value for the metric;
-  let didIncreased =
-    readyMetrics.metricsParent.value > readyMetrics.metricsParent.previousValue
-      ? true
-      : false;
-
-  // Calculation source: http://mathcentral.uregina.ca/qq/database/qq.09.06/h/other1.html
-  let percentage =
-    readyMetrics.metricsParent.value - readyMetrics.metricsParent.previousValue;
-
-  percentage /= didIncreased
-    ? readyMetrics.metricsParent.value
-    : readyMetrics.metricsParent.previousValue;
-
-  percentage *= 100;
-  percentage = percentage.toPrecision(3);
-
-  summaryPreviousValueContainer.innerHTML = `
-      <i
-      class="material-icons mdc-button__icon ${
-        didIncreased ? "mdc-theme--secondary" : "mdc-theme--error"
-      } trending-icon">${didIncreased ? "trending_up" : "trending_down"}</i >
-      <span id="summaryPreviousValue">${percentage}% of target</span>
-      `;
-
-  // Add the metric title to the summary card;
-  summaryTitle.innerHTML = readyMetrics.metricsParent.title || "Home";
+  checkIncreaseOrDecrease(readyMetrics);
 
   currentMetricList = helpers.sortMetrics(
     currentMetricList,
@@ -137,7 +120,39 @@ const renderMetrics = (metrics) => {
   listViewDiv.loadListViewItems(metrics);
 };
 
-//
+const checkIncreaseOrDecrease = (metrics) => {
+  // Calculate the percentage increase or decreased compared to the previous value for the metric;
+  let situation;
+  let situationClass;
+  if (metrics.metricsParent.value > metrics.metricsParent.previousValue) {
+    situation = "trending_up";
+    situationClass = "mdc-theme--secondary";
+  } else if (
+    metrics.metricsParent.value < metrics.metricsParent.previousValue
+  ) {
+    situation = "trending_down";
+    situationClass = "mdc-theme--error";
+  } else {
+    situation = "remove";
+    situationClass = "mdc-theme--text-primary-on-background";
+  }
+  // Calculation source: http://mathcentral.uregina.ca/qq/database/qq.09.06/h/other1.html
+  let percentage =
+    metrics.metricsParent.value - metrics.metricsParent.previousValue;
+
+  percentage = percentage.toPrecision(3);
+
+  summaryPreviousValueContainer.innerHTML = `
+      <i
+      class="material-icons mdc-button__icon ${situationClass} trending-icon">${situation}</i >
+      <span id="summaryPreviousValue">${percentage}% of target</span>
+      `;
+
+  // Add the metric title to the summary card;
+  summaryTitle.innerHTML = metrics.metricsParent.title || "Home";
+};
+
+// Initialize metics to be rendered using list view library
 const metricAsItemInit = (newMetric) => {
   let listItem = new ListViewItem(newMetric);
   listItem.onIconTitleClick = (item) => {
@@ -178,8 +193,7 @@ const metricAsItemInit = (newMetric) => {
 
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
-            value,
-            `${currentUser.firstName} ${currentUser.lastName}`
+            { value, username: currentUser.firstName }
           ).then((result) => {
             metrics = result;
             buildfire.history.pop();
@@ -212,10 +226,10 @@ const initChart = (metric) => {
       label: title,
       data: historyValues,
       backgroundColor: "rgba(101, 116, 205, 0.1)",
-      borderColor: "rgba(101, 116, 205, 0.8)",
+      borderColor: appThemeObj.colors.primaryTheme,
       pointBackgroundColor: "rgba(255, 255, 255, 1)",
       borderWidth: 2,
-      fill: false,
+      fill: true,
     },
   ];
   renderChart(datasets);
@@ -231,6 +245,7 @@ const renderChart = (datasets) => {
       datasets,
     },
     options: {
+      responsive: true,
       maintainAspectRatio: true,
       spanGaps: false,
       legend: {
@@ -288,8 +303,8 @@ const initProgressBar = (newMetric) => {
       value: "",
       alignToBottom: true,
     },
-    from: { color: "#FCD12A" },
-    to: { color: "#4CAF50" },
+    from: { color: appThemeObj.colors.dangerTheme },
+    to: { color: appThemeObj.colors.primaryTheme },
     // Set default step function for all animate calls
     step: (state, bar) => {
       bar.path.setAttribute("stroke", state.color);
@@ -367,6 +382,16 @@ const isUserAuthorized = () => {
     }
   }
   return authorized;
+};
+
+const initMaterialComponents = () => {
+  document.querySelectorAll(".mdc-button").forEach((btn) => {
+    mdc.ripple.MDCRipple.attachTo(btn);
+  });
+
+  document.querySelectorAll(".mdc-fab").forEach((btn) => {
+    mdc.ripple.MDCRipple.attachTo(btn);
+  });
 };
 
 buildfire.history.onPop((breadcrumb) => {

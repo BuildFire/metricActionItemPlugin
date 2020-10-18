@@ -18,6 +18,29 @@ let metricsSortBy = "manual";
 let sortableList = null;
 let metricsContainer = null;
 
+// tinymce.init({
+//   selector: "textarea",
+//   init_instance_callback: function (editor) {
+//     editor.on("SetContent", function (e) {
+//       console.log(e);
+//     });
+//   },
+// });
+var tmrDelay = null;
+tinymce.init({
+  selector: "textarea",
+  setup: function (editor) {
+    editor.on("ExecCommand change NodeChange ObjectResized keyup", function (
+      e
+    ) {
+      if (tmrDelay) clearTimeout(tmrDelay);
+      tmrDelay = setTimeout(function () {
+        console.log(e);
+      }, 500);
+    });
+  },
+});
+
 // Get the logged in user
 const getCurrentUser = () => {
   return authManager.getCurrentUser().then((user) => {
@@ -40,7 +63,7 @@ buildfire.messaging.sendMessageToWidget({
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
-
+  initMaterialComponents();
   console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   if (typeof Sortable !== "undefined") {
@@ -70,58 +93,34 @@ const initMetricFields = (data = {}) => {
   initIconComponent(data.icon);
 
   title.value = metricFields.title;
-  if (metricFields.type === "metric") {
-    // document.getElementById('min-lable').style.display = "block";
-    // document.getElementById('max-lable').style.display = "block";
-    min.value = metricFields.min;
-    max.value = metricFields.max;
-  } else {
-    // document.getElementById('min-lable').style.display = "none";
-    // document.getElementById('max-lable').style.display = "none";
-  }
 
-  // if (Object.keys(data).length !== 0) {
-  document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
-    ele.classList.add("mdc-floating-label--float-above");
-  });
-  document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
-    ele.classList.add("mdc-notched-outline--notched");
-  });
-  // }
-
-  let maxInput = document.getElementById("max"),
-    minInput = document.getElementById("min");
-  if (metricFields.type === "") {
-    parentType.checked = false;
-    metricType.checked = false;
-    maxInput.disabled = false;
-    minInput.disabled = false;
-  } else if (metricFields.type === "parent") {
+  if (metricFields.type === "parent") {
     parentType.checked = true;
-    maxInput.disabled = true;
-    minInput.disabled = true;
-    document
-      .querySelectorAll(
-        "#min-lable .mdc-floating-label, #max-lable .mdc-floating-label"
-      )
-      .forEach((ele) => {
-        ele.classList.remove("mdc-floating-label--float-above");
-      });
-    document
-      .querySelectorAll(
-        "#min-lable .mdc-notched-outline, #max-lable .mdc-notched-outline"
-      )
-      .forEach((ele) => {
-        ele.classList.remove("mdc-notched-outline--notched");
-      });
+    setTimeout(() => {
+      max.disabled = true;
+      min.disabled = true;
+    }, 0);
+
     // Reset min and max input fields
-    maxInput.value = "";
-    minInput.value = "";
+    max.value = "";
+    min.value = "";
   } else {
     metricType.checked = true;
-    maxInput.disabled = false;
-    minInput.disabled = false;
+    min.value = metricFields.min;
+    max.value = metricFields.max;
+    max.disabled = false;
+    min.disabled = false;
   }
+  // To give all the input fields the required classes where some inputs need to focus on to get the required class to float, for example
+  document.querySelectorAll("#min, #max, #title").forEach((ele) => {
+    ele.focus();
+    ele.blur();
+  });
+};
+
+const InitWysiwyg = (description) => {
+  // Initialize WYSIWYG
+  tinymce.activeEditor.setContent(description || "No Value");
 };
 
 const initMaterialComponents = () => {
@@ -139,20 +138,8 @@ const initMaterialComponents = () => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
 
-  document.querySelectorAll(".mdc-fab").forEach((btn) => {
-    mdc.ripple.MDCRipple.attachTo(btn);
-  });
-
   document.querySelectorAll(".mdc-radio").forEach((radio) => {
     mdc.radio.MDCRadio.attachTo(radio);
-  });
-
-  document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
-    mdc.checkbox.MDCCheckbox.attachTo(checkbox);
-  });
-
-  document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
-    mdc.chips.MDCChip.attachTo(chip);
   });
 };
 
@@ -217,18 +204,15 @@ const goToAddItem = () => {
 
 // Go to metrics page from add/edit pages
 const goToMetricspage = () => {
-  iconInput.focus();
-  iconInput.blur();
+  // To reset all the error message if found in the form's page before leaving
+  document.querySelectorAll("input").forEach((ele) => {
+    ele.focus();
+    ele.blur();
+  });
   metricForm.style.display = "none";
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
-  document.querySelectorAll(".mdc-floating-label").forEach((ele) => {
-    ele.classList.remove("mdc-floating-label--float-above");
-  });
-  document.querySelectorAll(".mdc-notched-outline").forEach((ele) => {
-    ele.classList.remove("mdc-notched-outline--notched");
-  });
 };
 
 // Handle Input fields values' changes
@@ -243,41 +227,7 @@ const onFieldChange = (ele) => {
 // Handle Input fields values' changes (Radio buttons)
 const onRadioChange = (value) => {
   metricFields["type"] = value;
-
-  let maxInput = document.getElementById("max"),
-    minInput = document.getElementById("min");
-  if (value === "parent") {
-    maxInput.disabled = true;
-    minInput.disabled = true;
-
-    // Reset min and max input fields
-    maxInput.value = "";
-    minInput.value = "";
-
-    document
-      .querySelectorAll(
-        "#min-lable .mdc-floating-label, #max-lable .mdc-floating-label"
-      )
-      .forEach((ele) => {
-        ele.classList.remove("mdc-floating-label--float-above");
-      });
-    document
-      .querySelectorAll(
-        "#min-lable .mdc-notched-outline, #max-lable .mdc-notched-outline"
-      )
-      .forEach((ele) => {
-        ele.classList.remove("mdc-notched-outline--notched");
-      });
-  } else {
-    minInput.focus();
-    maxInput.focus();
-    maxInput.disabled = false;
-    minInput.disabled = false;
-    metricFields["min"] = 0;
-    metricFields["max"] = 100;
-
-    initMetricFields(metricFields);
-  }
+  initMetricFields(metricFields);
 };
 
 const createMetric = () => {
@@ -318,6 +268,7 @@ const updateMetrics = async (item) => {
         console.log("thus is", prop, metricFields[prop]);
       }
     }
+    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
     if (
       updateObj.type === "parent" ||
       (updateObj.type !== "metric" && item.type === "parent")
@@ -340,8 +291,7 @@ const updateMetrics = async (item) => {
     Metrics.update(
       { nodeSelector, metricsId: metrics.id },
       updateObj,
-      item.id,
-      `${currentUser.firstName} ${currentUser.lastName}`
+      item.id
     ).then((result) => {
       metrics = result;
       renderInit();
@@ -360,11 +310,11 @@ const inputValidation = () => {
       "Please add metric title"
     );
     isValid = false;
-  } else if (title.length > 50) {
+  } else if (title.length > 20) {
     helpers.inputError(
       "title-lable",
       "title-helper-text",
-      "Metric's title must be less than 50 characters long"
+      "Metric's title must be less than 20 characters long"
     );
     isValid = false;
   }
@@ -373,20 +323,20 @@ const inputValidation = () => {
     delete metricFields.min;
     delete metricFields.max;
   } else if (type === "metric") {
-    if (min !== 0 && !min) {
-      helpers.inputError(
-        "min-lable",
-        "min-helper-text",
-        "Please add min value"
-      );
+    if ((min !== 0 && !min) || min < 0) {
+      let message = "Please add min value";
+      if (min < 0) {
+        message = "Min value can't be negative";
+      }
+      helpers.inputError("min-lable", "min-helper-text", message);
       isValid = false;
     }
-    if (max !== 0 && !max) {
-      helpers.inputError(
-        "max-lable",
-        "max-helper-text",
-        "Please add max value"
-      );
+    if ((max !== 0 && !max) || max < 0) {
+      let message = "Please add max value";
+      if (max < 0) {
+        message = "Max value can't be negative";
+      }
+      helpers.inputError("max-lable", "max-helper-text", message);
       isValid = false;
     }
     if (max < min) {
@@ -414,7 +364,10 @@ const inputValidation = () => {
 const renderInit = () => {
   metricsContainer = metricsList;
   // Extract the desired metrics (children) from the big object using nodeSelector
-  let metricsChildren = helpers.nodeSplitter(nodeSelector, metrics);
+  let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+  let metricsChildren = readyMetrics.metricsChildren;
+
+  InitWysiwyg(readyMetrics.description);
 
   let currentMetricList = [];
   // Prepare metrics to be rendered (Object to Array)
@@ -544,7 +497,6 @@ const orderChange = () => {
 // Trigered when a user update a metric
 const updateItem = (item) => {
   item.lastUpdatedBy = currentUser.firstName;
-  initMetricFields(item);
   metricForm.style.display = "block";
   updateMetric.style.display = "inline";
   createAMetric.style.display = "none";
@@ -552,6 +504,7 @@ const updateItem = (item) => {
   updateMetric.onclick = () => {
     updateMetrics(item);
   };
+  initMetricFields(item);
 };
 
 const askBeforeUpdate = () => {
@@ -613,14 +566,27 @@ const onSortByChange = () => {
       nodeSelector,
       metricsId: metrics.id,
     },
-    sortBy
+    sortBy,
+    "sortBy"
   ).then((result) => {
     metrics = result;
     metricsSortBy = sortBy;
-    if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
-      // Disable manual sorting
-      sortableList.sortableList.option("disabled", true);
-    }
+    // if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
+    //   // Disable manual sorting
+    //   sortableList.sortableList.option("disabled", true);
+    // }
     renderInit();
+  });
+};
+
+const updateWysiwyg = () => {
+  Metrics.sortBy(
+    { nodeSelector, metricsId: metrics.id },
+    description,
+    "description"
+  ).then((result) => {
+    // metrics = result;
+    // renderInit();
+    // goToMetricspage();
   });
 };

@@ -339,14 +339,17 @@ input:disabled + span {
   vertical-align: middle;
 }
 
-.mdc-icon-button.cursor-grab:not(.disabledDrag):hover {
+/* .mdc-icon-button.cursor-grab:not(.disabledDrag):hover {
   color: var(--mdc-theme-secondary);
-}
+  transition: color 0.3s;
+} */
 .mdc-icon-button.edit-btn:hover {
   color: var(--mdc-theme-primary);
+  transition: color 0.3s;
 }
 .mdc-icon-button.delete-btn:hover {
   color: var(--mdc-theme-error);
+  transition: color 0.3s;
 }
 
 input:disabled + span .mdc-notched-outline__notch {

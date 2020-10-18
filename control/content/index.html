@@ -36,12 +36,17 @@
 
     <!-- Import the thumbnail component -->
     <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
+
+    <!-- Import WYSIWYG -->
+    <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
   </head>
 
   <body>
     <div id="bread" class="mdc-typography--headline6"></div>
     <br />
 
+    <textarea name="content"></textarea>
+    <br>
     <h1>Metrics</h1>
 
     <div id="metricsMain">
@@ -144,7 +149,6 @@
         <input
           onchange="onFieldChange(this)"
           id="min"
-          min="0"
           autocomplete="false"
           type="number"
           class="mdc-text-field__input"
@@ -172,7 +176,6 @@
         <input
           onchange="onFieldChange(this)"
           id="max"
-          min="0"
           autocomplete="false"
           type="number"
           class="mdc-text-field__input"
@@ -267,37 +270,5 @@
     <script src="js/breadcrumb.js"></script>
 
     <script src="app.js"></script>
-
-    <script>
-      document.querySelectorAll(".mdc-text-field").forEach((field) => {
-        mdc.textField.MDCTextField.attachTo(field);
-      });
-
-      document
-        .querySelectorAll(".mdc-text-field-helper-text")
-        .forEach((helperField) => {
-          mdc.textField.MDCTextFieldHelperText.attachTo(helperField);
-        });
-
-      document.querySelectorAll(".mdc-button").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-
-      document.querySelectorAll(".mdc-fab").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-
-      document.querySelectorAll(".mdc-radio").forEach((radio) => {
-        mdc.radio.MDCRadio.attachTo(radio);
-      });
-
-      document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
-        mdc.checkbox.MDCCheckbox.attachTo(checkbox);
-      });
-
-      document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
-        mdc.chips.MDCChip.attachTo(chip);
-      });
-    </script>
   </body>
 </html>

@@ -30,7 +30,7 @@ class Metrics {
     });
   }
 
-  static updateMetricHistory({ nodeSelector, metricsId }, value, username) {
+  static updateMetricHistory({ nodeSelector, metricsId }, data) {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
@@ -41,15 +41,15 @@ class Metrics {
         { [`${nodeSelector}.history.date`]: absoluteDate },
         {
           $set: {
-            [`${nodeSelector}.history.$.value`]: value,
+            [`${nodeSelector}.history.$.value`]: data.value,
             [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: username,
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username,
           },
         },
         "metrics",
-        async (err, data) => {
+        async (err, res) => {
           if (err) reject(err);
-          if (data.nModified === 0) {
+          if (res.nModified === 0) {
             buildfire.publicData.update(
               metricsId,
               {
@@ -57,10 +57,10 @@ class Metrics {
                   [`${nodeSelector}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
-                    createdBy: username,
+                    createdBy: data.username,
                     lastUpdatedOn: new Date(),
-                    lastUpdatedBy: username,
-                    value,
+                    lastUpdatedBy: data.username,
+                    value: data.value,
                   },
                 },
               },
@@ -95,7 +95,8 @@ class Metrics {
         if (metric.history[metric.history.length - i]) {
           if (
             new Date(
-              todayDate - new Date(metric.history[metric.history.length - i].date)
+              todayDate -
+                new Date(metric.history[metric.history.length - i].date)
             ).getDate() >= inde
           ) {
             let val = metric.history[metric.history.length - i].value;
@@ -106,7 +107,6 @@ class Metrics {
             }
             return val;
           }
-          
         }
       }
       return "No value";
@@ -118,9 +118,11 @@ class Metrics {
         let sum = 0;
         let numberChildren = 0;
         for (let key in metric.metrics) {
-          if (Metrics.getHistoryValue(metric.metrics[key], inde) !== "No value") {
+          if (
+            Metrics.getHistoryValue(metric.metrics[key], inde) !== "No value"
+          ) {
             numberChildren++;
-  
+
             sum += Metrics.getHistoryValue(metric.metrics[key], inde);
           }
         }

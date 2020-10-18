@@ -6,6 +6,7 @@ authManager.getCurrentUser().then((user) => {
 });
 
 Settings.load().then(() => {
+  initMaterialComponents();
   // Use element id and assign the new data to it's value
   showSummary.checked = Settings.showSummary;
   renderTags();
@@ -100,4 +101,18 @@ const renderTags = () => {
 
     document.getElementById("tag-chips").innerHTML = chip;
   }
+};
+
+const initMaterialComponents = () => {
+  document.querySelectorAll(".mdc-button").forEach((btn) => {
+    mdc.ripple.MDCRipple.attachTo(btn);
+  });
+
+  document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
+    mdc.checkbox.MDCCheckbox.attachTo(checkbox);
+  });
+
+  document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
+    mdc.chips.MDCChip.attachTo(chip);
+  });
 };

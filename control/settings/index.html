@@ -84,36 +84,5 @@
     <script src="js/authManager.js"></script>
     <script src="js/classes/settings.js"></script>
     <script src="script.js"></script>
-
-    <script>
-      document.querySelectorAll(".mdc-text-field").forEach((field) => {
-        mdc.textField.MDCTextField.attachTo(field);
-      });
-
-      document
-        .querySelectorAll(".mdc-text-field-helper-text")
-        .forEach((helperField) => {
-          mdc.textField.MDCTextFieldHelperText.attachTo(helperField);
-        });
-
-      document.querySelectorAll(".mdc-button").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-      document.querySelectorAll(".mdc-fab").forEach((btn) => {
-        mdc.ripple.MDCRipple.attachTo(btn);
-      });
-
-      document.querySelectorAll(".mdc-radio").forEach((radio) => {
-        mdc.radio.MDCRadio.attachTo(radio);
-      });
-
-      document.querySelectorAll(".mdc-checkbox").forEach((checkbox) => {
-        mdc.checkbox.MDCCheckbox.attachTo(checkbox);
-      });
-
-      document.querySelectorAll(".mdc-chip-set").forEach((chip) => {
-        mdc.chips.MDCChip.attachTo(chip);
-      });
-    </script>
   </body>
 </html>

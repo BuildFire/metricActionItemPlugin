@@ -9,23 +9,26 @@ const helpers = {
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
     let metricsChildren = metrics;
+    let description = "";
 
     splittedNode.forEach((item, i) => {
       // If we are at the home page (top of the object)
       if (nodeSelector === "metrics") {
         metricsSortBy = metrics.sortBy || "manual";
         document.getElementById("sortBy").value = metricsSortBy;
+        description = metrics.description;
       }
       // Assign the parent metric sortBy value (If we are in parent metric);
       if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
         metricsSortBy = metricsChildren[item].sortBy || "manual";
         document.getElementById("sortBy").value = metricsSortBy;
+        description = metricsChildren[item].description;
       }
 
       metricsChildren = metricsChildren[item];
     });
 
-    return metricsChildren;
+    return { metricsChildren, description };
   },
   sortMetrics: (currentMetricList, sortBy) => {
     // Sort metrics based sortBy value

@@ -32,10 +32,7 @@ const breadcrumbsManager = {
           nodeSelector,
         });
         nodeSelector = data.nodeSelector;
-
-        if (typeof Sortable !== "undefined") {
-          renderInit();
-        }
+        renderInit();
         goToMetricspage();
       };
       if (breadcrumb !== "Home") {

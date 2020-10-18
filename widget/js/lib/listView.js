@@ -10,7 +10,7 @@ class ListView {
   clear() {
     this.container.innerHTML = "";
   }
-  
+
   loadListViewItems(items) {
     if (this.container.innerHTML == "") {
       // if (this.options.enableAddButton) {
@@ -25,10 +25,10 @@ class ListView {
       // }
     }
     if (items.length === 0) {
-      listViewContainer.classList.add('empty');
+      listViewContainer.classList.add("empty");
       summary.style.display = "none";
     } else {
-      listViewContainer.classList.remove('empty');
+      listViewContainer.classList.remove("empty");
       items.forEach((item) => this.addItem(item));
     }
   }
@@ -63,7 +63,6 @@ class ListViewItem {
     this.id = obj.id;
     this.title = obj.title;
     this.icon = obj.icon;
-    this.description = obj.description;
     this.value = obj.value || 0;
     this.data = obj.data;
     this.order = obj.order || null;
@@ -76,7 +75,6 @@ class ListViewItem {
       id: this.id,
       title: this.title,
       icon: this.icon,
-      description: this.description,
       value: this.value,
       data: this.data,
       order: this.order,
@@ -103,7 +101,10 @@ class ListViewItem {
       return false;
     };
     if (this.icon) {
-      let img = ui.create("img", imgContainer, null, ["listViewItemImg", "mdc-theme--text-primary-on-background"]);
+      let img = ui.create("img", imgContainer, null, [
+        "listViewItemImg",
+        "mdc-theme--text-primary-on-background",
+      ]);
 
       if (this.icon.indexOf("http") == 0)
         img.src = buildfire.imageLib.cropImage(this.icon, {
@@ -132,7 +133,7 @@ class ListViewItem {
       "listViewItemTitle",
       "ellipsis",
       "margin--0",
-      "mdc-theme--text-primary-on-background"
+      "mdc-theme--text-primary-on-background",
     ]);
 
     if (this.description)
@@ -147,6 +148,7 @@ class ListViewItem {
     if (this.value === 0 || this.value) {
       let listViewItemToolbar = ui.create("div", card, null, [
         "listViewItemToolbar",
+        "mdc-theme--text-primary-on-background",
       ]);
 
       // Add icon
@@ -172,7 +174,6 @@ class ListViewItem {
       ui.create("span", listViewItemToolbar, `${this.value}%`, [
         "listViewItemToolbarItem",
         "value",
-        "mdc-theme--text-primary-on-background"
       ]);
 
       listViewItemToolbar.onclick = (e) => {
@@ -186,11 +187,9 @@ class ListViewItem {
     return card;
   }
 
-  onToolbarClicked(key, item) {
-  }
+  onToolbarClicked(key, item) {}
 
-  onIconTitleClick(item) {
-  }
+  onIconTitleClick(item) {}
 
   update() {
     this.render(this.container, this.card);

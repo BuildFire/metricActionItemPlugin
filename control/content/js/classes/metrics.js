@@ -62,7 +62,7 @@ class Metrics {
   }
 
   // To update any metric properties but not historys' values (Control Panel Only)
-  static update({ nodeSelector, metricsId }, data, id, username) {
+  static update({ nodeSelector, metricsId }, data, id) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
@@ -73,7 +73,7 @@ class Metrics {
       }
 
       _set[`${nodeSelector}.${id}.lastUpdatedOn`] = new Date();
-      _set[`${nodeSelector}.${id}.lastUpdatedBy`] = username;
+      _set[`${nodeSelector}.${id}.lastUpdatedBy`] = data.lastUpdatedBy;
 
       buildfire.publicData.update(
         metricsId,
@@ -143,7 +143,7 @@ class Metrics {
   }
 
   // To update the way that the metrics should be sorted by
-  static sortBy({ nodeSelector, metricsId }, sortBy) {
+  static sortBy({ nodeSelector, metricsId }, sortBy, type) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
@@ -151,12 +151,16 @@ class Metrics {
       let _set = {};
       if (nodeSelector === "metrics") {
         // If it's the main metrics
-        _set.sortBy = sortBy;
+        type === "sortBy"
+          ? (_set.sortBy = sortBy)
+          : (_set.description = sortBy);
       } else {
         // If the metrics was a parent
         let selector = nodeSelector.split(".");
         selector = selector.slice(0, selector.length - 1).join(".");
-        _set[`${selector}.sortBy`] = sortBy;
+        type === "sortBy"
+          ? (_set[`${selector}.sortBy`] = sortBy)
+          : (_set[`${selector}.description`] = sortBy);
       }
 
       buildfire.publicData.update(
