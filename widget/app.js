@@ -88,8 +88,9 @@ const renderInit = () => {
   let metricsChildren = readyMetrics.metricsChildren;
   // Init metrics values' chart
   initChart(readyMetrics.metricsParent);
-  document.getElementById("my_container_div").innerHTML =
-    readyMetrics.metricsParent.description || "<p>Hello world</p>";
+
+  document.getElementById("metricDescription").innerHTML =
+    readyMetrics.metricsParent.description || "<p>No Value</p>";
 
   let currentMetricList = [];
   // Prepare metrics to be rendered in the ListView component
@@ -100,7 +101,7 @@ const renderInit = () => {
     currentMetricList.push(InitMetricAsItem);
   }
   // Add the summary value of the parent metric
-  summaryValue.innerText = `${readyMetrics.metricsParent.value}%`;
+  summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
 
   checkIncreaseOrDecrease(readyMetrics);
 
@@ -145,7 +146,7 @@ const checkIncreaseOrDecrease = (metrics) => {
   summaryPreviousValueContainer.innerHTML = `
       <i
       class="material-icons mdc-button__icon ${situationClass} trending-icon">${situation}</i >
-      <span id="summaryPreviousValue">${percentage}% of target</span>
+      <span id="summaryPreviousValue">${percentage || 0}% of target</span>
       `;
 
   // Add the metric title to the summary card;

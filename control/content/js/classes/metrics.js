@@ -142,8 +142,10 @@ class Metrics {
     });
   }
 
-  // To update the way that the metrics should be sorted by
-  static sortBy({ nodeSelector, metricsId }, sortBy, type) {
+  // To updates the root metric and metrics of type parent only,
+  // takes two types of values: sortBy and description
+  // which are placed in the root of the metric object
+  static updateParent({ nodeSelector, metricsId }, value, type) {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
@@ -152,15 +154,15 @@ class Metrics {
       if (nodeSelector === "metrics") {
         // If it's the main metrics
         type === "sortBy"
-          ? (_set.sortBy = sortBy)
-          : (_set.description = sortBy);
+          ? (_set.sortBy = value)
+          : (_set.description = value);
       } else {
         // If the metrics was a parent
         let selector = nodeSelector.split(".");
         selector = selector.slice(0, selector.length - 1).join(".");
         type === "sortBy"
-          ? (_set[`${selector}.sortBy`] = sortBy)
-          : (_set[`${selector}.description`] = sortBy);
+          ? (_set[`${selector}.sortBy`] = value)
+          : (_set[`${selector}.description`] = value);
       }
 
       buildfire.publicData.update(

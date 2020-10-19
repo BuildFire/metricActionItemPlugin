@@ -30,13 +30,12 @@ var tmrDelay = null;
 tinymce.init({
   selector: "textarea",
   setup: function (editor) {
-    editor.on("ExecCommand change NodeChange ObjectResized keyup", function (
-      e
-    ) {
+    editor.on("change keyup", function (e) {
       if (tmrDelay) clearTimeout(tmrDelay);
       tmrDelay = setTimeout(function () {
-        console.log(e);
-      }, 500);
+        let description = tinymce.activeEditor.getContent();
+        updateDescription(description);
+      }, 1000);
     });
   },
 });
@@ -120,7 +119,7 @@ const initMetricFields = (data = {}) => {
 
 const InitWysiwyg = (description) => {
   // Initialize WYSIWYG
-  tinymce.activeEditor.setContent(description || "No Value");
+  tinymce.activeEditor.setContent(description || "<p>No Value</p>");
 };
 
 const initMaterialComponents = () => {
@@ -140,6 +139,9 @@ const initMaterialComponents = () => {
 
   document.querySelectorAll(".mdc-radio").forEach((radio) => {
     mdc.radio.MDCRadio.attachTo(radio);
+  });
+  document.querySelectorAll(".mdc-select").forEach((select) => {
+    mdc.select.MDCSelect.attachTo(select);
   });
 };
 
@@ -198,6 +200,8 @@ const goToAddItem = () => {
   metricsMain.style.display = "none";
   createAMetric.style.display = "inline";
   updateMetric.style.display = "none";
+  // Hide wysiwyg
+  document.getElementById("tinymce-19").style.display = "none";
   // Reset input field to it's initial values
   initMetricFields();
 };
@@ -213,6 +217,8 @@ const goToMetricspage = () => {
   metricsMain.style.display = "block";
   createAMetric.style.display = "none";
   updateMetric.style.display = "none";
+  // Show wysiwyg
+  document.getElementById("tinymce-19").style.display = "block";
 };
 
 // Handle Input fields values' changes
@@ -501,6 +507,8 @@ const updateItem = (item) => {
   updateMetric.style.display = "inline";
   createAMetric.style.display = "none";
   metricsMain.style.display = "none";
+  // Hide wysiwyg
+  document.getElementById("tinymce-19").style.display = "none";
   updateMetric.onclick = () => {
     updateMetrics(item);
   };
@@ -561,7 +569,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
 // To handle users' choices for sorting
 const onSortByChange = () => {
   let sortBy = document.getElementById("sortBy").value;
-  Metrics.sortBy(
+  Metrics.updateParent(
     {
       nodeSelector,
       metricsId: metrics.id,
@@ -579,14 +587,10 @@ const onSortByChange = () => {
   });
 };
 
-const updateWysiwyg = () => {
-  Metrics.sortBy(
+const updateDescription = (description) => {
+  Metrics.updateParent(
     { nodeSelector, metricsId: metrics.id },
     description,
     "description"
-  ).then((result) => {
-    // metrics = result;
-    // renderInit();
-    // goToMetricspage();
-  });
+  );
 };
