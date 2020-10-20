@@ -118,11 +118,9 @@ class Metrics {
         let sum = 0;
         let numberChildren = 0;
         for (let key in metric.metrics) {
-          if (
-            Metrics.getHistoryValue(metric.metrics[key], inde) !== "No value"
-          ) {
+          let result = Metrics.getHistoryValue(metric.metrics[key], inde);
+          if (!isNaN(result)) {
             numberChildren++;
-
             sum += Metrics.getHistoryValue(metric.metrics[key], inde);
           }
         }

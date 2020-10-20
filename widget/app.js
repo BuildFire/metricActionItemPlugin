@@ -181,6 +181,7 @@ const metricAsItemInit = (newMetric) => {
       if (currentUser && isUserAuthorized()) {
         metricsScreen.style.display = "none";
         updateHistoryContainer.style.display = "block";
+        updateHistoryButton.style.display = "block";
 
         nodeSelector += `.${newMetric.id}`;
 
@@ -188,6 +189,19 @@ const metricAsItemInit = (newMetric) => {
           nodeSelector,
           showLabelInTitlebar: true,
         });
+
+        // Add onclick handler to add notes icon inorder to add notes
+        notes.children[0].onclick = () => {
+          const options = {
+            itemId: nodeSelector,
+            title: newMetric.title,
+            imageUrl: newMetric.icon,
+          };
+
+          buildfire.notes.openDialog(options, () => {
+            console.log("It worked");
+          });
+        };
 
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
@@ -403,6 +417,8 @@ buildfire.history.onPop((breadcrumb) => {
 
     metricsScreen.style.display = "block";
     updateHistoryContainer.style.display = "none";
+    updateHistoryButton.style.display = "none";
+
     renderInit();
 
     if (numberOfPops) {
@@ -414,6 +430,7 @@ buildfire.history.onPop((breadcrumb) => {
     // if (Object.keys(breadcrumb.options).length > 0) {
     metricsScreen.style.display = "block";
     updateHistoryContainer.style.display = "none";
+    updateHistoryButton.style.display = "none";
     nodeSelector = breadcrumb.options.nodeSelector || "metrics";
     buildfire.messaging.sendMessageToControl({ nodeSelector });
     renderInit();
@@ -445,6 +462,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
     renderInit();
     metricsScreen.style.display = "block";
     updateHistoryContainer.style.display = "none";
+    updateHistoryButton.style.display = "none";
   }
 };
 

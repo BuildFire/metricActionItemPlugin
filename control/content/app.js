@@ -18,28 +18,6 @@ let metricsSortBy = "manual";
 let sortableList = null;
 let metricsContainer = null;
 
-// tinymce.init({
-//   selector: "textarea",
-//   init_instance_callback: function (editor) {
-//     editor.on("SetContent", function (e) {
-//       console.log(e);
-//     });
-//   },
-// });
-var tmrDelay = null;
-tinymce.init({
-  selector: "textarea",
-  setup: function (editor) {
-    editor.on("change keyup", function (e) {
-      if (tmrDelay) clearTimeout(tmrDelay);
-      tmrDelay = setTimeout(function () {
-        let description = tinymce.activeEditor.getContent();
-        updateDescription(description);
-      }, 1000);
-    });
-  },
-});
-
 // Get the logged in user
 const getCurrentUser = () => {
   return authManager.getCurrentUser().then((user) => {
@@ -70,6 +48,26 @@ Metrics.getMetrics().then(async (result) => {
     pushBreadcrumb("Home", { nodeSelector });
   }
 });
+
+// Initialize WYSIWYG
+const initWysiwyg = (callback) => {
+  var tmrDelay = null;
+  tinymce.init({
+    selector: "textarea",
+    setup: (editor) => {
+      editor.on("change keyup", (e) => {
+        if (tmrDelay) clearTimeout(tmrDelay);
+        tmrDelay = setTimeout(() => {
+          let description = tinymce.activeEditor.getContent();
+          updateDescription(description);
+        }, 1000);
+      });
+      editor.on("init", () => {
+        callback();
+      });
+    },
+  });
+};
 
 // Initialize add/edit Forms' Fields
 const initMetricFields = (data = {}) => {
@@ -117,7 +115,7 @@ const initMetricFields = (data = {}) => {
   });
 };
 
-const InitWysiwyg = (description) => {
+const wysiwygSetContent = (description) => {
   // Initialize WYSIWYG
   tinymce.activeEditor.setContent(description || "<p>No Value</p>");
 };
@@ -139,9 +137,6 @@ const initMaterialComponents = () => {
 
   document.querySelectorAll(".mdc-radio").forEach((radio) => {
     mdc.radio.MDCRadio.attachTo(radio);
-  });
-  document.querySelectorAll(".mdc-select").forEach((select) => {
-    mdc.select.MDCSelect.attachTo(select);
   });
 };
 
@@ -372,8 +367,13 @@ const renderInit = () => {
   // Extract the desired metrics (children) from the big object using nodeSelector
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
   let metricsChildren = readyMetrics.metricsChildren;
-
-  InitWysiwyg(readyMetrics.description);
+  if (tinymce.activeEditor) {
+    wysiwygSetContent(readyMetrics.description);
+  } else {
+    initWysiwyg(() => {
+      wysiwygSetContent(readyMetrics.description);
+    });
+  }
 
   let currentMetricList = [];
   // Prepare metrics to be rendered (Object to Array)
