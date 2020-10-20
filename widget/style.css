@@ -1,9 +1,15 @@
+*, *::before, *::after{
+ box-sizing: border-box;
+}
 html,
 body {
   height: 100% !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   margin: 0;
+}
+html{
+  font-size: 16px;
 }
 
 html[safe-area="true"] body {
@@ -18,16 +24,15 @@ span {
   font-size: x-large;
 }
 
-#metricsScreen {
-  padding: 10px;
-}
-
 #listViewContainer.empty {
   background-image: url(./.images/empty_page.svg);
   background-repeat: no-repeat;
   background-attachment: absolute;
   background-position: center;
   height: 75vh;
+}
+#my_container_div{
+  padding: 0 1rem;
 }
 
 #updateHistoryContainer {
@@ -38,7 +43,7 @@ span {
 
 #progressbar-container {
   width: 100%;
-  margin-top: 10%;
+  padding-top: 10vh;
 }
 
 #updateHistoryContainer {
@@ -91,8 +96,10 @@ span {
 }
 
 .listViewItem .value {
-  font-size: 18px;
-  margin: 0 10px 0 3px;
+  font-size: 1rem;
+  margin: .75rem;
+  min-width: 3rem;
+  padding: 0;
 }
 
 .listViewItem .material-icons {
@@ -106,14 +113,13 @@ span {
 }
 
 .summary-card {
-  padding: 16px;
+  padding: 1rem;
   text-align: left;
   font-size: 1.25rem;
   line-height: 1rem;
   font-weight: 900;
-  width: 100%;
-  height: 100%;
   border-radius: 10px;
+  margin: 1rem;
 }
 
 .summary-card .card__title {
@@ -176,7 +182,7 @@ span {
 #minMax {
   text-align: center;
   margin-top: 25%;
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   font-weight: bold;
 }
 
@@ -186,3 +192,48 @@ span {
 #historyCloseBtn:hover {
   color: var(--mdc-theme-primary);
 } */
+.swipe-icons{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 10vh;
+  height: 25vh;
+  pointer-events: none;
+  opacity: .25;
+}
+
+.material-icons.up{
+  animation: swipe-up 4s ease 1s 2 forwards;
+}
+.material-icons.down{
+  animation: swipe-down 4s ease 1s 2 forwards;
+}
+@keyframes swipe-up{
+  0%{
+    transform: translateY(0%);
+  }
+  20%{
+    transform: translateY(-100%);
+  }
+  40%{
+    transform: translateY(0%);
+  }
+  100%{
+    transform: translateY(0%);
+  }
+}
+@keyframes swipe-down{
+  0%{
+    transform: translateY(0%);
+  }
+  20%{
+    transform: translateY(100%);
+  }
+  40%{
+    transform: translateY(0%);
+  }
+  100%{
+    transform: translateY(0%);
+  }
+}
