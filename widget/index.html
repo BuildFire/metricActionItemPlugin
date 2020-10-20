@@ -34,6 +34,11 @@
     <!-- hammer.js library -->
     <script src="js/lib/hammer.min.js"></script>
 
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+
     <!-- Custom style's stylesheet -->
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
@@ -49,7 +54,7 @@
             class="card__subtitle mdc-theme--text-secondary-on-background"
           ></div>
           <span
-            class="card__title mdc-theme--text-primary-on-background" 
+            class="card__title mdc-theme--text-primary-on-background"
             id="summaryValue"
           ></span>
 
@@ -64,7 +69,11 @@
         </div>
       </div>
 
-      <div id="my_container_div"></div>
+      <div class="mdc-card description-card mdc-card--outlined">
+        <div class="mdc-card-wrapper__text-section">
+          <div id="metricDescription"></div>
+        </div>
+      </div>
 
       <div id="listViewContainer"></div>
     </div>

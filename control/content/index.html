@@ -45,8 +45,8 @@
     <div id="bread" class="mdc-typography--headline6"></div>
     <br />
 
-    <textarea name="content"></textarea>
-    <br>
+    <textarea id="metricDescription" name="content"></textarea>
+    <br />
     <h1>Metrics</h1>
 
     <div id="metricsMain">
@@ -200,20 +200,24 @@
         ></div>
       </div>
 
-        <button id="actionItemButton"
-          class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
-          onclick="addActionItem()"
-        >
-          <div class="mdc-button__ripple"></div>
-          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
-          <span  class="mdc-button__label">Add Action Item</span>
-        </button>
+      <button
+        id="actionItemButton"
+        class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+        onclick="addActionItem()"
+      >
+        <div class="mdc-button__ripple"></div>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+        <span class="mdc-button__label">Add Action Item</span>
+      </button>
 
-        <span id="showActionItem"></span>   
+      <span id="showActionItem"></span>
 
-        <br><br>
+      <br /><br />
       <div id="icon"></div>
-      <label id="icon-lable" class="mdc-text-field mdc-text-field--outlined invisible">
+      <label
+        id="icon-lable"
+        class="mdc-text-field mdc-text-field--outlined invisible"
+      >
         <input
           id="iconInput"
           autocomplete="false"
@@ -244,9 +248,7 @@
       </button>
       <button id="updateMetric" class="mdc-button mdc-button--raised">
         <div class="mdc-button__ripple"></div>
-        <i class="material-icons mdc-button__icon" aria-hidden="true"
-          >edit</i
-        >
+        <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
         Update Metric
       </button>
 
