@@ -37,11 +37,11 @@ getCurrentUser();
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
-// buildfire.deeplink.getData((data) => {
-//   if (data && data.link) {
-//     nodeSelector = data.link;
-//   }
-// });
+buildfire.deeplink.getData((data) => {
+  if (data && data.link) {
+    nodeSelector = data.link;
+  }
+});
 
 // Get all user bookmarks
 let bookmarks = {};
@@ -208,37 +208,42 @@ const metricAsItemInit = (newMetric) => {
           showLabelInTitlebar: true,
         });
 
-        helpers.getElem("#bookmark").querySelector("button").onclick = () => {
-          if (!bookmarks[newMetric.id]) {
-            const options = {
-              id: newMetric.id,
-              title: newMetric.title,
-              icon: newMetric.icon,
-              payload: {
-                data: { link: nodeSelector },
-              },
-            };
+        // helpers.getElem("#bookmark").querySelector("button").onclick = () => {
+        //   if (!bookmarks[newMetric.id]) {
+        //     const options = {
+        //       id: newMetric.id,
+        //       title: newMetric.title,
+        //       icon: newMetric.icon,
+        //       payload: {
+        //         data: { link: nodeSelector },
+        //       },
+        //     };
 
-            buildfire.bookmarks.add(options, () => {
-              // Change bookmarks button icon
-              helpers.getElem("#bookmarks button").innerText = "star";
-              // Add the bookmarked item to the global bookmarks object
-              bookmarks[newMetric.id] = newMetric.id;
-            });
-          } else {
-            buildfire.bookmarks.delete(newMetric.id, () => {
-              // Change bookmarks button icon
-              helpers.getElem("#bookmarks button").innerText = "star_outlined";
-              // Remove the bookmarked item to the global bookmarks object
-              delete bookmarks[newMetric.id];
-            });
-          }
-        };
+        //     buildfire.bookmarks.add(options, () => {
+        //       // Change bookmarks button icon
+        //       helpers.getElem("#bookmarks button").innerText = "star";
+        //       // Add the bookmarked item to the global bookmarks object
+        //       bookmarks[newMetric.id] = newMetric.id;
+        //     });
+        //   } else {
+        //     buildfire.bookmarks.delete(newMetric.id, () => {
+        //       // Change bookmarks button icon
+        //       helpers.getElem("#bookmarks button").innerText = "star_outlined";
+        //       // Remove the bookmarked item to the global bookmarks object
+        //       delete bookmarks[newMetric.id];
+        //     });
+        //   }
+        // };
 
         // Add onclick handler to add notes icon inorder to add notes
         helpers.getElem("#notes").querySelector("button").onclick = () => {
+          // Get the parent path for the metric
+          let itemPath = nodeSelector.split(".");
+          itemPath.pop();
+          itemPath = itemPath.join(".");
+
           const options = {
-            itemId: nodeSelector,
+            itemId: itemPath,
             title: newMetric.title,
             imageUrl: newMetric.icon,
           };
@@ -432,6 +437,8 @@ const changeProgressbarValue = (direction, newMetric) => {
 };
 
 const isUserAuthorized = () => {
+  if (!currentUser) return false;
+
   let authorized = false;
   let currentTags = {};
   if (Settings.tags.length === 0) {
