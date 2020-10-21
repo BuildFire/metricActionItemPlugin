@@ -49,6 +49,12 @@ Metrics.getMetrics().then(async (result) => {
   }
 });
 
+// buildfire.deeplink.getData((data) => {
+//   if (data && data.link) {
+//     nodeSelector = data.link;
+//   }
+// });
+
 // Initialize WYSIWYG
 const initWysiwyg = (callback) => {
   var tmrDelay = null;
@@ -191,12 +197,9 @@ const removeActionItem = () => {
 
 // Go to Add metric's form page
 const goToAddItem = () => {
-  metricForm.style.display = "block";
-  metricsMain.style.display = "none";
-  createAMetric.style.display = "inline";
-  updateMetric.style.display = "none";
-  // Hide wysiwyg
-  document.getElementById("tinymce-19").style.display = "none";
+  helpers.showElem("#metricForm");
+  helpers.showElem("#createAMetric", "inline");
+  helpers.hideElem("#metricsMain, #updateMetric, #tinymce-19");
   // Reset input field to it's initial values
   initMetricFields();
 };
@@ -208,12 +211,9 @@ const goToMetricspage = () => {
     ele.focus();
     ele.blur();
   });
-  metricForm.style.display = "none";
-  metricsMain.style.display = "block";
-  createAMetric.style.display = "none";
-  updateMetric.style.display = "none";
-  // Show wysiwyg
-  document.getElementById("tinymce-19").style.display = "block";
+
+  helpers.showElem("#metricsMain, #tinymce-19");
+  helpers.hideElem("#metricForm, #createAMetric, #updateMetric");
 };
 
 // Handle Input fields values' changes
@@ -238,12 +238,8 @@ const createMetric = () => {
     metricFields.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
     metricFields.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
     metricFields.order = metricsList.childNodes.length;
-    console.log(
-      "everything",
-      nodeSelector,
-      metrics.id,
-      new Metric(metricFields)
-    );
+
+    // Save metric
     Metrics.insert(
       {
         nodeSelector,
@@ -266,29 +262,47 @@ const updateMetrics = async (item) => {
       // To determine which fileds are needed to be updated
       if (metricFields[prop] !== item[prop]) {
         updateObj[prop] = metricFields[prop];
-        console.log("thus is", prop, metricFields[prop]);
       }
     }
-    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+
+    let isAccepted;
     if (
       updateObj.type === "parent" ||
       (updateObj.type !== "metric" && item.type === "parent")
     ) {
       delete metricFields.min;
       delete metricFields.max;
-    } else if (updateObj.type === "metric" && item.type === "parent") {
+    }
+    // If updating the metric type from metric to parent
+    else if (updateObj.type === "metric" && item.type === "parent") {
       // To ask the user if he really want to change the type of metric from (parent to metric),
-      // where this action is irreversable (it will delete al the children of the parent metric )
-      let isAccepted;
-      await askBeforeUpdate().then((result) => {
+      // where this action is irreversable (it will delete al the children of the parent metric)
+      await confirmMetricUpdate("parent").then((result) => {
         isAccepted = result;
       });
+
       if (isAccepted) {
         updateObj.metrics = {};
-      } else {
-        return;
-      }
+        updateObj.history = [];
+      } else return;
     }
+
+    // If updating the metric type from metric to parent
+    if (updateObj.type === "parent" && item.type === "metric") {
+      await confirmMetricUpdate("metric").then((result) => {
+        isAccepted = result;
+      });
+
+      if (isAccepted) {
+        updateObj.history = [];
+        updateObj.min = null;
+        updateObj.max = null;
+      } else return;
+    }
+
+    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+
+    // Update metric
     Metrics.update(
       { nodeSelector, metricsId: metrics.id },
       updateObj,
@@ -503,21 +517,27 @@ const orderChange = () => {
 // Trigered when a user update a metric
 const updateItem = (item) => {
   item.lastUpdatedBy = currentUser.firstName;
-  metricForm.style.display = "block";
-  updateMetric.style.display = "inline";
-  createAMetric.style.display = "none";
-  metricsMain.style.display = "none";
-  // Hide wysiwyg
-  document.getElementById("tinymce-19").style.display = "none";
+  helpers.showElem("#metricForm");
+  helpers.showElem("#updateMetric", "inline");
+  helpers.hideElem("#createAMetric, #metricsMain, #tinymce-19");
+
   updateMetric.onclick = () => {
     updateMetrics(item);
   };
   initMetricFields(item);
 };
 
-const askBeforeUpdate = () => {
+const confirmMetricUpdate = (from) => {
   return new Promise((resolve, reject) => {
-    let message = `<span class="text-danger">Warning: (Changing the type of this metric (parent to metric) will also delete all of it's children).</span> <br> Are you sure you want to update this metirc?`;
+    let message;
+    // Updating type from metric to parent
+    if (from === "metric") {
+      message = `<span class="text-danger">Warning: (Changing the type of this metric (metric to parent) will result in deleting all the metric previous values "history").</span> <br> Are you sure you want to update this metirc?`;
+    }
+    // Updating type from parent to metric
+    else if (from === "parent") {
+      message = `<span class="text-danger">Warning: (Changing the type of this metric (parent to metric) will also delete all of it's children).</span> <br> Are you sure you want to update this metirc?`;
+    }
     buildfire.notifications.confirm(
       {
         message,

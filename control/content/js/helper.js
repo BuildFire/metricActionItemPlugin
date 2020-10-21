@@ -99,4 +99,16 @@ const helpers = {
       showActionItem.innerHTML = `No Action Selected`;
     }
   },
+  hideElem: (selector) => {
+    let children = document.querySelectorAll(selector);
+    children.forEach((elem) => {
+      elem.style.display = "none";
+    });
+  },
+  showElem: (selector, displayType = null) => {
+    let children = document.querySelectorAll(selector);
+    children.forEach((elem) => {
+      elem.style.display = displayType || "block";
+    });
+  },
 };

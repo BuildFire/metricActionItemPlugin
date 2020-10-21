@@ -57,22 +57,19 @@ const helpers = {
     return result.reverse();
   },
 
-  hideElement: (selector) => {
-    let parent = document.querySelector(selector);
-    parent.style.transition = "height 0ms 700ms, opacity 700ms 0ms";
-    // parent.querySelectorAll("*").forEach((elem) => {
-    //   elem.style.transition = "height 0ms 500ms, opacity 500ms 0ms";
-    //   elem.classList.add("hide-element");
-    // });
-    parent.classList.add("hide-element");
+  hideElem: (selector) => {
+    let elements = document.querySelectorAll(selector);
+    elements.forEach((elem) => {
+      elem.style.display = "none";
+    });
   },
-  showElement: (selector) => {
-    let parent = document.querySelector(selector);
-    parent.style.transition = "height 0ms 500ms, opacity 500ms 0ms";
-    // parent.querySelectorAll("*").forEach((elem) => {
-    //   elem.style.transition = "height 0ms 700ms, opacity 700ms 0ms";
-    //   elem.classList.remove("hide-element");
-    // });
-    parent.classList.remove("hide-element");
+  showElem: (selector, displayType = null) => {
+    let elements = document.querySelectorAll(selector);
+    elements.forEach((elem) => {
+      elem.style.display = displayType || "block";
+    });
   },
+  getElem: (selector) => {
+    return document.querySelector(selector);
+  }
 };

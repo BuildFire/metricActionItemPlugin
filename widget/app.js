@@ -37,6 +37,25 @@ getCurrentUser();
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
+// buildfire.deeplink.getData((data) => {
+//   if (data && data.link) {
+//     nodeSelector = data.link;
+//   }
+// });
+
+// Get all user bookmarks
+let bookmarks = {};
+
+const getBookmarks = () => {
+  buildfire.bookmarks.getAll((bookmarks) => {
+    if (bookmarks) {
+      bookmarks.forEach((bookmark) => {
+        bookmarks[bookmark.id] = bookmark.id;
+      });
+    }
+  });
+};
+
 if (typeof ListView !== "undefined") {
   // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
   buildfire.publicData.onUpdate((event) => {
@@ -80,9 +99,9 @@ const renderInit = () => {
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
   // Hide the summary in the Home Page if the settings is set to hide it
   if (nodeSelector === "metrics" && !Settings.showSummary) {
-    summary.style.display = "none";
+    helpers.hideElem("#summary");
   } else {
-    summary.style.display = "block";
+    helpers.showElem("#summary");
   }
   // Get metrics that should be rendered
   let metricsChildren = readyMetrics.metricsChildren;
@@ -146,7 +165,7 @@ const checkIncreaseOrDecrease = (metrics) => {
   summaryPreviousValueContainer.innerHTML = `
       <i
       class="material-icons mdc-button__icon ${situationClass} trending-icon">${situation}</i >
-      <span id="summaryPreviousValue">${percentage || 0}% of target</span>
+      <span id="summaryPreviousValue">${percentage || 0}%</span>
       `;
 
   // Add the metric title to the summary card;
@@ -179,9 +198,8 @@ const metricAsItemInit = (newMetric) => {
       renderInit();
     } else {
       if (currentUser && isUserAuthorized()) {
-        metricsScreen.style.display = "none";
-        updateHistoryContainer.style.display = "block";
-        updateHistoryButton.style.display = "block";
+        helpers.hideElem("#metricsScreen");
+        helpers.showElem("#updateHistoryContainer, #updateHistoryButton");
 
         nodeSelector += `.${newMetric.id}`;
 
@@ -190,18 +208,53 @@ const metricAsItemInit = (newMetric) => {
           showLabelInTitlebar: true,
         });
 
+        helpers.getElem("#bookmark").querySelector("button").onclick = () => {
+          if (!bookmarks[newMetric.id]) {
+            const options = {
+              id: newMetric.id,
+              title: newMetric.title,
+              icon: newMetric.icon,
+              payload: {
+                data: { link: nodeSelector },
+              },
+            };
+
+            buildfire.bookmarks.add(options, () => {
+              // Change bookmarks button icon
+              helpers.getElem("#bookmarks button").innerText = "star";
+              // Add the bookmarked item to the global bookmarks object
+              bookmarks[newMetric.id] = newMetric.id;
+            });
+          } else {
+            buildfire.bookmarks.delete(newMetric.id, () => {
+              // Change bookmarks button icon
+              helpers.getElem("#bookmarks button").innerText = "star_outlined";
+              // Remove the bookmarked item to the global bookmarks object
+              delete bookmarks[newMetric.id];
+            });
+          }
+        };
+
         // Add onclick handler to add notes icon inorder to add notes
-        notes.children[0].onclick = () => {
+        helpers.getElem("#notes").querySelector("button").onclick = () => {
           const options = {
             itemId: nodeSelector,
             title: newMetric.title,
             imageUrl: newMetric.icon,
           };
 
-          buildfire.notes.openDialog(options, () => {
-            console.log("It worked");
-          });
+          buildfire.notes.openDialog(options, () => {});
         };
+
+        // helpers.getElem("#share").querySelector("button").onclick = () => {
+        //   const options = {
+        //     itemId: nodeSelector,
+        //     title: newMetric.title,
+        //     imageUrl: newMetric.icon,
+        //   };
+
+        //   buildfire.notes.openDialog(options, () => {});
+        // };
 
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
@@ -352,7 +405,7 @@ const InitHammerJS = (newMetric) => {
   let updateHistoryContainer = document.getElementById(
     "updateHistoryContainer"
   );
-  // create a simple instance of Hammer
+  // create an instance of Hammer
   hammer = new Hammer(updateHistoryContainer);
   hammer
     .get("pan")
@@ -415,9 +468,8 @@ buildfire.history.onPop((breadcrumb) => {
     --numberOfPops;
     nodeSelector = breadcrumb.options.nodeSelector || "metrics";
 
-    metricsScreen.style.display = "block";
-    updateHistoryContainer.style.display = "none";
-    updateHistoryButton.style.display = "none";
+    helpers.showElem("#metricsScreen");
+    helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
 
     renderInit();
 
@@ -428,9 +480,9 @@ buildfire.history.onPop((breadcrumb) => {
     //  This condition is for preventing the control side from going back (when clicking back in widget)
     // when we are at the home, which would lead to an error
     // if (Object.keys(breadcrumb.options).length > 0) {
-    metricsScreen.style.display = "block";
-    updateHistoryContainer.style.display = "none";
-    updateHistoryButton.style.display = "none";
+    helpers.showElem("#metricsScreen");
+    helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
+
     nodeSelector = breadcrumb.options.nodeSelector || "metrics";
     buildfire.messaging.sendMessageToControl({ nodeSelector });
     renderInit();
@@ -460,9 +512,8 @@ buildfire.messaging.onReceivedMessage = (message) => {
       showLabelInTitlebar: true,
     });
     renderInit();
-    metricsScreen.style.display = "block";
-    updateHistoryContainer.style.display = "none";
-    updateHistoryButton.style.display = "none";
+    helpers.showElem("#metricsScreen");
+    helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
   }
 };
 

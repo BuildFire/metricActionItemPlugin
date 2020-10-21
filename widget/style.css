@@ -20,16 +20,17 @@ html[buildfire][safe-area="true"] body {
   -webkit-overflow-scrolling: auto !important;
 }
 
-.hide-element {
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: "hidden" !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
 span {
   font-size: x-large;
+}
+
+#metricsScreen {
+  padding: 10px;
+}
+
+#metricDescription {
+  overflow-wrap: break-word;
+  line-height: 1.2;
 }
 
 #listViewContainer.empty {
@@ -219,7 +220,16 @@ span {
   font-weight: bold;
 }
 
-#notes {
+.metric-actions {
+  margin-top: 40px;
+  display: flex;
+}
+
+.metric-actions div span {
+  font-size: 16px;
+}
+
+.metric-actions div {
   flex-direction: column;
   justify-content: center;
   display: flex;
@@ -229,6 +239,8 @@ span {
 
 #notes span {
   font-size: .75rem;
+  margin: 10px;
+  flex: 1;
 }
 
 /* #updateHistoryBtn:hover {
