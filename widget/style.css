@@ -38,6 +38,8 @@ span {
   background-attachment: absolute;
   background-position: center;
   height: 75vh;
+  opacity: 0;
+	animation: load-in .2s ease-in .5s forwards;
 }
 #my_container_div{
   padding: 0 1rem;
@@ -47,6 +49,8 @@ span {
   padding: 20px 40px;
   height: 100%;
   position: relative;
+  opacity: 0;
+	animation: load-in .2s ease-in .5s forwards;
 }
 
 #progressbar-container {
@@ -54,7 +58,8 @@ span {
   padding-top: 10vh;
 }
 
-#updateHistoryContainer {
+#updateHistoryContainer,
+#updateHistoryButton {
   display: none;
 }
 
@@ -83,6 +88,12 @@ span {
 }
 .listViewItem > .listViewItemCopy {
   flex: auto;
+  overflow: hidden;
+}
+.listViewItem > .listViewItemCopy h5{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .listViewItem .toolbarBadge {
@@ -108,6 +119,7 @@ span {
   margin: .75rem;
   min-width: 3rem;
   padding: 0;
+  text-align: right;
 }
 
 .listViewItem .material-icons {
@@ -117,7 +129,9 @@ span {
 }
 
 .listViewItemToolbar {
-  padding-left: 25px;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .summary-card {
@@ -148,11 +162,11 @@ span {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-size: 18px;
-  line-height: 1.25rem;
+  line-height: 1rem;
   font-weight: 400;
   text-decoration: inherit;
   text-transform: inherit;
-  padding-bottom: 5px;
+  padding-bottom: .5rem;
   opacity: 0.6;
 }
 
@@ -167,15 +181,14 @@ span {
 }
 
 .description-card {
-  margin-top: 10px;
-  padding: 16px;
+  margin: .75rem 1rem 0 1rem;
+  padding: 1rem;
   text-align: center;
   font-size: 1.25rem;
-  line-height: 1rem;
+  line-height: 1.5rem;
   font-weight: 900;
-  width: 100%;
   height: 100%;
-  border-radius: 10px;
+  border-radius: .5rem;
 }
 
 .listViewItemToolbarItem {
@@ -184,14 +197,14 @@ span {
 
 .add-btn {
   position: fixed;
-  bottom: 5%;
-  right: 15%;
+  bottom: 1.5rem;
+  right: 1.5rem;
 }
 
 .close-btn {
   position: fixed;
-  bottom: 5%;
-  left: 15%;
+  bottom: 1.5rem;
+  left: 1.5rem;
 }
 
 .close-btn button {
@@ -201,9 +214,21 @@ span {
 
 #minMax {
   text-align: center;
-  margin-top: 25%;
+  margin: 2rem 0;
   font-size: 1.25rem;
   font-weight: bold;
+}
+
+#notes {
+  flex-direction: column;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  margin: .75rem;
+}
+
+#notes span {
+  font-size: .75rem;
 }
 
 /* #updateHistoryBtn:hover {
@@ -224,10 +249,14 @@ span {
 }
 
 .material-icons.up{
-  animation: swipe-up 4s ease 1s 2 forwards;
+  animation: swipe-up 4s ease 2s 2 forwards;
 }
 .material-icons.down{
-  animation: swipe-down 4s ease 1s 2 forwards;
+  animation: swipe-down 4s ease 2s 2 forwards;
+}
+#metricsScreen{
+  opacity: 0;
+	animation: load-in .2s ease-in .5s forwards;
 }
 @keyframes swipe-up{
   0%{
@@ -256,4 +285,13 @@ span {
   100%{
     transform: translateY(0%);
   }
+}
+@keyframes load-in {
+	0%{
+			transform: scale(.1);
+	}
+	100%{
+			transform: scale(1);
+			opacity: 1;
+	}
 }

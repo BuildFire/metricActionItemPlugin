@@ -34,11 +34,6 @@
     <!-- hammer.js library -->
     <script src="js/lib/hammer.min.js"></script>
 
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
-
     <!-- Custom style's stylesheet -->
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
@@ -69,7 +64,9 @@
         </div>
       </div>
 
-      <div class="mdc-card description-card mdc-card--outlined">
+      <div
+        class="mdc-card description-card mdc-card--outlined mdc-theme--text-primary-on-background"
+      >
         <div class="mdc-card-wrapper__text-section">
           <div id="metricDescription"></div>
         </div>
@@ -79,16 +76,24 @@
     </div>
 
     <div id="updateHistoryContainer">
-      <div>
-        <div id="progressbar-container"></div>
-        <div id="minMax" class="mdc-theme--text-primary-on-background"></div>
+      <div id="progressbar-container"></div>
+      <div id="minMax" class="mdc-theme--text-primary-on-background"></div>
+      <div id="notes">
+        <button
+          class="mdc-icon-button material-icons mdc-theme--text-icon-on-background"
+        >
+          post_add
+        </button>
+        <span class="mdc-theme--text-primary-on-background">Note</span>
       </div>
-
       <div class="swipe-icons">
         <span class="material-icons up">expand_less</span>
         <span class="material-icons down">expand_more</span>
       </div>
+    </div>
 
+
+    <div id="updateHistoryButton">
       <div class="add-btn">
         <button
           id="updateHistoryBtn"
