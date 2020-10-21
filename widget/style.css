@@ -24,10 +24,6 @@ span {
   font-size: x-large;
 }
 
-#metricsScreen {
-  padding: 10px;
-}
-
 #metricDescription {
   overflow-wrap: break-word;
   line-height: 1.2;
@@ -223,10 +219,12 @@ span {
 .metric-actions {
   margin-top: 40px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .metric-actions div span {
-  font-size: 16px;
+  font-size: .75rem;
 }
 
 .metric-actions div {
@@ -239,8 +237,8 @@ span {
 
 #notes span {
   font-size: .75rem;
-  margin: 10px;
   flex: 1;
+  text-align: center;
 }
 
 /* #updateHistoryBtn:hover {
