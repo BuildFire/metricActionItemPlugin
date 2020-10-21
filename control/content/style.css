@@ -60,7 +60,8 @@
 }
 
 input:disabled + span {
-  background: lightgray;
+  /* background: lightgray; */
+  background: rgba(175, 175, 175, 0.3);
 }
 
 #metricsMain button {
@@ -339,10 +340,10 @@ input:disabled + span {
   vertical-align: middle;
 }
 
-/* .mdc-icon-button.cursor-grab:not(.disabledDrag):hover {
+.mdc-icon-button.cursor-grab:not(.disabledDrag):hover {
   color: var(--mdc-theme-secondary);
   transition: color 0.3s;
-} */
+}
 .mdc-icon-button.edit-btn:hover {
   color: var(--mdc-theme-primary);
   transition: color 0.3s;

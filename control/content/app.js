@@ -18,6 +18,8 @@ let metricsSortBy = "manual";
 let sortableList = null;
 let metricsContainer = null;
 
+let wysiwygValue = "";
+
 // Get the logged in user
 const getCurrentUser = () => {
   return authManager.getCurrentUser().then((user) => {
@@ -64,8 +66,11 @@ const initWysiwyg = (callback) => {
       editor.on("change keyup", (e) => {
         if (tmrDelay) clearTimeout(tmrDelay);
         tmrDelay = setTimeout(() => {
-          let description = tinymce.activeEditor.getContent();
-          updateDescription(description);
+          if (tinymce.activeEditor.getContent() !== wysiwygValue) {
+            wysiwygValue = tinymce.activeEditor.getContent();
+            let description = tinymce.activeEditor.getContent();
+            updateDescription(description);
+          }
         }, 1000);
       });
       editor.on("init", () => {
