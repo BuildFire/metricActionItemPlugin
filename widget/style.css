@@ -1,5 +1,7 @@
-*, *::before, *::after{
- box-sizing: border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 html,
 body {
@@ -8,7 +10,7 @@ body {
   -webkit-overflow-scrolling: touch !important;
   margin: 0;
 }
-html{
+html {
   font-size: 16px;
 }
 
@@ -36,10 +38,7 @@ span {
   background-position: center;
   height: 75vh;
   opacity: 0;
-	animation: load-in .2s ease-in .5s forwards;
-}
-#my_container_div{
-  padding: 0 1rem;
+  animation: load-in 0.2s ease-in 0.5s forwards;
 }
 
 #updateHistoryContainer {
@@ -47,17 +46,20 @@ span {
   height: 100%;
   position: relative;
   opacity: 0;
-	animation: load-in .2s ease-in .5s forwards;
+  animation: load-in 0.2s ease-in 0.5s forwards;
 }
 
 #progressbar-container {
   width: 100%;
-  padding-top: 10vh;
 }
 
 #updateHistoryContainer,
 #updateHistoryButton {
   display: none;
+}
+
+#updateHistoryContainer {
+  height: 85vh;
 }
 
 .listViewContainer {
@@ -87,7 +89,7 @@ span {
   flex: auto;
   overflow: hidden;
 }
-.listViewItem > .listViewItemCopy h5{
+.listViewItem > .listViewItemCopy h5 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -113,7 +115,7 @@ span {
 
 .listViewItem .value {
   font-size: 1rem;
-  margin: .75rem;
+  margin: 0.75rem;
   min-width: 3rem;
   padding: 0;
   text-align: right;
@@ -163,7 +165,7 @@ span {
   font-weight: 400;
   text-decoration: inherit;
   text-transform: inherit;
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
   opacity: 0.6;
 }
 
@@ -178,14 +180,14 @@ span {
 }
 
 .description-card {
-  margin: .75rem 1rem 0 1rem;
+  margin: 0.75rem 1rem 0 1rem;
   padding: 1rem;
   text-align: center;
   font-size: 1.25rem;
   line-height: 1.5rem;
   font-weight: 900;
   height: 100%;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
 .listViewItemToolbarItem {
@@ -224,7 +226,7 @@ span {
 }
 
 .metric-actions div span {
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
 
 .metric-actions div {
@@ -232,11 +234,11 @@ span {
   justify-content: center;
   display: flex;
   align-items: center;
-  margin: .75rem;
+  margin: 0.75rem;
 }
 
 #notes span {
-  font-size: .75rem;
+  font-size: 0.75rem;
   flex: 1;
   text-align: center;
 }
@@ -247,7 +249,7 @@ span {
 #historyCloseBtn:hover {
   color: var(--mdc-theme-primary);
 } */
-.swipe-icons{
+.swipe-icons {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -255,53 +257,53 @@ span {
   padding-top: 10vh;
   height: 25vh;
   pointer-events: none;
-  opacity: .25;
+  opacity: 0.25;
 }
 
-.material-icons.up{
+.material-icons.up {
   animation: swipe-up 4s ease 2s 2 forwards;
 }
-.material-icons.down{
+.material-icons.down {
   animation: swipe-down 4s ease 2s 2 forwards;
 }
-#metricsScreen{
+#metricsScreen {
   opacity: 0;
-	animation: load-in .2s ease-in .5s forwards;
+  animation: load-in 0.2s ease-in 0.5s forwards;
 }
-@keyframes swipe-up{
-  0%{
+@keyframes swipe-up {
+  0% {
     transform: translateY(0%);
   }
-  20%{
+  20% {
     transform: translateY(-100%);
   }
-  40%{
+  40% {
     transform: translateY(0%);
   }
-  100%{
+  100% {
     transform: translateY(0%);
   }
 }
-@keyframes swipe-down{
-  0%{
+@keyframes swipe-down {
+  0% {
     transform: translateY(0%);
   }
-  20%{
+  20% {
     transform: translateY(100%);
   }
-  40%{
+  40% {
     transform: translateY(0%);
   }
-  100%{
+  100% {
     transform: translateY(0%);
   }
 }
 @keyframes load-in {
-	0%{
-			transform: scale(.1);
-	}
-	100%{
-			transform: scale(1);
-			opacity: 1;
-	}
+  0% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
