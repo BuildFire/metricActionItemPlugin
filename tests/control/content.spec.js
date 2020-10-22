@@ -1,4 +1,7 @@
 describe("Test The Control Side", () => {
+  let metrics = {};
+  let nodeSelector = "metrics";
+
   describe("Test the Metric class", () => {
     beforeAll(() => {
       let data = {
@@ -49,7 +52,7 @@ describe("Test The Control Side", () => {
       lastUpdatedOn: new Date(),
       max: 78,
       min: 44,
-      order: null,
+      order: 0,
       title: "metric",
       type: "metric",
       value: 23,
@@ -74,7 +77,7 @@ describe("Test The Control Side", () => {
       lastUpdatedOn: new Date(),
       max: 96,
       min: 15,
-      order: null,
+      order: 1,
       title: "metric",
       type: "metric",
       value: 56,
@@ -99,7 +102,7 @@ describe("Test The Control Side", () => {
       lastUpdatedOn: new Date(),
       max: 95,
       min: 23,
-      order: null,
+      order: 2,
       title: "metric",
       type: "metric",
       value: 22,
@@ -130,6 +133,59 @@ describe("Test The Control Side", () => {
 
     it("Should calculate the value of the big object correctly", async () => {
       await expect(Metric.getHistoryValue(metrics)).toBe(40);
+    });
+
+    it("Should change the order of metrics correctly", async () => {
+      let metricChildren = [];
+      for (let key in metrics.metrics) {
+        metricChildren.push(metrics.metrics[key]);
+      }
+      expect(metricChildren[0].order).toBe(0);
+      expect(metricChildren[1].order).toBe(1);
+      expect(metricChildren[2].order).toBe(2);
+      let orderObj = {
+        [metricChildren[0].id]: 2,
+        [metricChildren[1].id]: 0,
+        [metricChildren[2].id]: 1,
+      };
+      await Metrics.order({ nodeSelector, metricsId: metrics.id }, orderObj)
+        .then((result) => {
+          metrics = result;
+        })
+        .catch(console.log);
+
+      metricChildren = [];
+      for (let key in metrics.metrics) {
+        metricChildren.push(metrics.metrics[key]);
+      }
+      expect(metricChildren[0].order).toBe(2);
+      expect(metricChildren[1].order).toBe(0);
+      expect(metricChildren[2].order).toBe(1);
+    });
+
+    it("Should update parents' metrics sortBy and description correctly", async () => {
+      await Metrics.updateParent(
+        {
+          nodeSelector,
+          metricsId: metrics.id,
+        },
+        "lowest",
+        "sortBy"
+      ).then((result) => {
+        metrics = result;
+      });
+      await Metrics.updateParent(
+        {
+          nodeSelector,
+          metricsId: metrics.id,
+        },
+        "That is a new metric",
+        "description"
+      ).then((result) => {
+        metrics = result;
+      });
+      expect(metrics.sortBy).toBe("lowest");
+      expect(metrics.description).toBe("That is a new metric");
     });
 
     it("Should update a metric's title without any errors", async () => {

@@ -45,10 +45,8 @@ Metrics.getMetrics().then(async (result) => {
   initMaterialComponents();
   console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
-  if (typeof Sortable !== "undefined") {
-    renderInit();
-    pushBreadcrumb("Home", { nodeSelector });
-  }
+  renderInit();
+  pushBreadcrumb("Home", { nodeSelector });
 });
 
 // buildfire.deeplink.getData((data) => {

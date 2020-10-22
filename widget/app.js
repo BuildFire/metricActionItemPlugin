@@ -56,25 +56,23 @@ const getBookmarks = () => {
   });
 };
 
-if (typeof ListView !== "undefined") {
-  // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
-  buildfire.publicData.onUpdate((event) => {
-    if (event.data && event.id) {
-      metrics = event.data;
-      metrics.id = event.id;
-      renderInit();
-    }
-  });
+// To sync betwwen the widget and the control when any change (in metrics) happened in the control side
+buildfire.publicData.onUpdate((event) => {
+  if (event.data && event.id) {
+    metrics = event.data;
+    metrics.id = event.id;
+    renderInit();
+  }
+});
 
-  // To sync betwwen the widget and the control when any change (in settings) happened in the control side
-  buildfire.datastore.onUpdate((event) => {
-    if (event.tag === "settings") {
-      Settings.load().then(() => {
-        renderInit();
-      });
-    }
-  });
-}
+// To sync betwwen the widget and the control when any change (in settings) happened in the control side
+buildfire.datastore.onUpdate((event) => {
+  if (event.tag === "settings") {
+    Settings.load().then(() => {
+      renderInit();
+    });
+  }
+});
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
@@ -82,12 +80,10 @@ Metrics.getMetrics().then(async (result) => {
 
   await Settings.load().then(() => {
     // To prevent Functional Tests from Applying these lines where it will cause some errors
-    if (typeof ListView !== "undefined") {
-      // Check if the user have the permission to update metrics
-      isUserAuthorized();
+    // Check if the user have the permission to update metrics
+    isUserAuthorized();
 
-      renderInit();
-    }
+    renderInit();
   });
 });
 

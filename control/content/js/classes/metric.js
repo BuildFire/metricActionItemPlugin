@@ -7,7 +7,7 @@ class Metric {
     this.max = data.max || 0;
     this.actionItem = data.actionItem || {};
     this.type = data.type || "";
-    this.order = data.order || null;
+    this.order = data.order === 0 ? 0 : data.order || null;
     this.metrics = data.metrics || {};
     this.history = data.history || [];
     this.sortBy = this.sortBy || "manual";

@@ -61,7 +61,7 @@
 
 input:disabled + span {
   /* background: lightgray; */
-  background: rgba(175, 175, 175, 0.3);
+  background: rgba(175, 175, 175, 0.2);
 }
 
 #metricsMain button {
@@ -322,6 +322,16 @@ input:disabled + span {
   vertical-align: top;
 }
 
+input:disabled
+  + .mdc-notched-outline
+  .mdc-notched-outline__notch
+  #my-label-id:after {
+  color: grey;
+  content: "";
+  font-size: 18px;
+  vertical-align: top;
+}
+
 #metricsList.draggable-list-view button.cursor-grab {
   cursor: grab;
 }
@@ -360,17 +370,17 @@ input:disabled + span .mdc-notched-outline__notch {
 .mdc-notched-outline__notch {
   padding: 0 !important;
 }
-select{
-  -moz-appearance: none; 
-  -webkit-appearance: none; 
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
   appearance: none;
   padding-right: 32px;
 }
-.select-container{
+.select-container {
   position: relative;
   margin-left: 12px;
 }
-.select-container i.material-icons{
+.select-container i.material-icons {
   position: absolute;
   pointer-events: none;
   font-size: 16px;
@@ -380,7 +390,7 @@ select{
   display: inline-block;
 }
 
-.metric-actions{
+.metric-actions {
   display: flex;
   align-items: center;
 }

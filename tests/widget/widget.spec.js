@@ -1,4 +1,8 @@
 describe("Test The Widget Side", () => {
+  let metrics = {};
+  let nodeSelector = "metrics";
+  let currentUser;
+
   describe("Test the Metric class", () => {
     beforeAll(() => {
       let data = {
@@ -21,8 +25,17 @@ describe("Test The Widget Side", () => {
   });
 
   describe("Test the Metrics class", () => {
+    beforeAll(async () => {
+      await authManager.getCurrentUser().then((user) => {
+        currentUser = user;
+      });
+    });
     it("Should return the metrics object without any errors", async () => {
-      await expectAsync(Metrics.getMetrics()).toBeResolved();
+      await expectAsync(
+        Metrics.getMetrics().then((data) => {
+          metrics = data;
+        })
+      ).toBeResolved();
     });
 
     it("Should calculate the value of the big object correctly", async () => {
@@ -36,7 +49,11 @@ describe("Test The Widget Side", () => {
       nodeSelector = "metrics." + metric2Id;
 
       await expectAsync(
-        Metrics.updateMetricHistory({ nodeSelector, metricsId: metrics.id }, 55, `${currentUser.firstName} ${currentUser.lastName}`)
+        Metrics.updateMetricHistory(
+          { nodeSelector, metricsId: metrics.id },
+          55,
+          `${currentUser.firstName} ${currentUser.lastName}`
+        )
       ).toBeResolved();
     });
 
