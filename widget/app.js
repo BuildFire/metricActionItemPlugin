@@ -296,7 +296,8 @@ const initChart = (metric) => {
       data: historyValues,
       backgroundColor: "rgba(101, 116, 205, 0.1)",
       borderColor: appThemeObj.colors.primaryTheme,
-      pointBackgroundColor: "rgba(255, 255, 255, 1)",
+      pointBackgroundColor: "#fff",
+      pointHoverBackgroundColor: '#fff',
       borderWidth: 2,
       fill: true,
     },
@@ -323,7 +324,8 @@ const renderChart = (datasets) => {
       elements: {
         point: {
           radius: 3,
-          borderWidth: 3,
+          hitRadius: 20,
+          borderWidth: 2,
           hoverRadius: 5,
           hoverBorderWidth: 1,
         },
@@ -333,10 +335,10 @@ const renderChart = (datasets) => {
       },
       layout: {
         padding: {
-          top: 5,
-          left: 10,
-          right: 10,
-          bottom: 5,
+          top: 6,
+          left: 6,
+          right: 6,
+          bottom: 6,
         },
       },
       scales: {
