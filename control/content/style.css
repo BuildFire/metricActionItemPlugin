@@ -360,3 +360,27 @@ input:disabled + span .mdc-notched-outline__notch {
 .mdc-notched-outline__notch {
   padding: 0 !important;
 }
+select{
+  -moz-appearance: none; 
+  -webkit-appearance: none; 
+  appearance: none;
+  padding-right: 32px;
+}
+.select-container{
+  position: relative;
+  margin-left: 12px;
+}
+.select-container i.material-icons{
+  position: absolute;
+  pointer-events: none;
+  font-size: 16px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-block;
+}
+
+.metric-actions{
+  display: flex;
+  align-items: center;
+}

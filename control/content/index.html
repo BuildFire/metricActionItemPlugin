@@ -55,11 +55,14 @@
       <div class="metric-actions">
         <label for="metrics" class="sort-by-lable">Sort By: </label>
 
-        <select id="sortBy" onchange="onSortByChange()">
-          <option value="manual">Manual</option>
-          <option value="highest">Highest</option>
-          <option value="lowest">Lowest</option>
-        </select>
+        <div class="select-container">
+          <select id="sortBy" onchange="onSortByChange()">
+            <option value="manual">Manual</option>
+            <option value="highest">Highest</option>
+            <option value="lowest">Lowest</option>
+          </select>
+          <i class="material-icons">expand_more</i>
+        </div>
 
         <button
           class="mdc-button mdc-button--raised btn"

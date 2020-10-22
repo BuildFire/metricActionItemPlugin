@@ -47,6 +47,7 @@ span {
   position: relative;
   opacity: 0;
   animation: load-in 0.2s ease-in 0.5s forwards;
+  z-index: 1;
 }
 
 #progressbar-container {
@@ -56,10 +57,6 @@ span {
 #updateHistoryContainer,
 #updateHistoryButton {
   display: none;
-}
-
-#updateHistoryContainer {
-  height: 85vh;
 }
 
 .listViewContainer {
@@ -198,12 +195,18 @@ span {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
+  z-index: 2;
+  opacity: 0;
+  animation: slide-up .3s ease .7s forwards;
 }
 
 .close-btn {
   position: fixed;
   bottom: 1.5rem;
   left: 1.5rem;
+  z-index: 2;
+  opacity: 0;
+  animation: slide-up .3s ease .7s forwards;
 }
 
 .close-btn button {
@@ -219,7 +222,7 @@ span {
 }
 
 .metric-actions {
-  margin-top: 40px;
+  margin-top: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,8 +257,8 @@ span {
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
-  padding-top: 10vh;
-  height: 25vh;
+  margin-top: 6vh;
+  height: 15vh;
   pointer-events: none;
   opacity: 0.25;
 }
@@ -305,5 +308,15 @@ span {
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+@keyframes slide-up{
+  0%{
+    opacity: 0;
+    transform: translateY(200%);
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0);
   }
 }
