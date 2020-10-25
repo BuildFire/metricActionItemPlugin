@@ -39,22 +39,27 @@ buildfire.auth.onLogout(() => (currentUser = null));
 
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
+    console.log("data.link", data);
     nodeSelector = data.link;
+    // buildfire.history.push(data.title, {
+    //   nodeSelector,
+    //   showLabelInTitlebar: true,
+    // });
   }
 });
 
 // Get all user bookmarks
-let bookmarks = {};
+// let bookmarks = {};
 
-const getBookmarks = () => {
-  buildfire.bookmarks.getAll((bookmarks) => {
-    if (bookmarks) {
-      bookmarks.forEach((bookmark) => {
-        bookmarks[bookmark.id] = bookmark.id;
-      });
-    }
-  });
-};
+// const getBookmarks = () => {
+//   buildfire.bookmarks.getAll((bookmarks) => {
+//     if (bookmarks) {
+//       bookmarks.forEach((bookmark) => {
+//         bookmarks[bookmark.id] = bookmark.id;
+//       });
+//     }
+//   });
+// };
 
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
 buildfire.publicData.onUpdate((event) => {
