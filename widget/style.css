@@ -197,7 +197,7 @@ span {
   right: 1.5rem;
   z-index: 2;
   opacity: 0;
-  animation: slide-up .3s ease .7s forwards;
+  animation: slide-up 0.3s ease 0.7s forwards;
 }
 
 .close-btn {
@@ -206,7 +206,7 @@ span {
   left: 1.5rem;
   z-index: 2;
   opacity: 0;
-  animation: slide-up .3s ease .7s forwards;
+  animation: slide-up 0.3s ease 0.7s forwards;
 }
 
 .close-btn button {
@@ -260,7 +260,7 @@ span {
   margin-top: 6vh;
   height: 15vh;
   pointer-events: none;
-  opacity: 0.25;
+  opacity: 0.5;
 }
 
 .material-icons.up {
@@ -310,12 +310,12 @@ span {
     opacity: 1;
   }
 }
-@keyframes slide-up{
-  0%{
+@keyframes slide-up {
+  0% {
     opacity: 0;
     transform: translateY(200%);
   }
-  100%{
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
