@@ -142,7 +142,7 @@ class Metrics {
     });
   }
 
-  // To updates the root metric and metrics of type parent only,
+  // Updates the root metric and metrics of type parent only,
   // takes two types of values: sortBy and description
   // which are placed in the root of the metric object
   static updateParent({ nodeSelector, metricsId }, value, type) {
