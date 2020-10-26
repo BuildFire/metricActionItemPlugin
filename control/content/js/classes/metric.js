@@ -11,11 +11,11 @@ class Metric {
     this.metrics = data.metrics || {};
     this.history = data.history || [];
     this.sortBy = this.sortBy || "manual";
+    this.description = data.description || "";
     this.createdOn = data.createdOn || null;
     this.createdBy = data.createdBy || null;
     this.lastUpdatedOn = data.lastUpdatedOn || null;
     this.lastUpdatedBy = data.lastUpdatedBy || null;
-    this.description = data.description || "";
   }
 
   static getHistoryValue(metric) {
