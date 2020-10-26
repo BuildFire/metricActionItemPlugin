@@ -73,6 +73,10 @@ span {
   margin-bottom: 0.75rem;
   height: 3.75rem;
 }
+.listViewItem .listViewItemImgContainer{
+  display: flex;
+  align-items: center;
+}
 .listViewItem .listViewItemImg {
   height: 2rem;
   width: 2rem;

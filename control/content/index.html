@@ -241,28 +241,31 @@
         ></div>
       </div>
 
-      <button
+      <div class="bottom-actions">
+        <button
+          class="mdc-button mdc-button--raised custom-raised-button"
+          onclick="goToMetricspage()"
+        >
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Cancel</span>
+        </button>
+        
+        <button
         id="createAMetric"
         class="mdc-button mdc-button--raised"
         onclick="createMetric()"
-      >
-        <div class="mdc-button__ripple"></div>
-        <i class="material-icons mdc-button__icon" aria-hidden="true">add</i
-        >Create Metric
-      </button>
-      <button id="updateMetric" class="mdc-button mdc-button--raised">
-        <div class="mdc-button__ripple"></div>
-        <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
-        Update Metric
-      </button>
-
-      <button
-        class="mdc-button mdc-button--raised custom-raised-button"
-        onclick="goToMetricspage()"
-      >
-        <div class="mdc-button__ripple"></div>
-        <span class="mdc-button__label">Cancel</span>
-      </button>
+        >
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i
+          >Create Metric
+        </button>
+        <button id="updateMetric" class="mdc-button mdc-button--raised">
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
+          Update Metric
+        </button>
+      </div>
+      
     </div>
 
     <script src="js/helper.js"></script>
