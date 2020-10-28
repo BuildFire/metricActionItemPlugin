@@ -36,7 +36,10 @@ class Metrics {
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");
       if (!metricsId) return reject("metricsId not provided");
-      if (nodeSelector.slice(-7) === "metrics")
+      if (
+        nodeSelector.slice(-7) === "metrics" ||
+        nodeSelector.slice(-8) === "metrics."
+      )
         return reject("nodeSelector is not right");
 
       buildfire.publicData.searchAndUpdate(
