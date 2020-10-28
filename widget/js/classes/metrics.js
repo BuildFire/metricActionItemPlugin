@@ -3,19 +3,19 @@ class Metrics {
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", async (err, result) => {
+      buildfire.publicData.get("metrics", (err, result) => {
         if (err) reject(err);
         else {
           // Check if there is already objects in the database
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
-            await buildfire.publicData.save(
+            buildfire.publicData.save(
               { metrics: {}, sortBy: "manual" },
               "metrics",
-              async (err, result) => {
+              (err, result) => {
                 if (err) reject(err);
                 else {
-                  await this.getMetrics().then((result) => {
+                  this.getMetrics().then((result) => {
                     resolve(result);
                   });
                 }
@@ -52,7 +52,7 @@ class Metrics {
           },
         },
         "metrics",
-        async (err, res) => {
+        (err, res) => {
           if (err) reject(err);
           if (res.nModified === 0) {
             buildfire.publicData.update(
@@ -70,7 +70,7 @@ class Metrics {
                 },
               },
               "metrics",
-              async (err, result) => {
+              (err, result) => {
                 if (err) reject(err);
                 else {
                   result.data.id = result.id;
@@ -85,7 +85,7 @@ class Metrics {
           // Track action
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
 
-          await Metrics.getMetrics().then((result) => {
+          Metrics.getMetrics().then((result) => {
             resolve(result);
           });
         }

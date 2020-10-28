@@ -40,7 +40,7 @@ buildfire.messaging.sendMessageToWidget({
 });
 
 // To get all metrics and start rendering
-Metrics.getMetrics().then(async (result) => {
+Metrics.getMetrics().then((result) => {
   metrics = result;
   initMaterialComponents();
   console.log("All metrics", metrics);
@@ -258,10 +258,13 @@ const createMetric = () => {
   }
 };
 
-const updateMetrics = async (item) => {
+const updateMetrics = (item) => {
+  debugger;
   // Metric fields validation
   if (inputValidation()) {
     let updateObj = {};
+    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+
     for (let prop in metricFields) {
       // To determine which fileds are needed to be updated
       if (metricFields[prop] !== item[prop]) {
@@ -269,7 +272,6 @@ const updateMetrics = async (item) => {
       }
     }
 
-    let isAccepted;
     if (
       updateObj.type === "parent" ||
       (updateObj.type !== "metric" && item.type === "parent")
@@ -281,42 +283,41 @@ const updateMetrics = async (item) => {
     else if (updateObj.type === "metric" && item.type === "parent") {
       // To ask the user if he really want to change the type of metric from (parent to metric),
       // where this action is irreversable (it will delete al the children of the parent metric)
-      await confirmMetricUpdate("parent").then((result) => {
-        isAccepted = result;
+      return confirmMetricUpdate("parent").then((accepted) => {
+        if (accepted) {
+          updateObj.metrics = {};
+          updateObj.history = [];
+          updateMetricDB(updateObj, item.id);
+        }
       });
-
-      if (isAccepted) {
-        updateObj.metrics = {};
-        updateObj.history = [];
-      } else return;
     }
-
     // If updating the metric type from metric to parent
-    if (updateObj.type === "parent" && item.type === "metric") {
-      await confirmMetricUpdate("metric").then((result) => {
-        isAccepted = result;
+    else if (updateObj.type === "parent" && item.type === "metric") {
+      return confirmMetricUpdate("metric").then((accepted) => {
+        if (accepted) {
+          updateObj.history = [];
+          updateObj.min = null;
+          updateObj.max = null;
+          updateMetricDB(updateObj, item.id);
+        }
       });
-
-      if (isAccepted) {
-        updateObj.history = [];
-        updateObj.min = null;
-        updateObj.max = null;
-      } else return;
+    } else {
+      updateMetricDB(updateObj, item.id);
     }
-
-    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
-
-    // Update metric
-    Metrics.update(
-      { nodeSelector, metricsId: metrics.id },
-      updateObj,
-      item.id
-    ).then((result) => {
-      metrics = result;
-      renderInit();
-      goToMetricspage();
-    });
   }
+};
+
+const updateMetricDB = (updateObj, itemId) => {
+  // Update metric
+  Metrics.update(
+    { nodeSelector, metricsId: metrics.id },
+    updateObj,
+    itemId
+  ).then((result) => {
+    metrics = result;
+    renderInit();
+    goToMetricspage();
+  });
 };
 
 const inputValidation = () => {

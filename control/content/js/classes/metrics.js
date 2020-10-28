@@ -4,19 +4,19 @@ class Metrics {
   // Get the big Object (metrics object)
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", async (err, result) => {
+      buildfire.publicData.get("metrics", (err, result) => {
         if (err) reject(err);
         else {
           // Check if there is already objects in the database
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
-            await buildfire.publicData.save(
+            buildfire.publicData.save(
               { metrics: {}, sortBy: "manual" },
               "metrics",
-              async (err, result) => {
+              (err, result) => {
                 if (err) reject(err);
                 else {
-                  await this.getMetrics().then((result) => {
+                  this.getMetrics().then((result) => {
                     resolve(result);
                   });
                 }
@@ -153,9 +153,7 @@ class Metrics {
       let _set = {};
       if (nodeSelector === "metrics") {
         // If it's the main metrics
-        type === "sortBy"
-          ? (_set.sortBy = value)
-          : (_set.description = value);
+        type === "sortBy" ? (_set.sortBy = value) : (_set.description = value);
       } else {
         // If the metrics was a parent
         let selector = nodeSelector.split(".");

@@ -23,6 +23,8 @@ let snackbarMessage = {};
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
 
+let listViewDiv = {};
+
 // Get the App's Theme properties in order to inherit them in the widget design
 buildfire.appearance.getAppTheme((err, appTheme) => {
   appThemeObj = appTheme;
@@ -79,11 +81,11 @@ buildfire.datastore.onUpdate((event) => {
 });
 
 // To get all metrics and start rendering
-Metrics.getMetrics().then(async (result) => {
+Metrics.getMetrics().then((result) => {
   metrics = result;
   initMaterialComponents();
 
-  await Settings.load().then(() => {
+  Settings.load().then(() => {
     // To prevent Functional Tests from Applying these lines where it will cause some errors
     // Check if the user have the permission to update metrics
     isUserAuthorized();

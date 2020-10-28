@@ -11,7 +11,6 @@ const plumber = require("gulp-plumber");
 const minifyInline = require("gulp-minify-inline");
 let babel = require("gulp-babel");
 
-let version = new Date().getTime();
 const destinationFolder = releaseFolder();
 
 function releaseFolder() {
@@ -45,10 +44,6 @@ gulp.task("lint", () => {
             ecmaVersion: 2017,
           },
           rules: {
-            // "semi": [
-            // 	"error",
-            // 	"always"
-            // ],
             "no-console": ["off"],
           },
         })
@@ -66,23 +61,13 @@ const cssTasks = [
   { name: "widgetCSS", src: "widget/**/*.css", dest: "/widget" },
   {
     name: "controlContentCSS",
-    src: "control/content/**/*.css",
+    src: ["control/assets/*.css", "control/content/**/*.css"],
     dest: "/control/content",
-  },
-  {
-    name: "controlDesignCSS",
-    src: "control/design/**/*.css",
-    dest: "/control/design",
   },
   {
     name: "controlSettingsCSS",
     src: "control/settings/**/*.css",
     dest: "/control/settings",
-  },
-  {
-    name: "controlStringsCSS",
-    src: "control/strings/**/*.css",
-    dest: "/control/strings",
   },
 ];
 
@@ -111,21 +96,6 @@ cssTasks.forEach(function (task) {
   });
 });
 
-// gulp.task("sharedJS", function () {
-//   return gulp
-//     .src(["widget/js/shared/**.js"], { base: "." })
-
-//     .pipe(concat("scripts.shared.js"))
-//     .pipe(
-//       babel({
-//         presets: ["@babel/env"],
-//         plugins: ["@babel/plugin-proposal-class-properties"],
-//       })
-//     )
-//     .pipe(minify())
-//     .pipe(gulp.dest(destinationFolder + "/widget"));
-// });
-
 const jsTasks = [
   {
     name: "widgetJS",
@@ -147,58 +117,30 @@ const jsTasks = [
     ],
     dest: "/control/content",
   },
-  //   {
-  //     name: "controlDesignJS",
-  //     src: "control/design/**/*.js",
-  //     dest: "/control/design",
-  //   },
   {
     name: "controlSettingsJS",
-    src: "control/settings/**/*.js",
+    src: [
+      "control/settings/js/classes/*.js",
+      "control/settings/js/*.js",
+      "control/settings/app.js",
+    ],
     dest: "/control/settings",
-  },
-  //   {
-  //     name: "controlStringsJS",
-  //     src: "control/strings/**/*.js",
-  //     dest: "/control/strings",
-  //   },
-  //data, data access, tests and analytics
-  //   { name: "dataJS", src: ["data/*.js", "dataAccess/*.js"], dest: "/data" },
-  {
-    name: "testsJS",
-    src: ["tests/**/*.js", "tests/basic/*.js", "test/screens/*.js"],
-    dest: "/tests",
   },
 ];
 
 jsTasks.forEach(function (task) {
   gulp.task(task.name, function () {
-    return (
-      gulp
-        .src(task.src, { base: "." })
-        .pipe(plumber())
-        .pipe(
-          babel({
-            presets: [
-              [
-                "@babel/preset-env",
-                {
-                  modules: false,
-                },
-              ],
-            ],
-            plugins: ["@babel/plugin-transform-async-to-generator"],
-          })
-        )
-        // .pipe(minify())
-        .pipe(uglify())
-        /// merge all the JS files together. If the
-        /// order matters you can pass each file to the function
-        /// in an array in the order you like
-        .pipe(concat("scripts.min.js"))
-        ///output here
-        .pipe(gulp.dest(destinationFolder + task.dest))
-    );
+    return gulp
+      .src(task.src, { base: "." })
+      .pipe(plumber())
+      .pipe(
+        babel({
+          presets: ["@babel/preset-env"],
+        })
+      )
+      .pipe(uglify())
+      .pipe(concat("scripts.min.js"))
+      .pipe(gulp.dest(destinationFolder + task.dest));
   });
 });
 
@@ -219,9 +161,9 @@ gulp.task("controlHTML", function () {
         // bundleSharedJSFiles: "../../widget/scripts.shared.min.js",
         bundleJSFiles: "scripts.min.js",
         bundleCSSFiles: "styles.min.css",
-        //data, data access, tests and analytics
-        bundleDataJSFiles: "../../data/scripts.min.js",
-        bundleTestsJSFiles: "../../tests/scripts.min.js",
+
+        bundleSettingsCSSFiles: "styles.min.css",
+        bundleSettingsJSFiles: "scripts.min.js",
       })
     )
     .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
@@ -241,9 +183,6 @@ gulp.task("widgetHTML", function () {
         // bundleSharedJSFiles: "scripts.shared.min.js",
         bundleJSFiles: "scripts.min.js",
         bundleCSSFiles: "styles.min.css",
-        //data, data access and tests
-        bundleDataJSFiles: "../../data/scripts.min.js",
-        bundleTestsJSFiles: "../../tests/scripts.min.js",
       })
     )
     .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
@@ -267,13 +206,7 @@ gulp.task("clean", function () {
   return del([destinationFolder], { force: true });
 });
 
-var buildTasksToRun = [
-  "controlHTML",
-  "widgetHTML",
-  "resources",
-  "images",
-  //   "sharedJS",
-];
+var buildTasksToRun = ["controlHTML", "widgetHTML", "resources", "images"];
 
 cssTasks.forEach(function (task) {
   buildTasksToRun.push(task.name);

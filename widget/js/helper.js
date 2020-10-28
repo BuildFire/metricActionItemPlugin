@@ -49,7 +49,7 @@ const helpers = {
     let date = helpers.getAbsoluteDate();
     result.push(days[date.getDay()]);
 
-    for (i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 6; i++) {
       let copiedDate = new Date(date);
       copiedDate.setDate(date.getDate() - i);
       result.push(days[copiedDate.getDay()]);
@@ -71,5 +71,5 @@ const helpers = {
   },
   getElem: (selector) => {
     return document.querySelector(selector);
-  }
+  },
 };
