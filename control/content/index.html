@@ -8,9 +8,6 @@
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <!-- Template base stylesheet -->
-    <link rel="stylesheet" href="../assets/base.css" />
-
     <!-- Material Design css & js -->
     <link
       href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
@@ -27,18 +24,23 @@
       rel="stylesheet"
     />
 
-    <!-- Sortable list css & js  -->
-    <link rel="stylesheet" href="css/sortableList.css" />
+    <!-- Sortable list js  -->
     <script src="../../../../scripts/sortable.min.js"></script>
-
-    <!-- Custom style's stylesheet -->
-    <link rel="stylesheet" href="style.css" />
 
     <!-- Import the thumbnail component -->
     <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
 
     <!-- Import WYSIWYG -->
     <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+
+    <!-- build:bundleCSSFiles  -->
+    <!-- Sortable list css  -->
+    <link rel="stylesheet" href="css/sortableList.css" />
+    <!-- Template base stylesheet -->
+    <link rel="stylesheet" href="../assets/base.css" />
+    <!-- Custom style's stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- endbuild -->
   </head>
 
   <body>
@@ -274,6 +276,7 @@
       </div>
     </div>
 
+    <!-- build:bundleJSFiles  -->
     <script src="js/helper.js"></script>
     <script src="js/classes/analytics.js"></script>
     <script src="js/classes/metric.js"></script>
@@ -285,5 +288,6 @@
     <script src="js/breadcrumb.js"></script>
 
     <script src="app.js"></script>
+    <!-- endbuild -->
   </body>
 </html>

@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="buildfire" content="enableMDTheme" />
 
-    <!-- build:bundleWidgetBFMinJS  -->
+    <!-- build:bundleWidgetBFMinJS -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
@@ -24,18 +24,12 @@
       rel="stylesheet"
     />
 
-    <!-- Chart.js css & js -->
-    <script src="js/lib/chart.bundle.min.js"></script>
+    <!-- build:bundleCSSFiles -->
+    <!-- Chart.js css -->
     <link rel="stylesheet" type="text/css" href="css/chart.min.css" />
-
-    <!-- progressbar.js library -->
-    <script src="js/lib/progressbar.min.js"></script>
-
-    <!-- hammer.js library -->
-    <script src="js/lib/hammer.min.js"></script>
-
     <!-- Custom style's stylesheet -->
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <!-- endbuild -->
   </head>
   <body>
     <div id="metricsScreen">
@@ -156,6 +150,14 @@
       </div>
     </div>
 
+    <!-- build:bundleJSFiles -->
+    <!-- Chart.js css & js -->
+    <script src="js/lib/chart.bundle.min.js"></script>
+    <!-- progressbar.js library -->
+    <script src="js/lib/progressbar.min.js"></script>
+    <!-- hammer.js library -->
+    <script src="js/lib/hammer.min.js"></script>
+
     <script src="js/ui.js"></script>
     <script src="js/lib/listView.js"></script>
 
@@ -167,5 +169,6 @@
 
     <script src="js/authManager.js"></script>
     <script src="app.js"></script>
+    <!-- endbuild -->
   </body>
 </html>
