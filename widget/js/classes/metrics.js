@@ -34,8 +34,10 @@ class Metrics {
     const absoluteDate = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
-      if (!nodeSelector) reject("nodeSelector not provided");
-      if (!metricsId) reject("metricsId not provided");
+      if (!nodeSelector) return reject("nodeSelector not provided");
+      if (!metricsId) return reject("metricsId not provided");
+      if (nodeSelector.slice(-7) === "metrics")
+        return reject("nodeSelector is not right");
 
       buildfire.publicData.searchAndUpdate(
         { [`${nodeSelector}.history.date`]: absoluteDate },
@@ -111,7 +113,7 @@ class Metrics {
       }
       return "No value";
     } else if (metric.type === "parent" || !metric.type) {
-      if (Object.keys(metric.metrics).length === 0) {
+      if (metric.metrics && Object.keys(metric.metrics).length === 0) {
         return "No value";
       }
       if (metric.metrics) {
@@ -132,6 +134,7 @@ class Metrics {
         }
         return avg;
       }
+      return 0;
     }
   }
 }

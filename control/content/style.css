@@ -394,8 +394,9 @@ select {
   display: flex;
   align-items: center;
 }
-.bottom-actions{
+.bottom-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding: 12px 16px 14px;
 }

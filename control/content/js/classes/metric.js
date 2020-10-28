@@ -25,8 +25,11 @@ class Metric {
         : 0;
       metric.value = val;
       return val;
-    } else if (metric.type === "parent" || !metric.type) {
-      if (Object.keys(metric.metrics).length === 0) {
+    } else if (
+      metric.type === "parent" ||
+      !metric.type /*That is mean it is the master object */
+    ) {
+      if (metric.metrics && Object.keys(metric.metrics).length === 0) {
         metric.value = 0;
         return 0;
       }
@@ -40,5 +43,7 @@ class Metric {
         return avg;
       }
     }
+    //TODO: check if it affect the avg claculations
+    return 0;
   }
 }

@@ -127,6 +127,7 @@
           onchange="onFieldChange(this)"
           type="text"
           id="title"
+          maxlength="50"
           autocomplete="false"
           class="mdc-text-field__input"
           aria-labelledby="my-label-id"
@@ -255,11 +256,11 @@
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Cancel</span>
         </button>
-        
+
         <button
-        id="createAMetric"
-        class="mdc-button mdc-button--raised"
-        onclick="createMetric()"
+          id="createAMetric"
+          class="mdc-button mdc-button--raised"
+          onclick="createMetric()"
         >
           <div class="mdc-button__ripple"></div>
           <i class="material-icons mdc-button__icon" aria-hidden="true">add</i
@@ -271,7 +272,6 @@
           Update Metric
         </button>
       </div>
-      
     </div>
 
     <script src="js/helper.js"></script>

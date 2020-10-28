@@ -49,12 +49,6 @@ Metrics.getMetrics().then(async (result) => {
   pushBreadcrumb("Home", { nodeSelector });
 });
 
-// buildfire.deeplink.getData((data) => {
-//   if (data && data.link) {
-//     nodeSelector = data.link;
-//   }
-// });
-
 // Initialize WYSIWYG
 const initWysiwyg = (callback) => {
   var tmrDelay = null;
@@ -64,10 +58,12 @@ const initWysiwyg = (callback) => {
       editor.on("change keyup", (e) => {
         if (tmrDelay) clearTimeout(tmrDelay);
         tmrDelay = setTimeout(() => {
-          if (tinymce.activeEditor.getContent() !== wysiwygValue) {
+          if (
+            tinymce.activeEditor.getContent() !== wysiwygValue ||
+            wysiwygValue === ""
+          ) {
             wysiwygValue = tinymce.activeEditor.getContent();
-            let description = tinymce.activeEditor.getContent();
-            updateDescription(description);
+            updateDescription(wysiwygValue);
           }
         }, 1000);
       });
@@ -125,8 +121,13 @@ const initMetricFields = (data = {}) => {
 };
 
 const wysiwygSetContent = (description) => {
-  // Initialize WYSIWYG
-  tinymce.activeEditor.setContent(description || "<p>No Value</p>");
+  if (tinymce.activeEditor) {
+    tinymce.activeEditor.setContent(description || "");
+  } else {
+    initWysiwyg(() => {
+      tinymce.activeEditor.setContent(description || "");
+    });
+  }
 };
 
 const initMaterialComponents = () => {
@@ -176,7 +177,7 @@ const initIconComponent = (imageUrl = "") => {
   };
 };
 
-const addActionItem = (actionItem = {}) => {
+const addActionItem = (actionItem = { action: "linkToApp" }) => {
   return new Promise((resolve, reject) => {
     const options = {
       showIcon: false,
@@ -328,13 +329,6 @@ const inputValidation = () => {
       "Please add metric title"
     );
     isValid = false;
-  } else if (title.length > 20) {
-    helpers.inputError(
-      "title-lable",
-      "title-helper-text",
-      "Metric's title must be less than 20 characters long"
-    );
-    isValid = false;
   }
 
   if (type === "parent") {
@@ -384,13 +378,8 @@ const renderInit = () => {
   // Extract the desired metrics (children) from the big object using nodeSelector
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
   let metricsChildren = readyMetrics.metricsChildren;
-  if (tinymce.activeEditor) {
-    wysiwygSetContent(readyMetrics.description);
-  } else {
-    initWysiwyg(() => {
-      wysiwygSetContent(readyMetrics.description);
-    });
-  }
+
+  wysiwygSetContent(readyMetrics.description);
 
   let currentMetricList = [];
   // Prepare metrics to be rendered (Object to Array)
@@ -519,7 +508,6 @@ const orderChange = () => {
 
 // Trigered when a user update a metric
 const updateItem = (item) => {
-  item.lastUpdatedBy = currentUser.firstName;
   helpers.showElem("#metricForm");
   helpers.showElem("#updateMetric", "inline");
   helpers.hideElem("#createAMetric, #metricsMain, #tinymce-19");

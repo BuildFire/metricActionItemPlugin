@@ -73,7 +73,7 @@ span {
   margin-bottom: 0.75rem;
   height: 3.75rem;
 }
-.listViewItem .listViewItemImgContainer{
+.listViewItem .listViewItemImgContainer {
   display: flex;
   align-items: center;
 }
@@ -213,11 +213,6 @@ span {
   animation: slide-up 0.3s ease 0.7s forwards;
 }
 
-.close-btn button {
-  color: black !important;
-  background: white !important;
-}
-
 #minMax {
   text-align: center;
   margin: 2rem 0;
@@ -323,4 +318,12 @@ span {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+#description {
+  display: none;
+}
+
+#summaryTitle {
+  text-transform: capitalize;
 }

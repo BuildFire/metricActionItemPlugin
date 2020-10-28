@@ -88,16 +88,7 @@ const renderTags = () => {
       document.getElementById("tag-chips").innerHTML += chip;
     });
   } else {
-    let chip = `
-    <div class="mdc-chip mdc-chip--selected" role="row">
-      <div class="mdc-chip__ripple"></div>
-      <span role="gridcell">
-        <span role="radio" tabindex="0" aria-checked="true" class="mdc-chip__primary-action">
-          <span class="mdc-chip__text">No tags are selected</span>
-        </span>
-      </span>
-    </div>
-        `;
+    let chip = `<p class="info">No tags are selected</p>`;
 
     document.getElementById("tag-chips").innerHTML = chip;
   }

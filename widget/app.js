@@ -12,18 +12,22 @@ let bar = {};
 // Reference to hammer in (update histroy value page)
 let hammer = {};
 
-// Reference to the values chart in metrics lists' page
-let valuesChart = {};
+// Reference to the metric's chart in metrics lists' page
+let metricChart = {};
 
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
+let snackbarMessage = {};
+
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
 
-buildfire.appearance.getAppTheme(function (err, appTheme) {
+// Get the App's Theme properties in order to inherit them in the widget design
+buildfire.appearance.getAppTheme((err, appTheme) => {
   appThemeObj = appTheme;
 });
+
 // Get the logged in user
 const getCurrentUser = () => {
   return authManager.getCurrentUser().then((user) => {
@@ -39,12 +43,7 @@ buildfire.auth.onLogout(() => (currentUser = null));
 
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
-    console.log("data.link", data);
     nodeSelector = data.link;
-    // buildfire.history.push(data.title, {
-    //   nodeSelector,
-    //   showLabelInTitlebar: true,
-    // });
   }
 });
 
@@ -78,6 +77,7 @@ buildfire.datastore.onUpdate((event) => {
     });
   }
 });
+
 // To get all metrics and start rendering
 Metrics.getMetrics().then(async (result) => {
   metrics = result;
@@ -87,7 +87,6 @@ Metrics.getMetrics().then(async (result) => {
     // To prevent Functional Tests from Applying these lines where it will cause some errors
     // Check if the user have the permission to update metrics
     isUserAuthorized();
-
     renderInit();
   });
 });
@@ -95,7 +94,7 @@ Metrics.getMetrics().then(async (result) => {
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
   listViewContainer.innerHTML = "";
-  console.log("Hello everybody", nodeSelector, metrics);
+  console.log("Widget's metrics", nodeSelector, metrics);
   // Extract the desired metrics (children) from the big object using nodeSelector
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
   // Hide the summary in the Home Page if the settings is set to hide it
@@ -109,8 +108,13 @@ const renderInit = () => {
   // Init metrics values' chart
   initChart(readyMetrics.metricsParent);
 
-  document.getElementById("metricDescription").innerHTML =
-    readyMetrics.metricsParent.description || "<p>No Value</p>";
+  if (readyMetrics.metricsParent.description) {
+    description.style.display = "block";
+    document.getElementById("metricDescription").innerHTML =
+      readyMetrics.metricsParent.description;
+  } else {
+    description.style.display = "none";
+  }
 
   let currentMetricList = [];
   // Prepare metrics to be rendered in the ListView component
@@ -157,7 +161,6 @@ const checkIncreaseOrDecrease = (metrics) => {
     situation = "remove";
     situationClass = "mdc-theme--text-primary-on-background";
   }
-  // Calculation source: http://mathcentral.uregina.ca/qq/database/qq.09.06/h/other1.html
   let percentage =
     metrics.metricsParent.value - metrics.metricsParent.previousValue;
 
@@ -170,7 +173,7 @@ const checkIncreaseOrDecrease = (metrics) => {
       `;
 
   // Add the metric title to the summary card;
-  summaryTitle.innerHTML = metrics.metricsParent.title || "Home";
+  summaryTitle.innerHTML = metrics.metricsParent.title || "";
 };
 
 // Initialize metics to be rendered using list view library
@@ -201,6 +204,7 @@ const metricAsItemInit = (newMetric) => {
       if (currentUser && isUserAuthorized()) {
         helpers.hideElem("#metricsScreen");
         helpers.showElem("#updateHistoryContainer, #updateHistoryButton");
+        historyCloseBtn.style.background = appThemeObj.colors.warningTheme;
 
         nodeSelector += `.${newMetric.id}`;
 
@@ -268,13 +272,19 @@ const metricAsItemInit = (newMetric) => {
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
             { value, username: currentUser.firstName }
-          ).then((result) => {
-            metrics = result;
-            buildfire.history.pop();
-          });
+          )
+            .then((result) => {
+              metrics = result;
+              buildfire.history.pop();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         };
         initProgressBar(newMetric);
         document.body.scrollTop = 0;
+      } else {
+        snackbarMessage.open();
       }
     }
   };
@@ -283,8 +293,8 @@ const metricAsItemInit = (newMetric) => {
 
 const initChart = (metric) => {
   // To destroy (delete) any chart in the screen if exists
-  if (Object.keys(valuesChart).length !== 0) {
-    valuesChart.destroy();
+  if (Object.keys(metricChart).length !== 0) {
+    metricChart.destroy();
   }
 
   let title = !metric.title ? `Home History` : `${metric.title} History`;
@@ -302,7 +312,7 @@ const initChart = (metric) => {
       backgroundColor: "rgba(101, 116, 205, 0.1)",
       borderColor: appThemeObj.colors.primaryTheme,
       pointBackgroundColor: "#fff",
-      pointHoverBackgroundColor: '#fff',
+      pointHoverBackgroundColor: "#fff",
       borderWidth: 2,
       fill: true,
     },
@@ -313,7 +323,7 @@ const initChart = (metric) => {
 const renderChart = (datasets) => {
   const ctx = document.getElementById("chart").getContext("2d");
 
-  valuesChart = new Chart(ctx, {
+  metricChart = new Chart(ctx, {
     type: "line",
     data: {
       labels: helpers.getLast7Days(),
@@ -404,6 +414,7 @@ const initProgressBar = (newMetric) => {
 
   InitHammerJS(newMetric);
 };
+
 const InitHammerJS = (newMetric) => {
   if (Object.keys(hammer).length !== 0) {
     hammer.destroy();
@@ -430,10 +441,10 @@ const InitHammerJS = (newMetric) => {
 
 const changeProgressbarValue = (direction, newMetric) => {
   let progressText = document.getElementsByClassName("progressbar-text")[0];
-  if (direction === "pandown" && bar.value() >= 0.0000000001) {
+  if (direction === "pandown" && bar.value() > 0) {
     bar.set(bar.value() - 0.01);
     progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
-  } else if (direction === "panup" && bar.value() <= 0.99999999999) {
+  } else if (direction === "panup" && bar.value() < 1) {
     bar.set(bar.value() + 0.01);
     progressText.innerHTML = parseInt(progressText.innerHTML) + newMetric.min;
   }
@@ -470,6 +481,10 @@ const initMaterialComponents = () => {
   document.querySelectorAll(".mdc-fab").forEach((btn) => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
+
+  snackbarMessage = mdc.snackbar.MDCSnackbar.attachTo(
+    document.querySelector(".mdc-snackbar")
+  );
 };
 
 buildfire.history.onPop((breadcrumb) => {
@@ -527,6 +542,7 @@ buildfire.messaging.onReceivedMessage = (message) => {
   }
 };
 
+// To close the metric update value's screen (without saving) and return to metrics page
 const closeUpdateHistory = () => {
   return buildfire.history.pop();
 };
