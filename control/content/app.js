@@ -280,7 +280,7 @@ const updateMetrics = (item) => {
       delete metricFields.max;
     }
     // If updating the metric type from metric to parent
-    else if (updateObj.type === "metric" && item.type === "parent") {
+    if (updateObj.type === "metric" && item.type === "parent") {
       // To ask the user if he really want to change the type of metric from (parent to metric),
       // where this action is irreversable (it will delete al the children of the parent metric)
       return confirmMetricUpdate("parent").then((accepted) => {
