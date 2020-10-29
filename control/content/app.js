@@ -259,7 +259,6 @@ const createMetric = () => {
 };
 
 const updateMetrics = (item) => {
-  debugger;
   // Metric fields validation
   if (inputValidation()) {
     let updateObj = {};

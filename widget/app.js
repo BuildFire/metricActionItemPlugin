@@ -304,7 +304,7 @@ const initChart = (metric) => {
   // This for loop calculate and set all the values of all metrics for the last 7 days
   for (let i = 7; i > 0; i--) {
     let value = Metrics.getHistoryValue(metric, i) || 0;
-    historyValues.push(value.toPrecision(3));
+    historyValues.push(isNaN(value) ? value : value.toPrecision(3));
   }
 
   let datasets = [
