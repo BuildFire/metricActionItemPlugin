@@ -64,6 +64,7 @@ const initWysiwyg = (callback) => {
           ) {
             wysiwygValue = tinymce.activeEditor.getContent();
             updateDescription(wysiwygValue);
+            tinymce.activeEditor.save();
           }
         }, 1000);
       });
