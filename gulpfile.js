@@ -10,8 +10,10 @@ const imagemin = require("gulp-imagemin");
 const plumber = require("gulp-plumber");
 const minifyInline = require("gulp-minify-inline");
 let babel = require("gulp-babel");
+let zip = require("gulp-zip");
 
-const destinationFolder = releaseFolder();
+
+const destinationFolder = 'dist';
 
 function releaseFolder() {
   var arr = __dirname.split("/");
@@ -208,6 +210,12 @@ gulp.task("clean", function () {
 
 var buildTasksToRun = ["controlHTML", "widgetHTML", "resources", "images"];
 
+gulp.task('zip', function () {
+  return gulp.src('./dist/**')
+      .pipe(zip('metricActionItemPlugin_release.zip'))
+      .pipe(gulp.dest('../'));
+});
+
 cssTasks.forEach(function (task) {
   buildTasksToRun.push(task.name);
 });
@@ -215,4 +223,4 @@ jsTasks.forEach(function (task) {
   buildTasksToRun.push(task.name);
 });
 
-gulp.task("build", gulp.series("lint", "clean", ...buildTasksToRun));
+gulp.task("build", gulp.series("lint", "clean", ...buildTasksToRun, 'zip'));
