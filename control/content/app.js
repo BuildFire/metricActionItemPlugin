@@ -603,5 +603,7 @@ const updateDescription = (description) => {
     { nodeSelector, metricsId: metrics.id },
     description,
     "description"
-  );
+  ).then((result) => {
+    metrics = result;
+  });
 };
