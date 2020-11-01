@@ -23,8 +23,6 @@ let snackbarMessage = {};
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
 
-let listViewDiv = {};
-
 // Get the App's Theme properties in order to inherit them in the widget design
 buildfire.appearance.getAppTheme((err, appTheme) => {
   appThemeObj = appTheme;
@@ -140,7 +138,7 @@ const renderInit = () => {
 
 // Render metrics using ListView component
 const renderMetrics = (metrics) => {
-  listViewDiv = new ListView("listViewContainer", {
+  let listViewDiv = new ListView("listViewContainer", {
     enableAddButton: true,
     Title: "",
   });

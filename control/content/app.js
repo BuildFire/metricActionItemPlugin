@@ -122,6 +122,7 @@ const initMetricFields = (data = {}) => {
 };
 
 const wysiwygSetContent = (description) => {
+  wysiwygValue = description;
   if (tinymce.activeEditor) {
     tinymce.activeEditor.setContent(description || "");
   } else {

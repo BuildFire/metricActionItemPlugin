@@ -12,15 +12,9 @@ const minifyInline = require("gulp-minify-inline");
 let babel = require("gulp-babel");
 let zip = require("gulp-zip");
 
+let version = new Date().getTime();
 
-const destinationFolder = 'dist';
-
-function releaseFolder() {
-  var arr = __dirname.split("/");
-  var fldr = arr.pop();
-  arr.push(fldr + "_release");
-  return arr.join("/");
-}
+const destinationFolder = "dist";
 
 console.log(">> Building to ", destinationFolder);
 
@@ -160,12 +154,8 @@ gulp.task("controlHTML", function () {
           src: "../../../../scripts/buildfire.min.js",
           tpl: '<script src="%s"></script>',
         },
-        // bundleSharedJSFiles: "../../widget/scripts.shared.min.js",
-        bundleJSFiles: "scripts.min.js",
-        bundleCSSFiles: "styles.min.css",
-
-        bundleSettingsCSSFiles: "styles.min.css",
-        bundleSettingsJSFiles: "scripts.min.js",
+        bundleJSFiles: "scripts.min.js?v=" + version,
+        bundleCSSFiles: "styles.min.css?v=" + version,
       })
     )
     .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
@@ -182,12 +172,12 @@ gulp.task("widgetHTML", function () {
           src: "../../../scripts/buildfire.min.js",
           tpl: '<script src="%s"></script>',
         },
-        // bundleSharedJSFiles: "scripts.shared.min.js",
-        bundleJSFiles: "scripts.min.js",
-        bundleCSSFiles: "styles.min.css",
+        bundleJSFiles: "scripts.min.js?v=" + version,
+        bundleCSSFiles: "styles.min.css?v=" + version,
       })
     )
     .pipe(minHTML({ removeComments: true, collapseWhitespace: true }))
+    .pipe(minifyInline())
     .pipe(gulp.dest(destinationFolder));
 });
 
@@ -205,15 +195,18 @@ gulp.task("images", function () {
 });
 
 gulp.task("clean", function () {
-  return del([destinationFolder], { force: true });
+  return del([destinationFolder, "../metricActionItemPlugin_release.zip"], {
+    force: true,
+  });
 });
 
 var buildTasksToRun = ["controlHTML", "widgetHTML", "resources", "images"];
 
-gulp.task('zip', function () {
-  return gulp.src('./dist/**')
-      .pipe(zip('metricActionItemPlugin_release.zip'))
-      .pipe(gulp.dest('../'));
+gulp.task("zip", function () {
+  return gulp
+    .src("./dist/**")
+    .pipe(zip("metricActionItemPlugin_release.zip"))
+    .pipe(gulp.dest("../"));
 });
 
 cssTasks.forEach(function (task) {
@@ -223,4 +216,4 @@ jsTasks.forEach(function (task) {
   buildTasksToRun.push(task.name);
 });
 
-gulp.task("build", gulp.series("lint", "clean", ...buildTasksToRun, 'zip'));
+gulp.task("build", gulp.series("lint", "clean", ...buildTasksToRun, "zip"));
