@@ -16,7 +16,6 @@ const breadcrumbsManager = {
           return;
         }
         let breadLength = breadcrumbsHistory.length;
-        console.log("go to ", +crumb.getAttribute("arrayIndex"));
         for (
           let i = 0;
           i < breadLength - 1 - +crumb.getAttribute("arrayIndex");

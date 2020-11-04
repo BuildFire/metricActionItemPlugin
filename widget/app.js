@@ -94,7 +94,6 @@ Metrics.getMetrics().then((result) => {
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
   listViewContainer.innerHTML = "";
-  console.log("Widget's metrics", nodeSelector, metrics);
   // Extract the desired metrics (children) from the big object using nodeSelector
   let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
   // Hide the summary in the Home Page if the settings is set to hide it
@@ -181,9 +180,7 @@ const metricAsItemInit = (newMetric) => {
   let listItem = new ListViewItem(newMetric);
   listItem.onIconTitleClick = (item) => {
     if (Object.keys(item.actionItem).length > 0) {
-      buildfire.actionItems.execute(item.actionItem, () => {
-        console.log("Action Done");
-      });
+      buildfire.actionItems.execute(item.actionItem, () => {});
     }
   };
   listItem.onToolbarClicked = (e) => {
@@ -433,7 +430,6 @@ const InitHammerJS = (newMetric) => {
   // listen to events...
   hammer.on("panup pandown", (ev) => {
     if (Math.round(ev.distance) % 1 === 0) {
-      // console.log(Math.round(ev.distance));
       changeProgressbarValue(ev.type, newMetric);
     }
   });

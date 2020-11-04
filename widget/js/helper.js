@@ -11,7 +11,6 @@ const helpers = {
       nodeSelector = splittedNode.join(".");
       buildfire.history.pop();
     }
-    console.log("splittedNode", splittedNode);
     let metricsChildren = metrics;
     let metricsParent = null;
     let metricsSortBy = "";

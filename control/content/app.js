@@ -43,7 +43,6 @@ buildfire.messaging.sendMessageToWidget({
 Metrics.getMetrics().then((result) => {
   metrics = result;
   initMaterialComponents();
-  console.log("All metrics", metrics);
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   renderInit();
   pushBreadcrumb("Home", { nodeSelector });
@@ -556,12 +555,6 @@ const pushBreadcrumb = (breadcrumb, data) => {
 
 // To synchronize with the widget
 buildfire.messaging.onReceivedMessage = (message) => {
-  console.log(
-    "Message has been received",
-    message.nodeSelector,
-    breadcrumbsHistory,
-    nodeSelector
-  );
   // If message has title then it is a push breacrumb
   if (message.title) {
     nodeSelector = message.nodeSelector;
