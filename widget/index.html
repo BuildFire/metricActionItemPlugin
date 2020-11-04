@@ -2,78 +2,171 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="buildfire" content="enableMDTheme" />
 
-    <!-- build:bundleWidgetBFMinJS  -->
+    <!-- build:bundleWidgetBFMinJS -->
     <script src="../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <!-- build:bundleSharedJSFiles  -->
-    <script src="js/shared/infoCard.class.js"></script>
-    <script src="js/shared/settings.class.js"></script>
-    <script src="js/shared/strings.js"></script>
-    <script src="js/shared/stringsConfig.js"></script>
+    <!-- Material Design css & js -->
+    <link
+      href="../../../styles/materialDesign/material-components-web@4.0.0.min.css"
+      rel="stylesheet"
+    />
+    <script
+      src="../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
+      type="text/javascript"
+    ></script>
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <!-- build:bundleCSSFiles -->
+    <!-- Chart.js css -->
+    <link rel="stylesheet" type="text/css" href="css/chart.min.css" />
+    <!-- Custom style's stylesheet -->
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <!-- endbuild -->
-
-    <!-- build:bundleJSFiles  -->
-    <!-- endbuild -->
-
-    <!-- build:bundleCSSFiles  -->
-    <link rel="stylesheet" type="text/css" href="css/a.css" />
-    <link rel="stylesheet" type="text/css" href="css/b.css" />
-    <!-- endbuild -->
-
-    <script>
-      /// string will have all the language settings from teh strings page on the control side
-      let strings = new buildfire.services.Strings("en-us", stringsConfig);
-      strings.init().then((s) => {
-        /// Inject into elements that have an attribute bfString
-        strings.inject(document, false);
-        //strings.get("screenOne.loading",true)},()=>{} );
-      });
-
-      buildfire.messaging.onReceivedMessage = (msg) => {
-        if (msg.cmd == "refresh")
-          /// message comes from the strings page on the control side
-          location.reload();
-      };
-
-      let settings;
-      Settings.get().then((s) => {
-        settings = s;
-        if (s.bgImageUrl) {
-          document.body.style.backgroundImage = `url(${buildfire.imageLib.cropImage(
-            s.bgImageUrl,
-            {
-              width: "full",
-              height: "full",
-            }
-          )})`;
-          document.body.style.backgroundSize = "cover";
-        }
-      });
-    </script>
   </head>
   <body>
-    <div class="padded">
-      <h3 bfString="screenOne.welcomeMessage">Widget - Hello, world!</h3>
-      <p>Samples</p>
-      <ul>
-        <li class="text-primary">
-          <a href="samples/listView/listView.html">List View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/gridView/gridView.html">Grid View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/detailView/detailView.html">Details View</a>
-        </li>
-        <li class="text-primary">
-          <a href="samples/mapView/mapView.html">Map View</a>
-        </li>
-      </ul>
+    <div id="metricsScreen">
+      <div
+        id="summary"
+        class="mdc-card mdc-card--outlined summary-card mdc-elevation--z1"
+      >
+        <div class="mdc-card-wrapper__text-section">
+          <div
+            id="summaryTitle"
+            class="card__subtitle mdc-theme--text-secondary-on-background"
+          ></div>
+          <span
+            class="card__title mdc-theme--text-primary-on-background"
+            id="summaryValue"
+          ></span>
+
+          <span
+            id="summaryPreviousValueContainer"
+            class="card__subtitle mdc-theme--text-secondary-on-background summary-previous-value"
+          >
+          </span>
+        </div>
+        <div class="mdc-card-wrapper__text-section">
+          <canvas id="chart" height="100"></canvas>
+        </div>
+      </div>
+
+      <div
+        id="description"
+        class="description-card mdc-theme--text-primary-on-background"
+      >
+        <div id="metricDescription"></div>
+      </div>
+
+      <div id="listViewContainer"></div>
     </div>
 
-    <script src="js/shared/authManager.js"></script>
-    <script src="script.js"></script>
+    <div id="updateHistoryContainer">
+      <div id="progressbar-container"></div>
+      <div id="minMax" class="mdc-theme--text-primary-on-background"></div>
+
+      <div class="metric-actions">
+        <!-- <div id="bookmark">
+          <button
+            class="mdc-icon-button material-icons mdc-theme--text-icon-on-background"
+          >
+            star_outlined
+          </button>
+          <span class="mdc-theme--text-primary-on-background">Bookmark</span>
+        </div> -->
+        <div id="notes">
+          <button
+            class="mdc-icon-button material-icons mdc-theme--text-icon-on-background"
+          >
+            post_add
+          </button>
+          <span class="mdc-theme--text-primary-on-background">Notes</span>
+        </div>
+        <!-- <div id="share">
+          <button
+            class="mdc-icon-button material-icons mdc-theme--text-icon-on-background"
+          >
+            share
+          </button>
+          <span class="mdc-theme--text-primary-on-background">Share</span>
+        </div> -->
+      </div>
+      <div class="swipe-icons mdc-theme--text-primary-on-background">
+        <span class="material-icons up">expand_less</span>
+        <span class="material-icons down">expand_more</span>
+      </div>
+    </div>
+
+    <div id="updateHistoryButton">
+      <div class="add-btn">
+        <button
+          id="updateHistoryBtn"
+          class="mdc-fab mdc-button--raised"
+          aria-label="Add"
+        >
+          <div class="mdc-fab__ripple"></div>
+          <span class="mdc-fab__icon material-icons">check</span>
+        </button>
+      </div>
+      <div class="close-btn">
+        <button
+          id="historyCloseBtn"
+          class="mdc-fab mdc-button--raised"
+          aria-label="Add"
+          onclick="closeUpdateHistory()"
+        >
+          <div class="mdc-fab__ripple"></div>
+          <span class="mdc-fab__icon material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mdc-snackbar">
+      <div
+        class="mdc-snackbar__surface"
+        role="status"
+        aria-relevant="additions"
+      >
+        <div class="mdc-snackbar__label" aria-atomic="false">
+          You do not have access to update
+        </div>
+        <div class="mdc-snackbar__actions" aria-atomic="true">
+          <button
+            class="mdc-icon-button mdc-snackbar__dismiss material-icons"
+            title="Dismiss"
+          >
+            close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- build:bundleJSFiles -->
+    <!-- Chart.js css & js -->
+    <script src="js/lib/chart.bundle.min.js"></script>
+    <!-- progressbar.js library -->
+    <script src="js/lib/progressbar.min.js"></script>
+    <!-- hammer.js library -->
+    <script src="js/lib/hammer.min.js"></script>
+
+    <script src="js/ui.js"></script>
+    <script src="js/lib/listView.js"></script>
+
+    <script src="js/helper.js"></script>
+    <script src="js/classes/analytics.js"></script>
+    <script src="js/classes/metric.js"></script>
+    <script src="js/classes/metrics.js"></script>
+    <script src="js/classes/settings.js"></script>
+
+    <script src="js/authManager.js"></script>
+    <script src="app.js"></script>
+    <!-- endbuild -->
   </body>
 </html>

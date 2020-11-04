@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="buildfire" content="enableMDTheme" />
+
+    <script src="../../../../scripts/buildfire.js"></script>
+
+    <link
+      href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
+      rel="stylesheet"
+    />
+    <script
+      src="../../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
+      type="text/javascript"
+    ></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/3.6.0/jasmine.min.css"
+      integrity="sha512-VmXOc/75WLdJSABvh3ovbpXUxqO/tyW29GcmNZz0sRwQHRqBIAq61kAGITx5v2YPuvG07y8m522WVYKpRB6rxw=="
+      crossorigin="anonymous"
+    />
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/3.6.0/jasmine.min.js"
+      integrity="sha512-hSiRgmBWJ4Up/wGCaolTZ6HaOgkzTwS2Z4vQWY9jqDK8Tov+GzQKy0PcgIYoOi1WtZ3+hWNkgSDMyGaMGb4ybg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/3.6.0/jasmine-html.min.js"
+      integrity="sha512-p/nVZroN9H1CSaY3Dh8HVfoaI0qhL6a9FuszMYFfUeLrGTHIi73gG0kc31xlL9KEwYT0tLox6nEsJfYwQebuvA=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/3.6.0/boot.min.js"
+      integrity="sha512-uVTH4+dZ7oHLKN3wMAPltsPuVOgfORZSUelvr7HWJmSsazBJKgUNTRSm+bUJ3IfKkG4Y1nLFr0qRX8oFS2fbZg=="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Set jasmine random tests to false
+      jasmine.currentEnv_.configure({ random: false });
+    </script>
+  </head>
+
+  <body>
+    <div>
+      <button
+        class="mdc-button mdc-button--raised btn mdc-theme--secondary-bg"
+        onclick="location='control.html'"
+      >
+        Go to control's tests
+      </button>
+    </div>
+    <br />
+    <br />
+  </body>
+  <script src="../../widget/js/helper.js"></script>
+  <script src="../../widget/js/classes/analytics.js"></script>
+  <script src="../../widget/js/classes/metric.js"></script>
+  <script src="../../widget/js/classes/metrics.js"></script>
+
+  <script src="../../widget/js/classes/settings.js"></script>
+
+  <script src="../../widget/js/authManager.js"></script>
+
+  <script src="../../tests/widget/widget.spec.js"></script>
+</html>

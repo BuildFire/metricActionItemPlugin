@@ -6,12 +6,11 @@
   "scripts": {
     "build": "gulp build && cd ../ && rm -rf gulpStarterKitPluginTemplate.zip && zip -r gulpStarterKitPluginTemplate.zip gulpStarterKitPluginTemplate_release && rm -rf gulpStarterKitPluginTemplate_release"
   },
-  "author": "Daniel Hindi",
+  "author": "Hamza & Amjad",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/preset-env": "^7.7.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
     "del": "^3.0.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
@@ -21,7 +20,10 @@
     "gulp-html-replace": "^1.6.2",
     "gulp-htmlmin": "^3.0.0",
     "gulp-imagemin": "^6.0.0",
-    "gulp-minify": "^3.1.0",
-    "gulp-uglify": "^3.0.0"
-  }
+    "gulp-minify-inline": "^1.1.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-uglify": "^3.0.2",
+    "gulp-zip": "^5.0.2"
+  },
+  "dependencies": {}
 }

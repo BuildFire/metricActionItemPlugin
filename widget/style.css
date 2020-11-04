@@ -1,0 +1,327 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100% !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin: 0;
+}
+html {
+  font-size: 16px;
+}
+
+html[safe-area="true"] body {
+  padding-bottom: 0px !important;
+  -webkit-overflow-scrolling: auto;
+}
+html[buildfire][safe-area="true"] body {
+  -webkit-overflow-scrolling: auto !important;
+}
+
+span {
+  font-size: x-large;
+}
+
+#metricDescription {
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+#listViewContainer.empty {
+  background-image: url(./.images/empty_page.svg);
+  background-repeat: no-repeat;
+  background-attachment: absolute;
+  background-position: center;
+  height: 75vh;
+  opacity: 0;
+  animation: load-in 0.2s ease-in 0.5s forwards;
+}
+
+#updateHistoryContainer {
+  padding: 20px 40px;
+  height: 100%;
+  position: relative;
+  opacity: 0;
+  animation: load-in 0.2s ease-in 0.5s forwards;
+  z-index: 1;
+}
+
+#progressbar-container {
+  width: 100%;
+}
+
+#updateHistoryContainer,
+#updateHistoryButton {
+  display: none;
+}
+
+.listViewContainer {
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+.listViewItem {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(50, 50, 50, 0.2);
+  margin-bottom: 0.75rem;
+  height: 3.75rem;
+}
+.listViewItem .listViewItemImgContainer {
+  display: flex;
+  align-items: center;
+}
+.listViewItem .listViewItemImg {
+  height: 2rem;
+  width: 2rem;
+  margin: 0.5rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.listViewItem > .listViewItemCopy {
+  flex: auto;
+  overflow: hidden;
+}
+.listViewItem > .listViewItemCopy h5 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listViewItem .toolbarBadge {
+  background-color: red;
+  border-radius: 50%;
+  color: white;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+}
+
+.listViewItem .toolbarShare {
+  background-color: blue;
+  border-radius: 50%;
+  color: white;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+}
+
+.listViewItem .value {
+  font-size: 1rem;
+  margin: 0.75rem;
+  min-width: 3rem;
+  padding: 0;
+  text-align: right;
+}
+
+.listViewItem .material-icons {
+  display: inline;
+  vertical-align: bottom;
+  font-size: 20px;
+}
+
+.listViewItemToolbar {
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.summary-card {
+  padding: 1rem;
+  text-align: left;
+  font-size: 1.25rem;
+  line-height: 1rem;
+  font-weight: 900;
+  border-radius: 10px;
+  margin: 1rem;
+}
+
+.summary-card .card__title {
+  font-family: Roboto, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-size: 35px;
+  line-height: 2rem;
+  font-weight: 500;
+  text-decoration: inherit;
+  text-transform: inherit;
+  padding-right: 12px;
+  padding-bottom: 4px;
+}
+
+.summary-card .card__subtitle {
+  font-family: Roboto, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-size: 18px;
+  line-height: 1rem;
+  font-weight: 400;
+  text-decoration: inherit;
+  text-transform: inherit;
+  padding-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.summary-card #summaryPreviousValue {
+  font-size: 16px;
+}
+
+.summary-card .trending-icon {
+  padding-left: 15px;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.description-card {
+  margin: 0.75rem 1rem 0 1rem;
+}
+
+.description-card * {
+  max-width: 100%;
+  height: auto;
+}
+
+.listViewItemToolbarItem {
+  padding: 10px;
+}
+
+.add-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 2;
+  opacity: 0;
+  animation: slide-up 0.3s ease 0.7s forwards;
+}
+
+.close-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 2;
+  opacity: 0;
+  animation: slide-up 0.3s ease 0.7s forwards;
+}
+
+#minMax {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.metric-actions {
+  margin-top: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-actions div span {
+  font-size: 0.75rem;
+}
+
+.metric-actions div {
+  flex-direction: column;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  margin: 0.75rem;
+}
+
+#notes span {
+  font-size: 0.75rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* #updateHistoryBtn:hover {
+  color: var(--mdc-theme-primary);
+}
+#historyCloseBtn:hover {
+  color: var(--mdc-theme-primary);
+} */
+.swipe-icons {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 6vh;
+  height: 15vh;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.material-icons.up {
+  animation: swipe-up 4s ease 2s 2 forwards;
+}
+.material-icons.down {
+  animation: swipe-down 4s ease 2s 2 forwards;
+}
+#metricsScreen {
+  opacity: 0;
+  animation: load-in 0.2s ease-in 0.5s forwards;
+}
+@keyframes swipe-up {
+  0% {
+    transform: translateY(0%);
+  }
+  20% {
+    transform: translateY(-100%);
+  }
+  40% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+@keyframes swipe-down {
+  0% {
+    transform: translateY(0%);
+  }
+  20% {
+    transform: translateY(100%);
+  }
+  40% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+@keyframes load-in {
+  0% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(200%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#description {
+  display: none;
+}
+
+#summaryTitle {
+  text-transform: capitalize;
+}

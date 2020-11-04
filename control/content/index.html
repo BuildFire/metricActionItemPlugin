@@ -2,35 +2,295 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link rel="stylesheet" href="../assets/base.css" />
+    <meta name="buildfire" content="enableMDTheme" />
 
     <!-- build:bundleControlBFMinJS  -->
     <script src="../../../../scripts/buildfire.js"></script>
     <!-- endbuild -->
 
-    <!-- build:bundleDataJSFiles  -->
-    <script src="../../data/section.js"></script>
-    <script src="../../dataAccess/sections.js"></script>
-    <!-- End of Scripts -->
+    <!-- Material Design css & js -->
+    <link
+      href="../../../../styles/materialDesign/material-components-web@4.0.0.min.css"
+      rel="stylesheet"
+    />
+    <script
+      src="../../../../scripts/materialDesign/material-components-web@4.0.0.min.js"
+      type="text/javascript"
+    ></script>
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <!-- Sortable list js  -->
+    <script src="../../../../scripts/sortable.min.js"></script>
+
+    <!-- Import the thumbnail component -->
+    <script src="../../../../scripts/buildfire/components/images/thumbnail.js"></script>
+
+    <!-- Import WYSIWYG -->
+    <script src="../../../../scripts/tinymce/tinymce.min.js"></script>
+
+    <!-- build:bundleCSSFiles  -->
+    <!-- Sortable list css  -->
+    <link rel="stylesheet" href="css/sortableList.css" />
+    <!-- Template base stylesheet -->
+    <link rel="stylesheet" href="../assets/base.css" />
+    <!-- Custom style's stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- endbuild -->
   </head>
+
   <body>
-    <h3 class="section__title">StarterKit Sample Pages</h3>
-    <ul>
-      <li onclick="location='samples/sortableList/sortableList.html'">
-        Draggable List
-      </li>
-      <li onclick="location='samples/subPage/index.html'">Sub Screen</li>
-      <li onclick="location='samples/searchTable/searchTable.html'">
-        Search Table
-      </li>
-    </ul>
-    <script>
-      //location = "samples/sortableList/sortableList.html";
-    </script>
-    <script src="helpers/helpers.js"></script>
-    <script src="../../data/metric.js"></script>
-    <script src="../../dataAccess/metrics.js"></script>
-    <!-- <script src="script.js"></script> -->
+    <div id="bread" class="mdc-typography--headline6"></div>
+    <br />
+
+    <textarea id="metricDescription" name="content"></textarea>
+    <br />
+    <h1 class="section__title">Metrics</h1>
+
+    <div id="metricsMain">
+      <div id="spinner" class="spinner">Loading...</div>
+
+      <div class="metric-actions">
+        <label for="metrics" class="sort-by-lable">Sort By: </label>
+
+        <div class="select-container">
+          <select id="sortBy" onchange="onSortByChange()">
+            <option value="manual">Manual</option>
+            <option value="highest">Highest</option>
+            <option value="lowest">Lowest</option>
+          </select>
+          <i class="material-icons">expand_more</i>
+        </div>
+
+        <button
+          class="mdc-button mdc-button--raised btn"
+          onclick="goToAddItem()"
+        >
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+          <span class="mdc-button__label">Add</span>
+        </button>
+      </div>
+
+      <div id="metricsList"></div>
+    </div>
+    <br />
+    <div id="metricForm">
+      <div id="metricTypeRadioGroup" class="fullwidth form-group">
+        <lable>Metric type</lable><br />
+        <div class="mdc-form-field fullwidth">
+          <label class="radio-label designLabel" for="metricType">
+            Metric
+          </label>
+          <div class="mdc-radio">
+            <input
+              onchange="onRadioChange('metric')"
+              class="mdc-radio__native-control"
+              type="radio"
+              value="metric"
+              id="metricType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+        <div class="mdc-form-field fullwidth" id="tagOnly">
+          <label class="radio-label designLabel" for="parentType">
+            Parent
+          </label>
+          <div class="mdc-radio">
+            <input
+              class="mdc-radio__native-control"
+              type="radio"
+              onchange="onRadioChange('parent')"
+              value="parent"
+              id="parentType"
+              name="metricTypes"
+            />
+            <div class="mdc-radio__background">
+              <div class="mdc-radio__outer-circle radio-outer-circle"></div>
+              <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+          </div>
+        </div>
+      </div>
+
+      <label id="title-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
+          onchange="onFieldChange(this)"
+          type="text"
+          id="title"
+          maxlength="50"
+          autocomplete="false"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="title-helper-text"
+          aria-describedby="title-helper-text"
+        />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Title</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="title-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <label id="min-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
+          onchange="onFieldChange(this)"
+          id="min"
+          autocomplete="false"
+          type="number"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="min-helper-text"
+          aria-describedby="min-helper-text"
+          pattern="^[0-9]"
+          min="0"
+          step="1"
+        />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Min</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="min-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <label id="max-lable" class="mdc-text-field mdc-text-field--outlined">
+        <input
+          onchange="onFieldChange(this)"
+          id="max"
+          autocomplete="false"
+          type="number"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="max-helper-text"
+          aria-describedby="max-helper-text"
+          pattern="^[0-9]"
+          min="0"
+          step="1"
+        />
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label" id="my-label-id">Max</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+      </label>
+
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="max-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <button
+        id="actionItemButton"
+        class="mdc-button mdc-button--raised"
+        onclick="addActionItem()"
+      >
+        <div class="mdc-button__ripple"></div>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">add</i>
+        <span class="mdc-button__label">Add Action Item</span>
+      </button>
+
+      <span id="showActionItem"></span>
+
+      <br /><br />
+      <div id="icon"></div>
+      <label
+        id="icon-lable"
+        class="mdc-text-field mdc-text-field--outlined invisible"
+      >
+        <input
+          id="iconInput"
+          autocomplete="false"
+          type="text"
+          class="mdc-text-field__input"
+          aria-labelledby="my-label-id"
+          aria-controls="icon-helper-text"
+          aria-describedby="icon-helper-text"
+        />
+      </label>
+
+      <div class="mdc-text-field-helper-line">
+        <div
+          id="icon-helper-text"
+          class="mdc-text-field-helper-text"
+          aria-hidden="true"
+        ></div>
+      </div>
+
+      <div class="bottom-actions">
+        <button
+          class="mdc-button mdc-button--raised custom-raised-button"
+          onclick="goToMetricspage()"
+        >
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Cancel</span>
+        </button>
+
+        <button
+          id="createAMetric"
+          class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+          onclick="createMetric()"
+        >
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">add</i
+          >Create Metric
+        </button>
+        <button
+          id="updateMetric"
+          class="mdc-button mdc-button--raised mdc-theme--secondary-bg"
+        >
+          <div class="mdc-button__ripple"></div>
+          <i class="material-icons mdc-button__icon" aria-hidden="true">edit</i>
+          Update Metric
+        </button>
+      </div>
+    </div>
+
+    <!-- build:bundleJSFiles  -->
+    <script src="js/helper.js"></script>
+    <script src="js/classes/analytics.js"></script>
+    <script src="js/classes/metric.js"></script>
+    <script src="js/classes/metrics.js"></script>
+
+    <script src="js/lib/sortableList.js"></script>
+    <script src="js/authManager.js"></script>
+    <script src="../settings/js/classes/settings.js"></script>
+    <script src="js/breadcrumb.js"></script>
+
+    <script src="app.js"></script>
+    <!-- endbuild -->
   </body>
 </html>
