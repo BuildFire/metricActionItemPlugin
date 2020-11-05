@@ -1,6 +1,6 @@
 {
   "author": "BuildFire",
-  "pluginName": "Metric plugin",
+  "pluginName": "Metrics",
   "pluginDescription": "Keep track of your business metrics with this feature by creating categories and updating how they performed based on parameters you set. Easily compare the performance of your metrics through time and improve your business with these valuable insights.",
   "supportEmail": "support@buildfire.com",
   "control": {
