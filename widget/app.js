@@ -278,6 +278,8 @@ const metricAsItemInit = (newMetric) => {
               console.log(err);
             });
         };
+        updateHistoryBtn.style.backgroundColor =
+          appThemeObj.colors.successTheme;
         initProgressBar(newMetric);
         document.body.scrollTop = 0;
       } else {
@@ -335,11 +337,11 @@ const renderChart = (datasets) => {
       },
       elements: {
         point: {
-          radius: 3,
-          hitRadius: 20,
+          radius: 5,
           borderWidth: 2,
-          hoverRadius: 5,
-          hoverBorderWidth: 1,
+          hitRadius: 15,
+          hoverRadius: 7,
+          hoverBorderWidth: 2,
         },
         line: {
           tension: 0,
@@ -350,13 +352,16 @@ const renderChart = (datasets) => {
           top: 6,
           left: 6,
           right: 6,
-          bottom: 6,
+          bottom: 0,
         },
       },
       scales: {
         xAxes: [
           {
-            display: false,
+            display: true,
+            gridLines: {
+              display: false,
+            },
           },
         ],
         yAxes: [
@@ -387,7 +392,7 @@ const initProgressBar = (newMetric) => {
       alignToBottom: true,
     },
     from: { color: appThemeObj.colors.dangerTheme },
-    to: { color: appThemeObj.colors.primaryTheme },
+    to: { color: appThemeObj.colors.successTheme },
     // Set default step function for all animate calls
     step: (state, bar) => {
       bar.path.setAttribute("stroke", state.color);

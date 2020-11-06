@@ -204,7 +204,7 @@ var buildTasksToRun = ["controlHTML", "widgetHTML", "resources", "images"];
 
 gulp.task("zip", function () {
   return gulp
-    .src("./dist/**")
+    .src("./dist/**", { dot: true })
     .pipe(zip("metricActionItemPlugin_release.zip"))
     .pipe(gulp.dest("../"));
 });
