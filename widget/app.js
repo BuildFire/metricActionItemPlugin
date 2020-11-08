@@ -18,7 +18,10 @@ let metricChart = {};
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
-let snackbarMessage = {};
+let snackbarMessages = {
+  noAccess: {},
+  noNote: {},
+};
 
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
@@ -44,10 +47,13 @@ buildfire.auth.onLogout(() => (currentUser = null));
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
     nodeSelector = data.link;
-    buildfire.history.push("Notes", {
-      nodeSelector,
-      showLabelInTitlebar: true,
-    });
+    // buildfire.history.push("Notes", {
+    //   nodeSelector,
+    //   showLabelInTitlebar: true,
+    // });
+    let itemPath = data.link.split(".");
+    itemPath.pop();
+    nodeSelector = itemPath.join(".");
   }
 });
 
@@ -90,7 +96,7 @@ Metrics.getMetrics().then((result) => {
   Settings.load().then(() => {
     // To prevent Functional Tests from Applying these lines where it will cause some errors
     // Check if the user have the permission to update metrics
-    isUserAuthorized();
+    // isUserAuthorized();
     renderInit();
   });
 });
@@ -202,7 +208,7 @@ const metricAsItemInit = (newMetric) => {
 
       renderInit();
     } else {
-      if (currentUser && isUserAuthorized()) {
+      if (isUserAuthorized()) {
         helpers.hideElem("#metricsScreen");
         helpers.showElem("#updateHistoryContainer, #updateHistoryButton");
         historyCloseBtn.style.background = appThemeObj.colors.warningTheme;
@@ -244,12 +250,9 @@ const metricAsItemInit = (newMetric) => {
         // Add onclick handler to add notes icon inorder to add notes
         helpers.getElem("#notes").querySelector("button").onclick = () => {
           // Get the parent path for the metric
-          let itemPath = nodeSelector.split(".");
-          itemPath.pop();
-          itemPath = itemPath.join(".");
 
           const options = {
-            itemId: itemPath,
+            itemId: nodeSelector,
             title: newMetric.title,
             imageUrl: newMetric.icon,
           };
@@ -286,8 +289,6 @@ const metricAsItemInit = (newMetric) => {
           appThemeObj.colors.successTheme;
         initProgressBar(newMetric);
         document.body.scrollTop = 0;
-      } else {
-        snackbarMessage.open();
       }
     }
   };
@@ -456,13 +457,16 @@ const changeProgressbarValue = (direction, newMetric) => {
 };
 
 const isUserAuthorized = () => {
-  if (!currentUser) return false;
-
   let authorized = false;
   let currentTags = {};
   if (Settings.tags.length === 0) {
     authorized = true;
   } else {
+    if (!currentUser) {
+      authManager.login();
+      return false;
+    };
+
     Settings.tags.forEach((tag) => {
       currentTags[tag.tagName] = tag.tagName;
     });
@@ -474,6 +478,9 @@ const isUserAuthorized = () => {
         }
       });
     }
+  }
+  if (!authorized) {
+    snackbarMessages.noAccess.open();
   }
   return authorized;
 };
@@ -487,8 +494,11 @@ const initMaterialComponents = () => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
 
-  snackbarMessage = mdc.snackbar.MDCSnackbar.attachTo(
-    document.querySelector(".mdc-snackbar")
+  snackbarMessages.noAccess = mdc.snackbar.MDCSnackbar.attachTo(
+    document.querySelector(".mdc-snackbar.no-access")
+  );
+  snackbarMessages.noNote = mdc.snackbar.MDCSnackbar.attachTo(
+    document.querySelector(".mdc-snackbar.no-note")
   );
 };
 

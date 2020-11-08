@@ -81,6 +81,14 @@ input:disabled + span {
   padding: 5px 15px;
 }
 
+#bread {
+  margin-top: 20px;
+}
+
+#bread span:nth-child(even) {
+  padding: 0 4px;
+}
+
 #bread .crumb {
   cursor: pointer;
   color: #00a1f3;
@@ -392,7 +400,7 @@ select {
 
 .metric-actions {
   display: flex;
-  align-items: center;
+  align-items: right;
 }
 .bottom-actions {
   display: flex;

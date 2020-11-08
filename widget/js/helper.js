@@ -15,20 +15,30 @@ const helpers = {
     let metricsParent = null;
     let metricsSortBy = "";
 
-    splittedNode.forEach((item, i) => {
-      // If we are at the home page (top of the object)
-      if (nodeSelector === "metrics") {
-        metricsParent = metrics;
-        metricsSortBy = metrics.sortBy;
-      }
-      // Assign the parent metric sortBy value (If we are in parent metric);
-      if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
-        metricsParent = metricsChildren[item];
-        metricsSortBy = metricsChildren[item].sortBy;
-      }
+    try {
+      splittedNode.forEach((item, i) => {
+        // If we are at the home page (top of the object)
+        if (nodeSelector === "metrics") {
+          metricsParent = metrics;
+          metricsSortBy = metrics.sortBy;
+        }
+        // Assign the parent metric sortBy value (If we are in parent metric);
+        if (nodeSelector !== "metrics" && i === splittedNode.length - 2) {
+          metricsParent = metricsChildren[item];
+          metricsSortBy = metricsChildren[item].sortBy;
+        }
 
-      metricsChildren = metricsChildren[item];
-    });
+        metricsChildren = metricsChildren[item];
+      });
+    } catch (err) {
+      // console.error(err);
+      snackbarMessages.noNote.open();
+
+      setTimeout(() => {
+        buildfire.navigation._goBackOne();
+      }, 2000);
+    }
+
     return { metricsChildren, metricsSortBy, metricsParent };
   },
   sortMetrics: (currentMetricList, sortBy) => {

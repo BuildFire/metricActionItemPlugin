@@ -48,7 +48,7 @@ class Metrics {
           $set: {
             [`${nodeSelector}.history.$.value`]: data.value,
             [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username,
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username || null,
           },
         },
         "metrics",
@@ -62,9 +62,9 @@ class Metrics {
                   [`${nodeSelector}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
-                    createdBy: data.username,
+                    createdBy: data.username || null,
                     lastUpdatedOn: new Date(),
-                    lastUpdatedBy: data.username,
+                    lastUpdatedBy: data.username || null,
                     value: data.value,
                   },
                 },
