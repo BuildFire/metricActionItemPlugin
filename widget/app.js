@@ -44,6 +44,10 @@ buildfire.auth.onLogout(() => (currentUser = null));
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
     nodeSelector = data.link;
+    buildfire.history.push("Notes", {
+      nodeSelector,
+      showLabelInTitlebar: true,
+    });
   }
 });
 

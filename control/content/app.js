@@ -555,21 +555,29 @@ const pushBreadcrumb = (breadcrumb, data) => {
 
 // To synchronize with the widget
 buildfire.messaging.onReceivedMessage = (message) => {
-  // If message has title then it is a push breacrumb
-  if (message.title) {
-    nodeSelector = message.nodeSelector;
-    pushBreadcrumb(message.title, { nodeSelector });
-    // If it is not then it is a backward breadcrumb
-  } else {
-    if (nodeSelector !== message.nodeSelector) {
+  if (breadcrumbsHistory && breadcrumbsHistory.length) {
+    // If message has title then it is a push breacrumb
+    if (message.title) {
       nodeSelector = message.nodeSelector;
-      bread.removeChild(bread.lastChild);
-      bread.removeChild(bread.lastChild);
-      breadcrumbsHistory.pop();
+      pushBreadcrumb(message.title, { nodeSelector });
+      // If it is not then it is a backward breadcrumb
+    } else {
+      if (
+        nodeSelector &&
+        nodeSelector !== message.nodeSelector &&
+        bread.children.length > 2
+      ) {
+        nodeSelector = message.nodeSelector;
+        bread.removeChild(bread.lastChild);
+        bread.removeChild(bread.lastChild);
+        breadcrumbsHistory.pop();
+      } else {
+        return;
+      }
     }
+    renderInit();
+    goToMetricspage();
   }
-  renderInit();
-  goToMetricspage();
 };
 
 // To handle users' choices for sorting
