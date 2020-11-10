@@ -303,7 +303,13 @@ const metricAsItemInit = (newMetric) => {
 
           Metrics.updateMetricHistory(
             { nodeSelector, metricsId: metrics.id },
-            { value, username: currentUser.username || null }
+            {
+              value,
+              username:
+                currentUser && currentUser.username
+                  ? currentUser.username
+                  : null,
+            }
           )
             .then((result) => {
               metrics = result;

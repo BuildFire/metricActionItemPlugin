@@ -175,6 +175,7 @@ input:disabled + span {
 }
 .screens .screen.layouticon a,
 .screens .layoutgrid .layouticon {
+  text-align: center;
   height: 124px;
   line-height: 121px;
 }

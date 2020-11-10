@@ -43,12 +43,12 @@ class Metrics {
         return reject("nodeSelector is not right");
 
       buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]: absoluteDate },
+        { [`${nodeSelector}.history.date`]:  /.*absoluteDate.*/i},
         {
           $set: {
             [`${nodeSelector}.history.$.value`]: data.value,
             [`${nodeSelector}.history.$.lastUpdatedOn`]: new Date(),
-            [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username || null,
+            [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username,
           },
         },
         "metrics",
@@ -62,9 +62,9 @@ class Metrics {
                   [`${nodeSelector}.history`]: {
                     date: absoluteDate,
                     createdOn: new Date(),
-                    createdBy: data.username || null,
+                    createdBy: data.username,
                     lastUpdatedOn: new Date(),
-                    lastUpdatedBy: data.username || null,
+                    lastUpdatedBy: data.username,
                     value: data.value,
                   },
                 },
@@ -95,7 +95,7 @@ class Metrics {
 
   static getHistoryValue(metric, inde) {
     if (metric.type === "metric") {
-      let todayDate = helpers.getAbsoluteDate();
+      let todayDate = new Date()
       for (var i = 1; i <= 7; i++) {
         if (metric.history[metric.history.length - i]) {
           if (

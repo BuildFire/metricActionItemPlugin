@@ -3,7 +3,7 @@ const helpers = {
   uuidv4: (m = Math, d = Date, h = 16, s = (s) => m.floor(s).toString(h)) =>
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
   // Return absolute date
-  getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
+  getAbsoluteDate: () => new Date().toISOString().slice(0, 10),
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
     if (splittedNode[splittedNode.length - 1] !== "metrics") {
@@ -54,7 +54,7 @@ const helpers = {
   getLast7Days: () => {
     let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     let result = [];
-    let date = helpers.getAbsoluteDate();
+    let date = new Date();
     result.push(days[date.getDay()]);
 
     for (let i = 1; i <= 6; i++) {
