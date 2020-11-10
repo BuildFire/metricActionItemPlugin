@@ -40,6 +40,9 @@ const getCurrentUser = () => {
 
 getCurrentUser();
 
+// hide metric screen on init;
+helpers.hideElem("#metricsScreen");
+
 // Login and Logout listners
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
@@ -59,11 +62,6 @@ buildfire.navigation.onAppLauncherActive(() => {
     renderInit();
   }
 }, false);
-
-// console.log("bread", bread);
-// if (bread.length > 1 && bread[bread.length - 1].source === "control") {
-//   nodeSelector = "metrics";
-//   renderInit();
 
 const getBreadCrumps = () => {
   return new Promise((resolve, reject) => {
@@ -125,49 +123,54 @@ Metrics.getMetrics().then((result) => {
 
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
-  listViewContainer.innerHTML = "";
-  // Extract the desired metrics (children) from the big object using nodeSelector
-  let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
-  // Hide the summary in the Home Page if the settings is set to hide it
-  if (nodeSelector === "metrics" && !Settings.showSummary) {
-    helpers.hideElem("#summary");
-  } else {
-    helpers.showElem("#summary");
+  try {
+    listViewContainer.innerHTML = "";
+    // Extract the desired metrics (children) from the big object using nodeSelector
+    let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+    // Hide the summary in the Home Page if the settings is set to hide it
+    if (nodeSelector === "metrics" && !Settings.showSummary) {
+      helpers.hideElem("#summary");
+    } else {
+      helpers.showElem("#summary");
+    }
+
+    // Get metrics that should be rendered
+    let metricsChildren = readyMetrics.metricsChildren;
+    // Init metrics values' chart
+    initChart(readyMetrics.metricsParent);
+
+    helpers.showElem("#metricsScreen");
+    helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
+
+    if (readyMetrics.metricsParent.description) {
+      description.style.display = "block";
+      document.getElementById("metricDescription").innerHTML =
+        readyMetrics.metricsParent.description;
+    } else {
+      description.style.display = "none";
+    }
+
+    let currentMetricList = [];
+    // Prepare metrics to be rendered in the ListView component
+    for (let metricId in metricsChildren) {
+      metricsChildren[metricId].id = metricId;
+      let newMetric = new Metric(metricsChildren[metricId]);
+      let InitMetricAsItem = metricAsItemInit(newMetric);
+      currentMetricList.push(InitMetricAsItem);
+    }
+    // Add the summary value of the parent metric
+    summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
+
+    checkIncreaseOrDecrease(readyMetrics);
+
+    currentMetricList = helpers.sortMetrics(
+      currentMetricList,
+      readyMetrics.metricsSortBy
+    );
+    renderMetrics(currentMetricList);
+  } catch (err) {
+    console.error(err);
   }
-
-  helpers.showElem("#metricsScreen");
-  helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
-  // Get metrics that should be rendered
-  let metricsChildren = readyMetrics.metricsChildren;
-  // Init metrics values' chart
-  initChart(readyMetrics.metricsParent);
-
-  if (readyMetrics.metricsParent.description) {
-    description.style.display = "block";
-    document.getElementById("metricDescription").innerHTML =
-      readyMetrics.metricsParent.description;
-  } else {
-    description.style.display = "none";
-  }
-
-  let currentMetricList = [];
-  // Prepare metrics to be rendered in the ListView component
-  for (let metricId in metricsChildren) {
-    metricsChildren[metricId].id = metricId;
-    let newMetric = new Metric(metricsChildren[metricId]);
-    let InitMetricAsItem = metricAsItemInit(newMetric);
-    currentMetricList.push(InitMetricAsItem);
-  }
-  // Add the summary value of the parent metric
-  summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
-
-  checkIncreaseOrDecrease(readyMetrics);
-
-  currentMetricList = helpers.sortMetrics(
-    currentMetricList,
-    readyMetrics.metricsSortBy
-  );
-  renderMetrics(currentMetricList);
 };
 
 // Render metrics using ListView component
