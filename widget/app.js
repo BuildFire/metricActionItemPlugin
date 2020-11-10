@@ -376,7 +376,7 @@ const renderChart = (datasets) => {
       },
       elements: {
         point: {
-          radius: 5,
+          radius: 4,
           borderWidth: 2,
           hitRadius: 15,
           hoverRadius: 7,
