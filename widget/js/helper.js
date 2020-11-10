@@ -31,7 +31,6 @@ const helpers = {
         metricsChildren = metricsChildren[item];
       });
     } catch (err) {
-      // console.error(err);
       snackbarMessages.noNote.open();
 
       setTimeout(() => {

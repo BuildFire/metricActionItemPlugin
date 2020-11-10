@@ -5,7 +5,6 @@ const minifyCSS = require("gulp-csso");
 const concat = require("gulp-concat");
 const htmlReplace = require("gulp-html-replace");
 const uglify = require("gulp-uglify");
-const minify = require('gulp-minify');
 const eslint = require("gulp-eslint");
 const imagemin = require("gulp-imagemin");
 const plumber = require("gulp-plumber");
@@ -135,7 +134,7 @@ jsTasks.forEach(function (task) {
           presets: ["@babel/preset-env"],
         })
       )
-      .pipe(minify())
+      // .pipe(uglify())
       .pipe(concat("scripts.min.js"))
       .pipe(gulp.dest(destinationFolder + task.dest));
   });

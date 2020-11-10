@@ -46,16 +46,38 @@ buildfire.auth.onLogout(() => (currentUser = null));
 
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
-    nodeSelector = data.link;
-    // buildfire.history.push("Notes", {
-    //   nodeSelector,
-    //   showLabelInTitlebar: true,
-    // });
     let itemPath = data.link.split(".");
     itemPath.pop();
     nodeSelector = itemPath.join(".");
   }
 });
+
+buildfire.navigation.onAppLauncherActive(() => {
+  if (nodeSelector !== "metrics") {
+    nodeSelector = "metrics";
+    buildfire.messaging.sendMessageToControl({ nodeSelector });
+    renderInit();
+  }
+}, false);
+
+// console.log("bread", bread);
+// if (bread.length > 1 && bread[bread.length - 1].source === "control") {
+//   nodeSelector = "metrics";
+//   renderInit();
+
+const getBreadCrumps = () => {
+  return new Promise((resolve, reject) => {
+    buildfire.history.get(
+      {
+        pluginBreadcrumbsOnly: false,
+      },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      }
+    );
+  });
+};
 
 // Get all user bookmarks
 // let bookmarks = {};
@@ -112,6 +134,9 @@ const renderInit = () => {
   } else {
     helpers.showElem("#summary");
   }
+
+  helpers.showElem("#metricsScreen");
+  helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
   // Get metrics that should be rendered
   let metricsChildren = readyMetrics.metricsChildren;
   // Init metrics values' chart
@@ -354,7 +379,7 @@ const renderChart = (datasets) => {
       },
       layout: {
         padding: {
-          top: 6,
+          top: 10,
           left: 6,
           right: 6,
           bottom: 0,
@@ -465,7 +490,7 @@ const isUserAuthorized = () => {
     if (!currentUser) {
       authManager.login();
       return false;
-    };
+    }
 
     Settings.tags.forEach((tag) => {
       currentTags[tag.tagName] = tag.tagName;
