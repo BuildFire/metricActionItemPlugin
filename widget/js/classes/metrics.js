@@ -32,6 +32,7 @@ class Metrics {
 
   static updateMetricHistory({ nodeSelector, metricsId }, data) {
     const absoluteDate = helpers.getAbsoluteDate();
+    const dateOnly = helpers.getAbsoluteDate().slice(0, 10);
 
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");
@@ -41,9 +42,8 @@ class Metrics {
         nodeSelector.slice(-8) === "metrics."
       )
         return reject("nodeSelector is not right");
-
       buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]:  /.*absoluteDate.*/i},
+        { [`${nodeSelector}.history.date`]: { $regex: `.*${dateOnly}.*` } },
         {
           $set: {
             [`${nodeSelector}.history.$.value`]: data.value,
@@ -95,7 +95,7 @@ class Metrics {
 
   static getHistoryValue(metric, inde) {
     if (metric.type === "metric") {
-      let todayDate = new Date()
+      let todayDate = new Date();
       for (var i = 1; i <= 7; i++) {
         if (metric.history[metric.history.length - i]) {
           if (

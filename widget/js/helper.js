@@ -3,7 +3,7 @@ const helpers = {
   uuidv4: (m = Math, d = Date, h = 16, s = (s) => m.floor(s).toString(h)) =>
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
   // Return absolute date
-  getAbsoluteDate: () => new Date().toISOString().slice(0, 10),
+  getAbsoluteDate: () => new Date().toISOString(),
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
     if (splittedNode[splittedNode.length - 1] !== "metrics") {
