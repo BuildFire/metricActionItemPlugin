@@ -240,8 +240,8 @@ const createMetric = () => {
   // Metric fields validation
   if (inputValidation()) {
     // Empty the form fields after submitting
-    metricFields.createdBy = `${currentUser.firstName} ${currentUser.lastName}`;
-    metricFields.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+    metricFields.createdBy = currentUser.username || null;
+    metricFields.lastUpdatedBy = currentUser.username || null;
     metricFields.order = metricsList.childNodes.length;
 
     // Save metric
@@ -263,7 +263,7 @@ const updateMetrics = (item) => {
   // Metric fields validation
   if (inputValidation()) {
     let updateObj = {};
-    updateObj.lastUpdatedBy = `${currentUser.firstName} ${currentUser.lastName}`;
+    updateObj.lastUpdatedBy = currentUser.username || null;
 
     for (let prop in metricFields) {
       // To determine which fileds are needed to be updated

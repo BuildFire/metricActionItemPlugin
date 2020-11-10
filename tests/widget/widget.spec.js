@@ -52,7 +52,7 @@ describe("Test The Widget Side", () => {
         Metrics.updateMetricHistory(
           { nodeSelector, metricsId: metrics.id },
           55,
-          `${currentUser.firstName} ${currentUser.lastName}`
+          currentUser.username || null
         )
       ).toBeResolved();
     });
