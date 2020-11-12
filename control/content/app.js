@@ -260,30 +260,19 @@ const createMetric = () => {
 
     let newMetric = new Metric(metricFields);
 
-    Histories.insert(
+    // Save metric
+    Metrics.insert(
       {
-        clientProfile,
         nodeSelector,
-        historyId: histories.id,
+        metricsId: metrics.id,
       },
-      // Assign the id of the metric to the new history object;
-      { id: newMetric.id, history: [] }
-    ).then((newHistories) => {
-      histories = newHistories;
-      // Save metric
-      Metrics.insert(
-        {
-          nodeSelector,
-          metricsId: metrics.id,
-        },
-        newMetric
-      ).then((result) => {
-        // Assign the metrics value to metrics
-        metrics = result;
+      newMetric
+    ).then((result) => {
+      // Assign the metrics value to metrics
+      metrics = result;
 
-        renderInit();
-        goToMetricspage();
-      });
+      renderInit();
+      goToMetricspage();
     });
   }
 };
@@ -519,21 +508,15 @@ const deleteItem = (item, index, callback) => {
       if (data && data.selectedButton.key == "y") {
         sortableList.items.splice(index, 1);
         // Delete the item from the client history db
-        Histories.delete(
-          { clientProfile, nodeSelector, historyId: histories.id },
-          item.id
-        ).then((newHistories) => {
-          histories = newHistories;
-          Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
-            (result) => {
-              // Assign the metrics value to metrics
-              metrics = result;
+        Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
+          (result) => {
+            // Assign the metrics value to metrics
+            metrics = result;
 
-              callback(metrics);
-              renderInit();
-            }
-          );
-        });
+            callback(metrics);
+            renderInit();
+          }
+        );
       }
     }
   );
