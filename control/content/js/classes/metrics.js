@@ -33,7 +33,7 @@ class Metrics {
 
   // Add new metrics in the big object (Control Panel Only)
   static insert({ nodeSelector, metricsId }, metric) {
-    metric.id = helpers.uuidv4();
+    // metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
 

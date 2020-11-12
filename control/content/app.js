@@ -1,6 +1,12 @@
 // The big object that contains all the metrics
 let metrics = {};
 
+// Object containes a specific client history
+let histories = {};
+
+// Client profile (client query)
+let clientProfile = "";
+
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
@@ -39,9 +45,15 @@ buildfire.messaging.sendMessageToWidget({
   cmd: "refresh",
 });
 
+// Initialize clinet history
+Histories.getHistories(clientProfile).then((result) => {
+  histories = result;
+});
+
 // To get all metrics and start rendering
 Metrics.getMetrics().then((result) => {
   metrics = result;
+
   initMaterialComponents();
   // To prevent Functional Tests from Applying these lines where it will cause some errors
   renderInit();
@@ -246,17 +258,32 @@ const createMetric = () => {
       currentUser && currentUser.username ? currentUser.username : null;
     metricFields.order = metricsList.childNodes.length;
 
-    // Save metric
-    Metrics.insert(
+    let newMetric = new Metric(metricFields);
+
+    Histories.insert(
       {
+        clientProfile,
         nodeSelector,
-        metricsId: metrics.id,
+        historyId: histories.id,
       },
-      new Metric(metricFields)
-    ).then((result) => {
-      metrics = result;
-      renderInit();
-      goToMetricspage();
+      // Assign the id of the metric to the new history object;
+      { id: newMetric.id, history: [] }
+    ).then((newHistories) => {
+      histories = newHistories;
+      // Save metric
+      Metrics.insert(
+        {
+          nodeSelector,
+          metricsId: metrics.id,
+        },
+        newMetric
+      ).then((result) => {
+        // Assign the metrics value to metrics
+        metrics = result;
+
+        renderInit();
+        goToMetricspage();
+      });
     });
   }
 };
@@ -318,6 +345,7 @@ const updateMetricDB = (updateObj, itemId) => {
     itemId
   ).then((result) => {
     metrics = result;
+
     renderInit();
     goToMetricspage();
   });
@@ -379,36 +407,44 @@ const inputValidation = () => {
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
   metricsContainer = metricsList;
-  // Extract the desired metrics (children) from the big object using nodeSelector
-  let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
-  let metricsChildren = readyMetrics.metricsChildren;
 
-  wysiwygSetContent(readyMetrics.description);
+  // Filter Metrics before rendering
+  helpers
+    .filterCustomerMetrics(metrics, clientProfile)
+    .then((filteredMetrics) => {
+      metrics.metrics = filteredMetrics;
 
-  let currentMetricList = [];
-  // Prepare metrics to be rendered (Object to Array)
-  for (let metricId in metricsChildren) {
-    metricsChildren[metricId].id = metricId;
-    let newMetric = new Metric(metricsChildren[metricId]);
-    Metric.getHistoryValue(newMetric);
-    currentMetricList.push(newMetric);
-  }
+      // Extract the desired metrics (children) from the big object using nodeSelector
+      let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+      let metricsChildren = readyMetrics.metricsChildren;
 
-  // To show messages while metrics being rendered or if there is no metrics at all
-  let spinner = document.getElementById("spinner");
-  if (currentMetricList.length === 0) {
-    spinner.innerHTML = "No metrics have been added yet.";
-    spinner.classList.remove("loaded");
-    metricsContainer.innerHTML = "";
-  } else {
-    spinner.innerHTML = "";
-    spinner.classList.add("loaded");
-    metricsContainer.innerHTML = "";
-  }
+      wysiwygSetContent(readyMetrics.description);
 
-  currentMetricList = helpers.sortMetrics(currentMetricList, metricsSortBy);
+      let currentMetricList = [];
+      // Prepare metrics to be rendered (Object to Array)
+      for (let metricId in metricsChildren) {
+        metricsChildren[metricId].id = metricId;
+        let newMetric = new Metric(metricsChildren[metricId]);
+        Metric.getHistoryValue(newMetric);
+        currentMetricList.push(newMetric);
+      }
 
-  render(currentMetricList);
+      // To show messages while metrics being rendered or if there is no metrics at all
+      let spinner = document.getElementById("spinner");
+      if (currentMetricList.length === 0) {
+        spinner.innerHTML = "No metrics have been added yet.";
+        spinner.classList.remove("loaded");
+        metricsContainer.innerHTML = "";
+      } else {
+        spinner.innerHTML = "";
+        spinner.classList.add("loaded");
+        metricsContainer.innerHTML = "";
+      }
+
+      currentMetricList = helpers.sortMetrics(currentMetricList, metricsSortBy);
+
+      render(currentMetricList);
+    });
 };
 
 // To render metrics
@@ -482,14 +518,22 @@ const deleteItem = (item, index, callback) => {
       if (e) console.error(e);
       if (data && data.selectedButton.key == "y") {
         sortableList.items.splice(index, 1);
-        Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id)
-          .then((result) => {
-            metrics = result;
-            callback(metrics);
-          })
-          .finally(() => {
-            renderInit();
-          });
+        // Delete the item from the client history db
+        Histories.delete(
+          { clientProfile, nodeSelector, historyId: histories.id },
+          item.id
+        ).then((newHistories) => {
+          histories = newHistories;
+          Metrics.delete({ nodeSelector, metricsId: metrics.id }, item.id).then(
+            (result) => {
+              // Assign the metrics value to metrics
+              metrics = result;
+
+              callback(metrics);
+              renderInit();
+            }
+          );
+        });
       }
     }
   );
@@ -596,10 +640,6 @@ const onSortByChange = () => {
   ).then((result) => {
     metrics = result;
     metricsSortBy = sortBy;
-    // if (metricsSortBy === "highest" || metricsSortBy === "lowest") {
-    //   // Disable manual sorting
-    //   sortableList.sortableList.option("disabled", true);
-    // }
     renderInit();
   });
 };
@@ -611,5 +651,12 @@ const updateDescription = (description) => {
     "description"
   ).then((result) => {
     metrics = result;
+
+    // Filter Metrics on data change
+    helpers
+      .filterCustomerMetrics(metrics, clientProfile)
+      .then((filteredMetrics) => {
+        metrics.metrics = filteredMetrics;
+      });
   });
 };

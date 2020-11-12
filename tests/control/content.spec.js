@@ -1,5 +1,14 @@
 describe("Test The Control Side", () => {
   let metrics = {};
+  let histories = {};
+  let clientProfile = "";
+
+  // Check if a query string was provided
+  let queryString = buildfire.parseQueryString();
+  if (queryString && queryString.clientProfile) {
+    clientProfile = queryString.clientProfile;
+  }
+
   let nodeSelector = "metrics";
 
   describe("Test the Metric class", () => {
@@ -30,6 +39,10 @@ describe("Test The Control Side", () => {
 
       await Metrics.getMetrics().then((data) => {
         metrics = data;
+      });
+
+      await Histories.getHistories(clientProfile).then((data) => {
+        histories = data;
       });
     });
 
@@ -87,16 +100,6 @@ describe("Test The Control Side", () => {
       actionItem: {},
       createdBy: "Amjad Hamza",
       createdOn: new Date(),
-      history: [
-        {
-          date: helpers.getAbsoluteDate(),
-          value: 23,
-          createdOn: new Date(),
-          createdBy: "Amjad Hamza",
-          lastUpdatedOn: new Date(),
-          lastUpdatedBy: "Amjad Hamza",
-        },
-      ],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
@@ -114,13 +117,61 @@ describe("Test The Control Side", () => {
 
     it("Should save metrics correctly", async () => {
       await expectAsync(
-        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric1)
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric1).then(
+          async () => {
+            let newHistory = new ClientHistory({
+              id: metric1.id,
+              history: [
+                {
+                  date: helpers.getAbsoluteDate(),
+                  value: 56,
+                  createdOn: new Date(),
+                  createdBy: "Amjad Hamza",
+                  lastUpdatedOn: new Date(),
+                  lastUpdatedBy: "Amjad Hamza",
+                },
+              ],
+            });
+            await Histories.insert(
+              { clientProfile, nodeSelector, historyId: histories.id },
+              newHistory
+            );
+          }
+        )
       ).toBeResolved();
       await expectAsync(
-        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric2)
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric2).then(
+          async () => {
+            let newHistory = new ClientHistory({
+              id: metric2.id,
+              history: [
+                {
+                  date: helpers.getAbsoluteDate(),
+                  value: 41,
+                  createdOn: new Date(),
+                  createdBy: "Amjad Hamza",
+                  lastUpdatedOn: new Date(),
+                  lastUpdatedBy: "Amjad Hamza",
+                },
+              ],
+            });
+            await Histories.insert(
+              { clientProfile, nodeSelector, historyId: histories.id },
+              newHistory
+            );
+          }
+        )
       ).toBeResolved();
       await expectAsync(
-        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric3)
+        Metrics.insert({ nodeSelector, metricsId: metrics.id }, metric3).then(
+          async () => {
+            let newHistory = new ClientHistory({ id: metric3.id });
+            await Histories.insert(
+              { clientProfile, nodeSelector, historyId: histories.id },
+              newHistory
+            );
+          }
+        )
       ).toBeResolved();
       await Metrics.getMetrics().then((result) => {
         metrics = result;
@@ -131,8 +182,18 @@ describe("Test The Control Side", () => {
       await expect(Object.keys(metrics.metrics).length).toBe(3);
     });
 
+    it("Should filter the metrics based on history correctly", async () => {
+      await expectAsync(
+        helpers
+          .filterCustomerMetrics(metrics, clientProfile)
+          .then((filteredMetrics) => {
+            metrics.metrics = filteredMetrics;
+          })
+      ).toBeResolved();
+    });
+
     it("Should calculate the value of the big object correctly", async () => {
-      await expect(Metric.getHistoryValue(metrics)).toBe(40);
+      await expect(Math.round(Metric.getHistoryValue(metrics))).toBe(32);
     });
 
     it("Should change the order of metrics correctly", async () => {
@@ -202,7 +263,15 @@ describe("Test The Control Side", () => {
     it("Should delete a metric without any errors", async () => {
       nodeSelector = "metrics";
       await expectAsync(
-        Metrics.delete({ nodeSelector, metricsId: metrics.id }, metric3.id)
+        Metrics.delete(
+          { nodeSelector, metricsId: metrics.id },
+          metric3.id
+        ).then(async () => {
+          Histories.delete(
+            { clientProfile, nodeSelector, historyId: histories.id },
+            metric3.id
+          );
+        })
       ).toBeResolved();
       await Metrics.getMetrics().then((data) => {
         metrics = data;
@@ -238,7 +307,13 @@ describe("Test The Control Side", () => {
       buildfire.publicData.save({}, "metrics", (err, result) => {
         if (err) reject(err);
         else {
-          resolve(result);
+          buildfire.publicData.save(
+            {},
+            `history${clientProfile}`,
+            (err, data) => {
+              resolve(result);
+            }
+          );
         }
       });
     });

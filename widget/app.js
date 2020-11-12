@@ -1,6 +1,18 @@
 // The big object that contains all the metrics
 let metrics = {};
 
+// Object containes a specific client history
+let histories = {};
+
+// Client profile (client query)
+let clientProfile = "";
+
+// Check if a query string was provided
+let queryString = buildfire.parseQueryString();
+if (queryString && queryString.clientProfile) {
+  clientProfile = queryString.clientProfile;
+}
+
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
@@ -93,9 +105,14 @@ const getBreadCrumps = () => {
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
 buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
-    metrics = event.data;
-    metrics.id = event.id;
-    renderInit();
+    if (event.tag === "metrics") {
+      metrics = event.data;
+      metrics.id = event.id;
+    }
+    // History updates on each render, and it updates before metrics db or when onPop
+    if (!event.tag.includes("history") && event.tag !== "settings") {
+      renderInit();
+    }
   }
 });
 
@@ -106,6 +123,11 @@ buildfire.datastore.onUpdate((event) => {
       renderInit();
     });
   }
+});
+
+// Initialize clinet history
+Histories.getHistories(clientProfile).then((result) => {
+  histories = result;
 });
 
 // To get all metrics and start rendering
@@ -124,50 +146,57 @@ Metrics.getMetrics().then((result) => {
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
   try {
-    listViewContainer.innerHTML = "";
-    // Extract the desired metrics (children) from the big object using nodeSelector
-    let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
-    // Hide the summary in the Home Page if the settings is set to hide it
-    if (nodeSelector === "metrics" && !Settings.showSummary) {
-      helpers.hideElem("#summary");
-    } else {
-      helpers.showElem("#summary");
-    }
+    // Filter Metrics before rendering
+    helpers
+      .filterCustomerMetrics(metrics, clientProfile)
+      .then((filteredMetrics) => {
+        metrics.metrics = filteredMetrics;
 
-    // Get metrics that should be rendered
-    let metricsChildren = readyMetrics.metricsChildren;
-    // Init metrics values' chart
-    initChart(readyMetrics.metricsParent);
+        listViewContainer.innerHTML = "";
+        // Extract the desired metrics (children) from the big object using nodeSelector
+        let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+        // Hide the summary in the Home Page if the settings is set to hide it
+        if (nodeSelector === "metrics" && !Settings.showSummary) {
+          helpers.hideElem("#summary");
+        } else {
+          helpers.showElem("#summary");
+        }
 
-    helpers.showElem("#metricsScreen");
-    helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
+        // Get metrics that should be rendered
+        let metricsChildren = readyMetrics.metricsChildren;
+        // Init metrics values' chart
+        initChart(readyMetrics.metricsParent);
 
-    if (readyMetrics.metricsParent.description) {
-      description.style.display = "block";
-      document.getElementById("metricDescription").innerHTML =
-        readyMetrics.metricsParent.description;
-    } else {
-      description.style.display = "none";
-    }
+        helpers.showElem("#metricsScreen");
+        helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
 
-    let currentMetricList = [];
-    // Prepare metrics to be rendered in the ListView component
-    for (let metricId in metricsChildren) {
-      metricsChildren[metricId].id = metricId;
-      let newMetric = new Metric(metricsChildren[metricId]);
-      let InitMetricAsItem = metricAsItemInit(newMetric);
-      currentMetricList.push(InitMetricAsItem);
-    }
-    // Add the summary value of the parent metric
-    summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
+        if (readyMetrics.metricsParent.description) {
+          description.style.display = "block";
+          document.getElementById("metricDescription").innerHTML =
+            readyMetrics.metricsParent.description;
+        } else {
+          description.style.display = "none";
+        }
 
-    checkIncreaseOrDecrease(readyMetrics);
+        let currentMetricList = [];
+        // Prepare metrics to be rendered in the ListView component
+        for (let metricId in metricsChildren) {
+          metricsChildren[metricId].id = metricId;
+          let newMetric = new Metric(metricsChildren[metricId]);
+          let InitMetricAsItem = metricAsItemInit(newMetric);
+          currentMetricList.push(InitMetricAsItem);
+        }
+        // Add the summary value of the parent metric
+        summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
 
-    currentMetricList = helpers.sortMetrics(
-      currentMetricList,
-      readyMetrics.metricsSortBy
-    );
-    renderMetrics(currentMetricList);
+        checkIncreaseOrDecrease(readyMetrics);
+
+        currentMetricList = helpers.sortMetrics(
+          currentMetricList,
+          readyMetrics.metricsSortBy
+        );
+        renderMetrics(currentMetricList);
+      });
   } catch (err) {
     console.error(err);
   }
@@ -301,8 +330,8 @@ const metricAsItemInit = (newMetric) => {
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
 
-          Metrics.updateMetricHistory(
-            { nodeSelector, metricsId: metrics.id },
+          Histories.updateMetricHistory(
+            { clientProfile, nodeSelector, historyId: histories.id },
             {
               value,
               username:
@@ -312,7 +341,7 @@ const metricAsItemInit = (newMetric) => {
             }
           )
             .then((result) => {
-              metrics = result;
+              // metrics = result;
               buildfire.history.pop();
             })
             .catch((err) => {

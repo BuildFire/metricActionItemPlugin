@@ -1,6 +1,6 @@
 class Metric {
   constructor(data = {}) {
-    this.id = data.id || "";
+    this.id = data.id || helpers.uuidv4();
     this.title = data.title || "";
     this.icon = data.icon || "";
     this.min = data.min || 0;
@@ -43,7 +43,7 @@ class Metric {
         return avg;
       }
     }
-    //TODO: check if it affect the avg claculations
+    // TODO: check if it affect the avg claculations
     return 0;
   }
 }

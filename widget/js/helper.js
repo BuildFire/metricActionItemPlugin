@@ -80,4 +80,46 @@ const helpers = {
   getElem: (selector) => {
     return document.querySelector(selector);
   },
+  // Filter Metrics based on the provided customer
+  filterCustomerMetrics(metrics, clientProfile) {
+    return new Promise((resolve, reject) => {
+      let filteredMetrics = {
+        metrics: {},
+      };
+
+      // Get client history data;
+      Histories.getHistories(clientProfile).then((histories) => {
+        // Check if the key in metrics is in the client history object
+        for (let key in metrics.metrics) {
+          if (histories.metrics[key]) {
+            filteredMetrics.metrics[key] = metrics.metrics[key];
+          }
+        }
+
+        // Add the history data to each metric
+        this.addHistoryToMetrics(filteredMetrics, histories);
+
+        resolve(filteredMetrics.metrics);
+      });
+    });
+  },
+  // Loop recursively on the metrics object and add the history value from histories object
+  addHistoryToMetrics(metrics, histories) {
+    if (Object.keys(metrics.metrics).length > 0) {
+      for (var key in metrics.metrics) {
+        if (
+          metrics.metrics[key].type === "parent" &&
+          Object.keys(metrics.metrics[key].metrics).length > 0
+        ) {
+          console.log(metrics.metrics[key]);
+          this.addHistoryToMetrics(
+            metrics.metrics[key],
+            histories.metrics[key]
+          );
+        } else {
+          metrics.metrics[key].history = histories.metrics[key].history;
+        }
+      }
+    }
+  },
 };
