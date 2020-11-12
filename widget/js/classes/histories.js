@@ -4,33 +4,36 @@ class Histories {
   // Get the big Object (history object)
   static getHistories(clientProfile) {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get(
-        `history${clientProfile || ""}`,
-        (err, result) => {
-          if (err) reject(err);
-          else {
-            // Check if there is already objects in the database
-            if (!result.data.metrics) {
-              // If there is no object, then create the parent object
-              buildfire.publicData.save(
-                { metrics: {} },
-                `history${clientProfile || ""}`,
-                (err, result) => {
-                  if (err) reject(err);
-                  else {
-                    this.getHistories().then((result) => {
-                      resolve(result);
-                    });
-                  }
+      buildfire.publicData.get(`history${clientProfile}`, (err, result) => {
+        if (err) {
+          console.error(err);
+          return reject(err);
+        }
+        else {
+          // Check if there is already objects in the database
+          if (!result.data.metrics) {
+            // If there is no object, then create the parent object
+            buildfire.publicData.save(
+              { metrics: {} },
+              `history${clientProfile}`,
+              (err, result) => {
+                if (err) {
+                  console.error(err);
+                  return reject(err);
                 }
-              );
-            } else {
-              result.data.id = result.id;
-              resolve(result.data);
-            }
+                else {
+                  this.getHistories(clientProfile).then((result) => {
+                    resolve(result);
+                  });
+                }
+              }
+            );
+          } else {
+            result.data.id = result.id;
+            resolve(result.data);
           }
         }
-      );
+      });
     });
   }
 
@@ -45,6 +48,7 @@ class Histories {
         nodeSelector.slice(-7) === "metrics" ||
         nodeSelector.slice(-8) === "metrics."
       ) {
+        console.error("ERROR");
         return reject("nodeSelector is not right");
       }
 
@@ -57,9 +61,12 @@ class Histories {
             [`${nodeSelector}.history.$.lastUpdatedBy`]: data.username,
           },
         },
-        `history${clientProfile || ""}`,
+        `history${clientProfile}`,
         (err, res) => {
-          if (err) reject(err);
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
           if (res.nModified === 0) {
             buildfire.publicData.update(
               historyId,
@@ -75,10 +82,12 @@ class Histories {
                   },
                 },
               },
-              `history${clientProfile || ""}`,
+              `history${clientProfile}`,
               (err, result) => {
-                if (err) reject(err);
-                else {
+                if (err) {
+                  console.error(err);
+                  return reject(err);
+                } else {
                   result.data.id = result.id;
                   resolve(result.data);
                 }
@@ -86,7 +95,7 @@ class Histories {
             );
           }
           // Extract metric id from nodeSelector
-          let updatedMetricId = nodeSelector.split(".");
+          let updatedMetricId = nodeSelector.slice().split(".");
           updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
           // Track action
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);

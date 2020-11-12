@@ -105,14 +105,14 @@ const getBreadCrumps = () => {
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
 buildfire.publicData.onUpdate((event) => {
   if (event.data && event.id) {
-    if (event.tag === "metrics") {
+    console.log("EVENT EVENT EVENT", event);
+
+    if (event.tag.includes("metrics")) {
+      console.log("INCLUDES INCLUDES INCLUDES");
       metrics = event.data;
       metrics.id = event.id;
     }
-    // History updates on each render, and it updates before metrics db or when onPop
-    if (!event.tag.includes("history") && event.tag !== "settings") {
-      renderInit();
-    }
+    renderInit();
   }
 });
 
@@ -125,21 +125,20 @@ buildfire.datastore.onUpdate((event) => {
   }
 });
 
-// Initialize clinet history
-Histories.getHistories(clientProfile).then((result) => {
-  histories = result;
-});
-
 // To get all metrics and start rendering
 Metrics.getMetrics().then((result) => {
   metrics = result;
-  initMaterialComponents();
+  // Initialize clinet history
+  Histories.getHistories(clientProfile).then((result) => {
+    histories = result;
 
-  Settings.load().then(() => {
-    // To prevent Functional Tests from Applying these lines where it will cause some errors
-    // Check if the user have the permission to update metrics
-    // isUserAuthorized();
-    renderInit();
+    initMaterialComponents();
+
+    Settings.load().then(() => {
+      // To prevent Functional Tests from Applying these lines where it will cause some errors
+      // Check if the user have the permission to update metrics
+      renderInit();
+    });
   });
 });
 
