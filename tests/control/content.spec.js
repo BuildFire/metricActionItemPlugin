@@ -237,7 +237,19 @@ describe("Test The Control Side", () => {
     return new Promise((resolve, reject) => {
       buildfire.publicData.save({}, "metrics", (err, result) => {
         if (err) reject(err);
-        else resolve()
+        else {
+          buildfire.publicData.save(
+            { metrics: {} },
+            `history${clientProfile}`,
+            (err, result) => {
+              if (err) {
+                console.error(err);
+                return reject(err);
+              }
+              resolve();
+            }
+          );
+        }
       });
     });
   };

@@ -115,7 +115,8 @@ const helpers = {
   filterCustomerMetrics(metrics, clientProfile) {
     return new Promise((resolve, reject) => {
       // Get client history data;
-      Histories.getHistories(clientProfile).then((histories) => {
+      Histories.getHistories(clientProfile).then((result) => {
+        histories = result;
         // Add the history data to each metric
         this.addHistoryToMetrics(metrics, histories);
 
@@ -132,7 +133,6 @@ const helpers = {
           metrics.metrics[key].type === "parent" &&
           Object.keys(metrics.metrics[key].metrics).length > 0
         ) {
-          console.log(metrics.metrics[key]);
           this.addHistoryToMetrics(
             metrics.metrics[key],
             histories.metrics[key]

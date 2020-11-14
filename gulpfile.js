@@ -184,6 +184,7 @@ gulp.task("widgetHTML", function () {
 gulp.task("resources", function () {
   return gulp
     .src(["resources/*", "plugin.json"], { base: "." })
+    .pipe(imagemin())
     .pipe(gulp.dest(destinationFolder));
 });
 

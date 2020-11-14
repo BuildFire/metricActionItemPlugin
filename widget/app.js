@@ -364,12 +364,17 @@ const initChart = (metric) => {
   }
 
   let title = !metric.title ? `Home History` : `${metric.title} History`;
-  let historyValues = [];
+  // let historyValues = [];
   // This for loop calculate and set all the values of all metrics for the last 7 days
-  for (let i = 7; i > 0; i--) {
-    let value = Metrics.getHistoryValue(metric, i) || 0;
-    historyValues.push(isNaN(value) ? value : value.toPrecision(3));
-  }
+  // for (let i = 7; i > 0; i--) {
+  //   let value = Metrics.getHistoryValue(metric, i) || 0;
+  //   historyValues.push(isNaN(value) ? value : value.toPrecision(3));
+  // }
+
+  let history = Metrics.getHistoryValues(metric);
+
+  let historyValues = history.historyData;
+  let historyDates = history.historyDays;
 
   let datasets = [
     {
@@ -383,16 +388,16 @@ const initChart = (metric) => {
       fill: true,
     },
   ];
-  renderChart(datasets);
+  renderChart(datasets, historyDates);
 };
 
-const renderChart = (datasets) => {
+const renderChart = (datasets, historyDates) => {
   const ctx = document.getElementById("chart").getContext("2d");
 
   metricChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: helpers.getLast7Days(),
+      labels: historyDates,
       datasets,
     },
     options: {
