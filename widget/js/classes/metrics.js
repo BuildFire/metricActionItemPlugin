@@ -3,28 +3,14 @@ class Metrics {
 
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", (err, result) => {
+      buildfire.datastore.get("metrics", (err, result) => {
         if (err) reject(err);
         else {
-          // Check if there is already objects in the database
-          if (!result.data.metrics) {
-            // If there is no object, then create the parent object
-            buildfire.publicData.save(
-              { metrics: {}, sortBy: "manual" },
-              "metrics",
-              (err, result) => {
-                if (err) reject(err);
-                else {
-                  this.getMetrics().then((result) => {
-                    resolve(result);
-                  });
-                }
-              }
-            );
-          } else {
-            result.data.id = result.id;
-            resolve(result.data);
+          if (!result || !result.data) {
+            result = { data: { metrics: {} } };
           }
+          result.data.id = result.id;
+          resolve(result.data);
         }
       });
     });
@@ -42,7 +28,7 @@ class Metrics {
         nodeSelector.slice(-8) === "metrics."
       )
         return reject("nodeSelector is not right");
-      buildfire.publicData.searchAndUpdate(
+      buildfire.datastore.searchAndUpdate(
         { [`${nodeSelector}.history.date`]: { $regex: `.*${dateOnly}.*` } },
         {
           $set: {
@@ -55,7 +41,7 @@ class Metrics {
         (err, res) => {
           if (err) reject(err);
           if (res.nModified === 0) {
-            buildfire.publicData.update(
+            buildfire.datastore.update(
               metricsId,
               {
                 $push: {

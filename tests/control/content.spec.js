@@ -234,10 +234,10 @@ describe("Test The Control Side", () => {
   // To delete everything (Big Object)
   const deleteEverything = () => {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.save({}, "metrics", (err, result) => {
+      buildfire.datastore.save({}, "metrics", (err, result) => {
         if (err) reject(err);
         else {
-          buildfire.publicData.save(
+          buildfire.datastore.save(
             { metrics: {} },
             `history${clientProfile}`,
             (err, result) => {

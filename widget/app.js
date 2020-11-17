@@ -56,7 +56,7 @@ helpers.hideElem("#metricsScreen");
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
-let isDeeplink = false
+let isDeeplink = false;
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
     isDeeplink = true;
@@ -102,25 +102,17 @@ const getBreadCrumps = () => {
 // };
 
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
-buildfire.publicData.onUpdate((event) => {
+buildfire.datastore.onUpdate((event) => {
   if (event.data && event.id) {
-    console.log("EVENT EVENT EVENT", event);
-
     if (event.tag.includes("metrics")) {
-      console.log("INCLUDES INCLUDES INCLUDES");
       metrics = event.data;
       metrics.id = event.id;
+    } else if (event.tag === "settings") {
+      return Settings.load().then(() => {
+        renderInit();
+      });
     }
     renderInit();
-  }
-});
-
-// To sync betwwen the widget and the control when any change (in settings) happened in the control side
-buildfire.datastore.onUpdate((event) => {
-  if (event.tag === "settings") {
-    Settings.load().then(() => {
-      renderInit();
-    });
   }
 });
 
@@ -546,8 +538,8 @@ const isUserAuthorized = () => {
     }
   }
   if (!authorized) {
-    let snackbar = helpers.getElem('.mdc-snackbar .mdc-snackbar__label');
-    snackbar.innerHTML = "You do not have access to update."
+    let snackbar = helpers.getElem(".mdc-snackbar .mdc-snackbar__label");
+    snackbar.innerHTML = "You do not have access to update.";
     snackbarMessages.open();
   }
   return authorized;
