@@ -165,11 +165,29 @@ class Metrics {
             history[history.length - index].date
           ).toLocaleDateString();
 
-          // TODO: make sure this if condetion is needed;
           // If the saved date was one day ahead of the current date, don't take the current value, take the previous one;
           if (set.date < historyDate) {
-            set.value = history[history.length - index - 1].value || 0;
             index++;
+            set.value = history[history.length - index].value || 0;
+
+            // Check if there is another element in the history
+            if (
+              history[history.length - index] &&
+              history[history.length - index].date
+            ) {
+              let lastDate = new Date(
+                history[history.length - index].date
+              ).toLocaleDateString();
+              // If the previous value's date === the the current set.date we just used then we need to move on to the next value,
+              // other wise we skip
+              if (set.date === lastDate) {
+                index++;
+              }
+            } else {
+              set.value = history[history.length - index].value
+                ? history[history.length - index].value
+                : 0;
+            }
           } else if (set.date === historyDate) {
             set.value = history[history.length - index].value || 0;
             index++;
@@ -189,15 +207,17 @@ class Metrics {
       return dataset;
     } else if (metric.type === "parent" || !metric.type) {
       if (metric.metrics && Object.keys(metric.metrics).length === 0) {
-        return "No value";
+        return helpers.getLast7DaysNoValue();
       } else if (metric.metrics) {
         // Creates the set to be able to calculate the average in this format:
+        let historyDataset = helpers.getLast7DaysNoValue();
         // [{"date":"11/14/2020","value":0},{"date":"11/13/2020","value":0}, .....]
-        let historyDataset = helpers.getLast7Days();
         for (let key in metric.metrics) {
           let metricHistory = Metrics.extractHistoryValues(metric.metrics[key]);
+
           historyDataset.forEach((day, i) => {
             if (!isNaN(metricHistory[i].value)) {
+              if (isNaN(day.value)) day.value = 0;
               day.value += metricHistory[i].value;
 
               // Add-increase the value of children which have values (type number) to calculate the average
@@ -215,9 +235,12 @@ class Metrics {
           }
         });
         // Assign current and previous average for the parent metric
-        metric.value = parseFloat(historyDataset[0].value.toPrecision(3)) || 0;
-        metric.previousValue =
-          parseFloat(historyDataset[1].value.toPrecision(3)) || 0;
+        metric.value = !isNaN(historyDataset[0].value)
+          ? parseFloat(historyDataset[0].value.toPrecision(3))
+          : 0;
+        metric.previousValue = !isNaN(historyDataset[1].value)
+          ? parseFloat(historyDataset[1].value.toPrecision(3))
+          : 0;
 
         return historyDataset;
       }
@@ -226,12 +249,13 @@ class Metrics {
 
   static getHistoryValues(metrics) {
     // Reverse the data to be displayed on the chart
-    const historyDataset = Metrics.extractHistoryValues(metrics).reverse();
+    let historyDataset = Metrics.extractHistoryValues(metrics).reverse();
 
     // Extract the values only from the history
-    let historyData = historyDataset.map((elem) =>
-      parseFloat(elem.value.toPrecision(3))
-    );
+    let historyData = historyDataset.map((elem) => {
+      if (isNaN(elem.value)) return 0;
+      return parseFloat(elem.value.toPrecision(3));
+    });
     // Format the dates which will appear on the chart
     let historyDays = historyDataset.map((elem) => {
       let date = elem.date.split("/");

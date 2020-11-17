@@ -1,6 +1,5 @@
 describe("Test The Control Side", () => {
   let metrics = {};
-  let histories = {};
   let clientProfile = "";
 
   let nodeSelector = "metrics";

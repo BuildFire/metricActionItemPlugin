@@ -30,10 +30,7 @@ let metricChart = {};
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
-let snackbarMessages = {
-  noAccess: {},
-  noNote: {},
-};
+let snackbarMessages = {};
 
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
@@ -59,8 +56,10 @@ helpers.hideElem("#metricsScreen");
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
+let isDeeplink = false
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
+    isDeeplink = true;
     let itemPath = data.link.split(".");
     itemPath.pop();
     nodeSelector = itemPath.join(".");
@@ -422,8 +421,8 @@ const renderChart = (datasets, historyDates) => {
       layout: {
         padding: {
           top: 10,
-          left: 6,
-          right: 6,
+          left: 8,
+          right: 8,
           bottom: 0,
         },
       },
@@ -547,7 +546,9 @@ const isUserAuthorized = () => {
     }
   }
   if (!authorized) {
-    snackbarMessages.noAccess.open();
+    let snackbar = helpers.getElem('.mdc-snackbar .mdc-snackbar__label');
+    snackbar.innerHTML = "You do not have access to update."
+    snackbarMessages.open();
   }
   return authorized;
 };
@@ -561,11 +562,8 @@ const initMaterialComponents = () => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
 
-  snackbarMessages.noAccess = mdc.snackbar.MDCSnackbar.attachTo(
+  snackbarMessages = mdc.snackbar.MDCSnackbar.attachTo(
     document.querySelector(".mdc-snackbar.no-access")
-  );
-  snackbarMessages.noNote = mdc.snackbar.MDCSnackbar.attachTo(
-    document.querySelector(".mdc-snackbar.no-note")
   );
 };
 

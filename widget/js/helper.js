@@ -31,7 +31,15 @@ const helpers = {
         metricsChildren = metricsChildren[item];
       });
     } catch (err) {
-      snackbarMessages.noNote.open();
+      let snackbar = helpers.getElem('.mdc-snackbar .mdc-snackbar__label');
+      // Change snackbar error text
+      if (isDeeplink) {
+        snackbar.innerHTML = "The note you selected has been removed, taking you back home."
+      } else {
+        snackbar.innerHTML = "Something went wrong, taking you back home."
+      }
+      // Show snackbar
+      snackbarMessages.open();
 
       setTimeout(() => {
         buildfire.navigation._goBackOne();
@@ -132,4 +140,19 @@ const helpers = {
     }
     return result;
   },
+  getLast7DaysNoValue: () => {
+    let result = [];
+    let date = new Date();
+    result.push({ date: date.toLocaleDateString(), value: "No value" });
+
+    for (let i = 1; i <= 6; i++) {
+      let copiedDate = new Date(date);
+      copiedDate.setDate(date.getDate() - i);
+      result.push({
+        date: copiedDate.toLocaleDateString(),
+        value: "No value",
+      });
+    }
+    return result;
+  }
 };
