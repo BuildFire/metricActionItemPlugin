@@ -1,5 +1,7 @@
 describe("Test The Control Side", () => {
   let metrics = {};
+  let clientProfile = "";
+
   let nodeSelector = "metrics";
 
   describe("Test the Metric class", () => {
@@ -31,22 +33,17 @@ describe("Test The Control Side", () => {
       await Metrics.getMetrics().then((data) => {
         metrics = data;
       });
+
+      await Histories.getHistories(clientProfile).then((data) => {
+        histories = data;
+      });
     });
 
     let metric1 = new Metric({
       actionItem: {},
       createdBy: "Amjad Hamza",
       createdOn: new Date(),
-      history: [
-        {
-          date: helpers.getAbsoluteDate(),
-          value: 56,
-          createdOn: new Date(),
-          createdBy: "Amjad Hamza",
-          lastUpdatedOn: new Date(),
-          lastUpdatedBy: "Amjad Hamza",
-        },
-      ],
+      history: [],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
@@ -62,16 +59,7 @@ describe("Test The Control Side", () => {
       actionItem: {},
       createdBy: "Amjad Hamza",
       createdOn: new Date(),
-      history: [
-        {
-          date: helpers.getAbsoluteDate(),
-          value: 41,
-          createdOn: new Date(),
-          createdBy: "Amjad Hamza",
-          lastUpdatedOn: new Date(),
-          lastUpdatedBy: "Amjad Hamza",
-        },
-      ],
+      history: [],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
@@ -87,16 +75,6 @@ describe("Test The Control Side", () => {
       actionItem: {},
       createdBy: "Amjad Hamza",
       createdOn: new Date(),
-      history: [
-        {
-          date: helpers.getAbsoluteDate(),
-          value: 23,
-          createdOn: new Date(),
-          createdBy: "Amjad Hamza",
-          lastUpdatedOn: new Date(),
-          lastUpdatedBy: "Amjad Hamza",
-        },
-      ],
       icon: "https://img.icons8.com/material/4ac144/256/user-male.png",
       lastUpdatedBy: "Amjad Hamza",
       lastUpdatedOn: new Date(),
@@ -109,7 +87,12 @@ describe("Test The Control Side", () => {
     });
 
     it("Should return the metrics object without any errors", async () => {
-      await expectAsync(Metrics.getMetrics()).toBeResolved();
+      await expectAsync(
+        Metrics.getMetrics().then(async (result) => {
+          metrics = result;
+          await helpers.filterCustomerMetrics(metrics, clientProfile);
+        })
+      ).toBeResolved();
     });
 
     it("Should save metrics correctly", async () => {
@@ -131,8 +114,18 @@ describe("Test The Control Side", () => {
       await expect(Object.keys(metrics.metrics).length).toBe(3);
     });
 
+    it("Should filter the metrics based on history correctly", async () => {
+      await expectAsync(
+        helpers
+          .filterCustomerMetrics(metrics, clientProfile)
+          .then((filteredMetrics) => {
+            metrics.metrics = filteredMetrics;
+          })
+      ).toBeResolved();
+    });
+
     it("Should calculate the value of the big object correctly", async () => {
-      await expect(Metric.getHistoryValue(metrics)).toBe(40);
+      await expect(Math.round(Metric.getHistoryValue(metrics))).toBe(0);
     });
 
     it("Should change the order of metrics correctly", async () => {
@@ -203,6 +196,12 @@ describe("Test The Control Side", () => {
       nodeSelector = "metrics";
       await expectAsync(
         Metrics.delete({ nodeSelector, metricsId: metrics.id }, metric3.id)
+        // .then(async () => {
+        //   Histories.delete(
+        //     { clientProfile, nodeSelector, historyId: histories.id },
+        //     metric3.id
+        //   );
+        // })
       ).toBeResolved();
       await Metrics.getMetrics().then((data) => {
         metrics = data;
@@ -235,10 +234,20 @@ describe("Test The Control Side", () => {
   // To delete everything (Big Object)
   const deleteEverything = () => {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.save({}, "metrics", (err, result) => {
+      buildfire.datastore.save({}, "metrics", (err, result) => {
         if (err) reject(err);
         else {
-          resolve(result);
+          buildfire.datastore.save(
+            { metrics: {} },
+            `history${clientProfile}`,
+            (err, result) => {
+              if (err) {
+                console.error(err);
+                return reject(err);
+              }
+              resolve();
+            }
+          );
         }
       });
     });

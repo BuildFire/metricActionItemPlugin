@@ -54,7 +54,7 @@
           </span>
         </div>
         <div class="mdc-card-wrapper__text-section">
-          <canvas id="chart" height="100"></canvas>
+          <canvas id="chart" height="110"></canvas>
         </div>
       </div>
 
@@ -128,14 +128,13 @@
       </div>
     </div>
 
-    <div class="mdc-snackbar">
+    <div class="mdc-snackbar no-access">
       <div
         class="mdc-snackbar__surface"
         role="status"
         aria-relevant="additions"
       >
         <div class="mdc-snackbar__label" aria-atomic="false">
-          You do not have access to update
         </div>
         <div class="mdc-snackbar__actions" aria-atomic="true">
           <button
@@ -147,6 +146,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- build:bundleJSFiles -->
     <!-- Chart.js css & js -->
@@ -163,6 +163,8 @@
     <script src="js/classes/analytics.js"></script>
     <script src="js/classes/metric.js"></script>
     <script src="js/classes/metrics.js"></script>
+    <script src="js/classes/history.js"></script>
+    <script src="js/classes/histories.js"></script>
     <script src="js/classes/settings.js"></script>
 
     <script src="js/authManager.js"></script>

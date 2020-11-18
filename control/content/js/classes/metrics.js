@@ -4,13 +4,13 @@ class Metrics {
   // Get the big Object (metrics object)
   static getMetrics() {
     return new Promise((resolve, reject) => {
-      buildfire.publicData.get("metrics", (err, result) => {
+      buildfire.datastore.get("metrics", (err, result) => {
         if (err) reject(err);
         else {
           // Check if there is already objects in the database
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
-            buildfire.publicData.save(
+            buildfire.datastore.save(
               { metrics: {}, sortBy: "manual" },
               "metrics",
               (err, result) => {
@@ -33,7 +33,7 @@ class Metrics {
 
   // Add new metrics in the big object (Control Panel Only)
   static insert({ nodeSelector, metricsId }, metric) {
-    metric.id = helpers.uuidv4();
+    // metric.id = helpers.uuidv4();
     metric.createdOn = new Date();
     metric.lastUpdatedOn = new Date();
 
@@ -41,7 +41,7 @@ class Metrics {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
 
-      buildfire.publicData.update(
+      buildfire.datastore.update(
         metricsId,
         { $set: { [`${nodeSelector}.${metric.id}`]: metric } },
         "metrics",
@@ -75,7 +75,7 @@ class Metrics {
       _set[`${nodeSelector}.${id}.lastUpdatedOn`] = new Date();
       _set[`${nodeSelector}.${id}.lastUpdatedBy`] = data.lastUpdatedBy;
 
-      buildfire.publicData.update(
+      buildfire.datastore.update(
         metricsId,
         { $set: _set },
         "metrics",
@@ -96,7 +96,7 @@ class Metrics {
       if (!nodeSelector) reject("nodeSelector not provided");
       if (!metricsId) reject("metricsId not provided");
 
-      buildfire.publicData.update(
+      buildfire.datastore.update(
         metricsId,
         {
           $unset: {
@@ -127,7 +127,7 @@ class Metrics {
         _set[`${nodeSelector}.${id}.order`] = orderObj[id];
       }
 
-      buildfire.publicData.update(
+      buildfire.datastore.update(
         metricsId,
         { $set: _set },
         "metrics",
@@ -163,7 +163,7 @@ class Metrics {
           : (_set[`${selector}.description`] = value);
       }
 
-      buildfire.publicData.update(
+      buildfire.datastore.update(
         metricsId,
         { $set: _set },
         "metrics",

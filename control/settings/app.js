@@ -62,7 +62,9 @@ const deleteTag = (index, name) => {
 
 const updateSettings = () => {
   return new Promise((resolve, reject) => {
-    Settings.save(`${currentUser.firstName} ${currentUser.lastName}`)
+    Settings.save(
+      currentUser && currentUser.username ? currentUser.username : null
+    )
       .then(() => {
         resolve();
       })

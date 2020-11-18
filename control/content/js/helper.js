@@ -111,4 +111,40 @@ const helpers = {
       elem.style.display = displayType || "block";
     });
   },
+  // Filter Metrics based on the provided customer
+  filterCustomerMetrics(metrics, clientProfile) {
+    return new Promise((resolve, reject) => {
+      // Get client history data;
+      Histories.getHistories(clientProfile).then((result) => {
+        histories = result;
+        // Add the history data to each metric
+        this.addHistoryToMetrics(metrics, histories);
+
+        resolve(metrics.metrics);
+      });
+    });
+  },
+  // Loop recursively on the metrics object and add the history value from histories object
+  addHistoryToMetrics(metrics, histories) {
+    if (Object.keys(metrics.metrics).length > 0) {
+      for (var key in metrics.metrics) {
+        if (
+          histories.metrics[key] &&
+          metrics.metrics[key].type === "parent" &&
+          Object.keys(metrics.metrics[key].metrics).length > 0
+        ) {
+          this.addHistoryToMetrics(
+            metrics.metrics[key],
+            histories.metrics[key]
+          );
+        } else {
+          if (histories.metrics[key] && histories.metrics[key].history) {
+            metrics.metrics[key].history = histories.metrics[key].history;
+          } else {
+            metrics.metrics[key].history = [];
+          }
+        }
+      }
+    }
+  },
 };

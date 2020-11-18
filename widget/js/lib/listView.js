@@ -63,6 +63,9 @@ class ListViewItem {
     this.id = obj.id;
     this.title = obj.title;
     this.icon = obj.icon;
+    this.history = obj.history;
+    this.type = obj.type;
+    this.metrics = obj.metrics;
     this.value = obj.value || 0;
     this.data = obj.data;
     this.order = obj.order || null;
@@ -75,6 +78,9 @@ class ListViewItem {
       id: this.id,
       title: this.title,
       icon: this.icon,
+      history: this.history,
+      type: this.type,
+      metrics: this.metrics,
       value: this.value,
       data: this.data,
       order: this.order,
@@ -170,8 +176,17 @@ class ListViewItem {
           "mdc-button__icon",
         ]);
       }
+      this.viewdValue = this.value;
 
-      ui.create("span", listViewItemToolbar, `${this.value}%`, [
+      if (
+        (this.history.length === 0 && this.type === "metric") ||
+        (this.type === "parent" && Object.keys(this.metrics).length === 0) ||
+        (this.value === 0 && Object.keys(this.metrics).length > 0)
+      ) {
+        this.viewdValue = "- ";
+      }
+
+      ui.create("span", listViewItemToolbar, `${this.viewdValue}%`, [
         "listViewItemToolbarItem",
         "value",
       ]);

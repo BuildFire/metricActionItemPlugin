@@ -1,6 +1,18 @@
 // The big object that contains all the metrics
 let metrics = {};
 
+// Object containes a specific client history
+let histories = {};
+
+// Client profile (client query)
+let clientProfile = "";
+
+// Check if a query string was provided
+let queryString = buildfire.parseQueryString();
+if (queryString && queryString.clientProfile) {
+  clientProfile = queryString.clientProfile;
+}
+
 // We used nodeSelector to determine where are we inside the big object
 let nodeSelector = "metrics";
 
@@ -18,7 +30,7 @@ let metricChart = {};
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
-let snackbarMessage = {};
+let snackbarMessages = {};
 
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
@@ -37,15 +49,44 @@ const getCurrentUser = () => {
 
 getCurrentUser();
 
+// hide metric screen on init;
+helpers.hideElem("#metricsScreen");
+
 // Login and Logout listners
 buildfire.auth.onLogin(() => getCurrentUser());
 buildfire.auth.onLogout(() => (currentUser = null));
 
+let isDeeplink = false;
 buildfire.deeplink.getData((data) => {
   if (data && data.link) {
-    nodeSelector = data.link;
+    isDeeplink = true;
+    let itemPath = data.link.split(".");
+    itemPath.pop();
+    nodeSelector = itemPath.join(".");
   }
 });
+
+buildfire.navigation.onAppLauncherActive(() => {
+  if (nodeSelector !== "metrics") {
+    nodeSelector = "metrics";
+    buildfire.messaging.sendMessageToControl({ nodeSelector });
+    renderInit();
+  }
+}, false);
+
+const getBreadCrumps = () => {
+  return new Promise((resolve, reject) => {
+    buildfire.history.get(
+      {
+        pluginBreadcrumbsOnly: false,
+      },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      }
+    );
+  });
+};
 
 // Get all user bookmarks
 // let bookmarks = {};
@@ -61,78 +102,94 @@ buildfire.deeplink.getData((data) => {
 // };
 
 // To sync betwwen the widget and the control when any change (in metrics) happened in the control side
-buildfire.publicData.onUpdate((event) => {
-  if (event.data && event.id) {
-    metrics = event.data;
-    metrics.id = event.id;
-    renderInit();
-  }
-});
-
-// To sync betwwen the widget and the control when any change (in settings) happened in the control side
 buildfire.datastore.onUpdate((event) => {
-  if (event.tag === "settings") {
-    Settings.load().then(() => {
-      renderInit();
-    });
+  if (event.data && event.id) {
+    if (event.tag.includes("metrics")) {
+      metrics = event.data;
+      metrics.id = event.id;
+    } else if (event.tag === "settings") {
+      return Settings.load().then(() => {
+        renderInit();
+      });
+    }
+    renderInit();
   }
 });
 
 // To get all metrics and start rendering
 Metrics.getMetrics().then((result) => {
   metrics = result;
-  initMaterialComponents();
+  // Initialize clinet history
+  Histories.getHistories(clientProfile).then((result) => {
+    histories = result;
 
-  Settings.load().then(() => {
-    // To prevent Functional Tests from Applying these lines where it will cause some errors
-    // Check if the user have the permission to update metrics
-    isUserAuthorized();
-    renderInit();
+    initMaterialComponents();
+
+    Settings.load().then(() => {
+      // To prevent Functional Tests from Applying these lines where it will cause some errors
+      // Check if the user have the permission to update metrics
+      renderInit();
+    });
   });
 });
 
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
-  listViewContainer.innerHTML = "";
-  // Extract the desired metrics (children) from the big object using nodeSelector
-  let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
-  // Hide the summary in the Home Page if the settings is set to hide it
-  if (nodeSelector === "metrics" && !Settings.showSummary) {
-    helpers.hideElem("#summary");
-  } else {
-    helpers.showElem("#summary");
+  try {
+    // Filter Metrics before rendering
+    helpers
+      .filterCustomerMetrics(metrics, clientProfile)
+      .then((filteredMetrics) => {
+        metrics.metrics = filteredMetrics;
+
+        listViewContainer.innerHTML = "";
+        // Extract the desired metrics (children) from the big object using nodeSelector
+        let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+        // Hide the summary in the Home Page if the settings is set to hide it
+        if (nodeSelector === "metrics" && !Settings.showSummary) {
+          helpers.hideElem("#summary");
+        } else {
+          helpers.showElem("#summary");
+        }
+
+        // Get metrics that should be rendered
+        let metricsChildren = readyMetrics.metricsChildren;
+        // Init metrics values' chart
+        initChart(readyMetrics.metricsParent);
+
+        helpers.showElem("#metricsScreen");
+        helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
+
+        if (readyMetrics.metricsParent.description) {
+          description.style.display = "block";
+          document.getElementById("metricDescription").innerHTML =
+            readyMetrics.metricsParent.description;
+        } else {
+          description.style.display = "none";
+        }
+
+        let currentMetricList = [];
+        // Prepare metrics to be rendered in the ListView component
+        for (let metricId in metricsChildren) {
+          metricsChildren[metricId].id = metricId;
+          let newMetric = new Metric(metricsChildren[metricId]);
+          let InitMetricAsItem = metricAsItemInit(newMetric);
+          currentMetricList.push(InitMetricAsItem);
+        }
+        // Add the summary value of the parent metric
+        summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
+
+        checkIncreaseOrDecrease(readyMetrics);
+
+        currentMetricList = helpers.sortMetrics(
+          currentMetricList,
+          readyMetrics.metricsSortBy
+        );
+        renderMetrics(currentMetricList);
+      });
+  } catch (err) {
+    console.error(err);
   }
-  // Get metrics that should be rendered
-  let metricsChildren = readyMetrics.metricsChildren;
-  // Init metrics values' chart
-  initChart(readyMetrics.metricsParent);
-
-  if (readyMetrics.metricsParent.description) {
-    description.style.display = "block";
-    document.getElementById("metricDescription").innerHTML =
-      readyMetrics.metricsParent.description;
-  } else {
-    description.style.display = "none";
-  }
-
-  let currentMetricList = [];
-  // Prepare metrics to be rendered in the ListView component
-  for (let metricId in metricsChildren) {
-    metricsChildren[metricId].id = metricId;
-    let newMetric = new Metric(metricsChildren[metricId]);
-    let InitMetricAsItem = metricAsItemInit(newMetric);
-    currentMetricList.push(InitMetricAsItem);
-  }
-  // Add the summary value of the parent metric
-  summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
-
-  checkIncreaseOrDecrease(readyMetrics);
-
-  currentMetricList = helpers.sortMetrics(
-    currentMetricList,
-    readyMetrics.metricsSortBy
-  );
-  renderMetrics(currentMetricList);
 };
 
 // Render metrics using ListView component
@@ -198,7 +255,7 @@ const metricAsItemInit = (newMetric) => {
 
       renderInit();
     } else {
-      if (currentUser && isUserAuthorized()) {
+      if (isUserAuthorized()) {
         helpers.hideElem("#metricsScreen");
         helpers.showElem("#updateHistoryContainer, #updateHistoryButton");
         historyCloseBtn.style.background = appThemeObj.colors.warningTheme;
@@ -240,12 +297,9 @@ const metricAsItemInit = (newMetric) => {
         // Add onclick handler to add notes icon inorder to add notes
         helpers.getElem("#notes").querySelector("button").onclick = () => {
           // Get the parent path for the metric
-          let itemPath = nodeSelector.split(".");
-          itemPath.pop();
-          itemPath = itemPath.join(".");
 
           const options = {
-            itemId: itemPath,
+            itemId: nodeSelector,
             title: newMetric.title,
             imageUrl: newMetric.icon,
           };
@@ -266,22 +320,28 @@ const metricAsItemInit = (newMetric) => {
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
 
-          Metrics.updateMetricHistory(
-            { nodeSelector, metricsId: metrics.id },
-            { value, username: currentUser.firstName }
+          Histories.updateMetricHistory(
+            { clientProfile, nodeSelector, historyId: histories.id },
+            {
+              value,
+              username:
+                currentUser && currentUser.username
+                  ? currentUser.username
+                  : null,
+            }
           )
             .then((result) => {
-              metrics = result;
+              // metrics = result;
               buildfire.history.pop();
             })
             .catch((err) => {
               console.log(err);
             });
         };
+        updateHistoryBtn.style.backgroundColor =
+          appThemeObj.colors.successTheme;
         initProgressBar(newMetric);
         document.body.scrollTop = 0;
-      } else {
-        snackbarMessage.open();
       }
     }
   };
@@ -295,12 +355,17 @@ const initChart = (metric) => {
   }
 
   let title = !metric.title ? `Home History` : `${metric.title} History`;
-  let historyValues = [];
+  // let historyValues = [];
   // This for loop calculate and set all the values of all metrics for the last 7 days
-  for (let i = 7; i > 0; i--) {
-    let value = Metrics.getHistoryValue(metric, i) || 0;
-    historyValues.push(isNaN(value) ? value : value.toPrecision(3));
-  }
+  // for (let i = 7; i > 0; i--) {
+  //   let value = Metrics.getHistoryValue(metric, i) || 0;
+  //   historyValues.push(isNaN(value) ? value : value.toPrecision(3));
+  // }
+
+  let history = Metrics.getHistoryValues(metric);
+
+  let historyValues = history.historyData;
+  let historyDates = history.historyDays;
 
   let datasets = [
     {
@@ -314,16 +379,16 @@ const initChart = (metric) => {
       fill: true,
     },
   ];
-  renderChart(datasets);
+  renderChart(datasets, historyDates);
 };
 
-const renderChart = (datasets) => {
+const renderChart = (datasets, historyDates) => {
   const ctx = document.getElementById("chart").getContext("2d");
 
   metricChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: helpers.getLast7Days(),
+      labels: historyDates,
       datasets,
     },
     options: {
@@ -335,11 +400,11 @@ const renderChart = (datasets) => {
       },
       elements: {
         point: {
-          radius: 3,
-          hitRadius: 20,
+          radius: 4,
           borderWidth: 2,
-          hoverRadius: 5,
-          hoverBorderWidth: 1,
+          hitRadius: 15,
+          hoverRadius: 7,
+          hoverBorderWidth: 2,
         },
         line: {
           tension: 0,
@@ -347,16 +412,19 @@ const renderChart = (datasets) => {
       },
       layout: {
         padding: {
-          top: 6,
-          left: 6,
-          right: 6,
-          bottom: 6,
+          top: 10,
+          left: 8,
+          right: 8,
+          bottom: 0,
         },
       },
       scales: {
         xAxes: [
           {
-            display: false,
+            display: true,
+            gridLines: {
+              display: false,
+            },
           },
         ],
         yAxes: [
@@ -387,7 +455,7 @@ const initProgressBar = (newMetric) => {
       alignToBottom: true,
     },
     from: { color: appThemeObj.colors.dangerTheme },
-    to: { color: appThemeObj.colors.primaryTheme },
+    to: { color: appThemeObj.colors.successTheme },
     // Set default step function for all animate calls
     step: (state, bar) => {
       bar.path.setAttribute("stroke", state.color);
@@ -447,13 +515,16 @@ const changeProgressbarValue = (direction, newMetric) => {
 };
 
 const isUserAuthorized = () => {
-  if (!currentUser) return false;
-
   let authorized = false;
   let currentTags = {};
   if (Settings.tags.length === 0) {
     authorized = true;
   } else {
+    if (!currentUser) {
+      authManager.login();
+      return false;
+    }
+
     Settings.tags.forEach((tag) => {
       currentTags[tag.tagName] = tag.tagName;
     });
@@ -465,6 +536,11 @@ const isUserAuthorized = () => {
         }
       });
     }
+  }
+  if (!authorized) {
+    let snackbar = helpers.getElem(".mdc-snackbar .mdc-snackbar__label");
+    snackbar.innerHTML = "You do not have access to update.";
+    snackbarMessages.open();
   }
   return authorized;
 };
@@ -478,8 +554,8 @@ const initMaterialComponents = () => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
 
-  snackbarMessage = mdc.snackbar.MDCSnackbar.attachTo(
-    document.querySelector(".mdc-snackbar")
+  snackbarMessages = mdc.snackbar.MDCSnackbar.attachTo(
+    document.querySelector(".mdc-snackbar.no-access")
   );
 };
 

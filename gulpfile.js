@@ -134,7 +134,7 @@ jsTasks.forEach(function (task) {
           presets: ["@babel/preset-env"],
         })
       )
-      .pipe(uglify())
+      // .pipe(uglify())
       .pipe(concat("scripts.min.js"))
       .pipe(gulp.dest(destinationFolder + task.dest));
   });
@@ -184,6 +184,7 @@ gulp.task("widgetHTML", function () {
 gulp.task("resources", function () {
   return gulp
     .src(["resources/*", "plugin.json"], { base: "." })
+    .pipe(imagemin())
     .pipe(gulp.dest(destinationFolder));
 });
 
@@ -204,7 +205,7 @@ var buildTasksToRun = ["controlHTML", "widgetHTML", "resources", "images"];
 
 gulp.task("zip", function () {
   return gulp
-    .src("./dist/**")
+    .src("./dist/**", { dot: true })
     .pipe(zip("metricActionItemPlugin_release.zip"))
     .pipe(gulp.dest("../"));
 });
