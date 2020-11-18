@@ -134,7 +134,7 @@ jsTasks.forEach(function (task) {
           presets: ["@babel/preset-env"],
         })
       )
-      // .pipe(uglify())
+      .pipe(uglify())
       .pipe(concat("scripts.min.js"))
       .pipe(gulp.dest(destinationFolder + task.dest));
   });
