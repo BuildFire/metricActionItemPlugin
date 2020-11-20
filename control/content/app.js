@@ -399,7 +399,7 @@ const renderInit = () => {
 
   // Filter Metrics before rendering
   helpers
-    .filterCustomerMetrics(metrics, clientProfile)
+    .filterClientMetrics(metrics, clientProfile)
     .then((filteredMetrics) => {
       metrics.metrics = filteredMetrics;
 
@@ -637,7 +637,7 @@ const updateDescription = (description) => {
 
     // Filter Metrics on data change
     helpers
-      .filterCustomerMetrics(metrics, clientProfile)
+      .filterClientMetrics(metrics, clientProfile)
       .then((filteredMetrics) => {
         metrics.metrics = filteredMetrics;
       });

@@ -4,7 +4,7 @@ const helpers = {
   // Returns current date in ISO string
   getAbsoluteDate: () => {
     let date = new Date();
-    return `${date.getFullYear()}-${(date.getMonth() + 1)}-${date.getDate()}`
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   },
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
@@ -84,16 +84,17 @@ const helpers = {
     return document.querySelector(selector);
   },
   // Filter Metrics based on the provided customer
-  filterCustomerMetrics: (metrics, clientProfile) => {
+  filterClientMetrics: (metrics) => {
     return new Promise((resolve, reject) => {
-      // Get client history data;
-      Histories.getHistories(clientProfile).then((result) => {
-        histories = result;
+      if (metrics && metrics.metrics && Object.keys(metrics).length > 0) {
+        // Get client history data;
         // Add the history data to each metric
         helpers.addHistoryToMetrics(metrics, histories);
 
         resolve(metrics.metrics);
-      });
+      } else {
+        resolve({});
+      }
     });
   },
   // Loop recursively on the metrics object and add the history value from histories object
@@ -123,18 +124,26 @@ const helpers = {
   getLast7Days: (empty) => {
     let result = [];
     let date = new Date();
-    let formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)}-${date.getDate()}`
-    result.push({ keyDate: formattedDate, value: empty ? "No value" : 0 , date});
+    let formattedDate = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
+    result.push({
+      keyDate: formattedDate,
+      value: empty ? "No value" : 0,
+      date,
+    });
 
     for (let i = 1; i <= 6; i++) {
       let copiedDate = new Date(date);
       copiedDate.setDate(date.getDate() - i);
       result.push({
-        keyDate: `${copiedDate.getFullYear()}-${(copiedDate.getMonth() + 1)}-${copiedDate.getDate()}`,
+        keyDate: `${copiedDate.getFullYear()}-${
+          copiedDate.getMonth() + 1
+        }-${copiedDate.getDate()}`,
         value: empty ? "No value" : 0,
-        date: copiedDate
+        date: copiedDate,
       });
     }
     return result;
-  }
+  },
 };

@@ -110,7 +110,7 @@ const helpers = {
     });
   },
   // Filter Metrics based on the provided customer
-  filterCustomerMetrics(metrics, clientProfile) {
+  filterClientMetrics(metrics, clientProfile) {
     return new Promise((resolve, reject) => {
       // Get client history data;
       Histories.getHistories(clientProfile).then((result) => {

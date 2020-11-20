@@ -85,7 +85,7 @@ buildfire.navigation.onAppLauncherActive(() => {
   if (nodeSelector !== "metrics") {
     nodeSelector = "metrics";
     buildfire.messaging.sendMessageToControl({ nodeSelector });
-    renderInit();
+    loadApp();
   }
 }, false);
 
@@ -119,23 +119,33 @@ const getBreadCrumps = () => {
 // To sync between the widget and the control when any change (in metrics) happened in the control side
 buildfire.datastore.onUpdate((event) => {
   if (event.data && event.tag) {
-    if (event.tag.includes("metrics")) {
+    if (event.data && event.id && event.tag === "metrics") {
       metrics = event.data;
       metrics.id = event.id;
+      renderInit();
     } else if (event.tag === "settings") {
       return Settings.load().then(() => {
         if (!isQeuryProvided && Settings.dataPolicyType === "private") {
           Settings.tags = [];
         }
-        renderInit();
+        loadApp();
       });
     }
-    renderInit();
   }
 });
 
+// Load the data again once the history is updated
 buildfire.publicData.onUpdate((event) => {
-  renderInit();
+  if (event.status && event.nModified) {
+    Histories.getHistories(clientProfile).then((result) => {
+      histories = result;
+      loadApp();
+    });
+  } else if (event.data && event.id && event.tag.includes("history")) {
+    histories = event.data;
+    histories = event.id;
+    loadApp();
+  }
 });
 
 const loadMetrics = () => {
@@ -156,8 +166,7 @@ const loadApp = () => {
   Settings.load().then(() => {
     if (isQeuryProvided) {
       return loadMetrics();
-    }
-    if (Settings.dataPolicyType === "private") {
+    } else if (Settings.dataPolicyType === "private") {
       Settings.tags = [];
       authManager.getCurrentUser().then((user) => {
         if (!user) {
@@ -178,12 +187,14 @@ const loadApp = () => {
             })
             .catch(console.error);
         } else {
+          // This means that the user is logged in and the dataPolicy is private
           clientProfile = encodeURIComponent(`user${user.userToken}`);
           loadMetrics();
         }
       });
     } else {
-      // This means the data policy type is public and there is no clientProfile
+      // This means the data policy type is public and clientProfile should be empty
+      clientProfile = "";
       return loadMetrics();
     }
   });
@@ -195,56 +206,54 @@ loadApp();
 const renderInit = () => {
   try {
     // Filter Metrics before rendering
-    helpers
-      .filterCustomerMetrics(metrics, clientProfile)
-      .then((filteredMetrics) => {
-        metrics.metrics = filteredMetrics;
+    helpers.filterClientMetrics(metrics).then((filteredMetrics) => {
+      metrics.metrics = filteredMetrics;
 
-        listViewContainer.innerHTML = "";
-        // Extract the desired metrics (children) from the big object using nodeSelector
-        let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
-        // Hide the summary in the Home Page if the settings is set to hide it
-        if (nodeSelector === "metrics" && !Settings.showSummary) {
-          helpers.hideElem("#summary");
-        } else {
-          helpers.showElem("#summary");
-        }
+      listViewContainer.innerHTML = "";
+      // Extract the desired metrics (children) from the big object using nodeSelector
+      let readyMetrics = helpers.nodeSplitter(nodeSelector, metrics);
+      // Hide the summary in the Home Page if the settings is set to hide it
+      if (nodeSelector === "metrics" && !Settings.showSummary) {
+        helpers.hideElem("#summary");
+      } else {
+        helpers.showElem("#summary");
+      }
 
-        // Get metrics that should be rendered
-        let metricsChildren = readyMetrics.metricsChildren;
-        // Init metrics values' chart
-        initChart(readyMetrics.metricsParent);
+      // Get metrics that should be rendered
+      let metricsChildren = readyMetrics.metricsChildren;
+      // Init metrics values' chart
+      initChart(readyMetrics.metricsParent);
 
-        helpers.showElem("#metricsScreen");
-        helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
+      helpers.showElem("#metricsScreen");
+      helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
 
-        if (readyMetrics.metricsParent.description) {
-          description.style.display = "block";
-          document.getElementById("metricDescription").innerHTML =
-            readyMetrics.metricsParent.description;
-        } else {
-          description.style.display = "none";
-        }
+      if (readyMetrics.metricsParent.description) {
+        description.style.display = "block";
+        document.getElementById("metricDescription").innerHTML =
+          readyMetrics.metricsParent.description;
+      } else {
+        description.style.display = "none";
+      }
 
-        let currentMetricList = [];
-        // Prepare metrics to be rendered in the ListView component
-        for (let metricId in metricsChildren) {
-          metricsChildren[metricId].id = metricId;
-          let newMetric = new Metric(metricsChildren[metricId]);
-          let InitMetricAsItem = metricAsItemInit(newMetric);
-          currentMetricList.push(InitMetricAsItem);
-        }
-        // Add the summary value of the parent metric
-        summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
+      let currentMetricList = [];
+      // Prepare metrics to be rendered in the ListView component
+      for (let metricId in metricsChildren) {
+        metricsChildren[metricId].id = metricId;
+        let newMetric = new Metric(metricsChildren[metricId]);
+        let InitMetricAsItem = metricAsItemInit(newMetric);
+        currentMetricList.push(InitMetricAsItem);
+      }
+      // Add the summary value of the parent metric
+      summaryValue.innerText = `${readyMetrics.metricsParent.value || 0}%`;
 
-        checkIncreaseOrDecrease(readyMetrics);
+      checkIncreaseOrDecrease(readyMetrics);
 
-        currentMetricList = helpers.sortMetrics(
-          currentMetricList,
-          readyMetrics.metricsSortBy
-        );
-        renderMetrics(currentMetricList);
-      });
+      currentMetricList = helpers.sortMetrics(
+        currentMetricList,
+        readyMetrics.metricsSortBy
+      );
+      renderMetrics(currentMetricList);
+    });
   } catch (err) {
     console.error(err);
   }
@@ -377,7 +386,6 @@ const metricAsItemInit = (newMetric) => {
 
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
-          // debugger
           Histories.updateMetricHistory(
             { clientProfile, nodeSelector, historyId: histories.id },
             {
@@ -627,14 +635,12 @@ buildfire.history.onPop((breadcrumb) => {
   } else {
     //  This condition is for preventing the control side from going back (when clicking back in widget)
     // when we are at the home, which would lead to an error
-    // if (Object.keys(breadcrumb.options).length > 0) {
     helpers.showElem("#metricsScreen");
     helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
 
     nodeSelector = breadcrumb.options.nodeSelector || "metrics";
     buildfire.messaging.sendMessageToControl({ nodeSelector });
     renderInit();
-    // }
   }
 });
 

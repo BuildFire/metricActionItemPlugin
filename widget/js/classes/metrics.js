@@ -45,7 +45,7 @@ class Metrics {
               {
                 $push: {
                   [`${nodeSelector}.history`]: {
-                    date: absoluteDate,
+                    date: dateOnly,
                     createdOn: new Date(),
                     createdBy: data.username,
                     lastUpdatedOn: new Date(),
