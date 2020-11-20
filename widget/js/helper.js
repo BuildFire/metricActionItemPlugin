@@ -1,9 +1,11 @@
-// A helper function to extract the date: Format: "year/month/day"
 const helpers = {
   uuidv4: (m = Math, d = Date, h = 16, s = (s) => m.floor(s).toString(h)) =>
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
-  // Return absolute date
-  getAbsoluteDate: () => new Date().toISOString(),
+  // Returns current date in ISO string
+  getCurrentDate: () => {
+    let date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  },
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
     if (splittedNode[splittedNode.length - 1] !== "metrics") {
@@ -31,16 +33,22 @@ const helpers = {
         metricsChildren = metricsChildren[item];
       });
     } catch (err) {
-      let snackbar = helpers.getElem('.mdc-snackbar .mdc-snackbar__label');
-      // Change snackbar error text
       if (isDeeplink) {
-        snackbar.innerHTML = "The note you selected has been removed, taking you back home."
+        buildfire.components.toast.showToastMessage(
+          {
+            text:
+              "The note you selected has been removed, taking you back home.",
+          },
+          () => {}
+        );
       } else {
-        snackbar.innerHTML = "Something went wrong, taking you back home."
+        buildfire.components.toast.showToastMessage(
+          {
+            text: "Something went wrong, taking you back home.",
+          },
+          () => {}
+        );
       }
-      // Show snackbar
-      snackbarMessages.open();
-
       setTimeout(() => {
         buildfire.navigation._goBackOne();
       }, 2000);
@@ -59,19 +67,6 @@ const helpers = {
     }
     return currentMetricList;
   },
-  // getLast7Days: () => {
-  //   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  //   let result = [];
-  //   let date = new Date();
-  //   result.push(`${date.getMonth()}-${date.getDate()}`);
-
-  //   for (let i = 1; i <= 6; i++) {
-  //     let copiedDate = new Date(date);
-  //     copiedDate.setDate(date.getDate() - i);
-  //     result.push(`${copiedDate.getMonth()}/${copiedDate.getDate()}`);
-  //   }
-  //   return result.reverse();
-  // },
 
   hideElem: (selector) => {
     let elements = document.querySelectorAll(selector);
@@ -89,16 +84,17 @@ const helpers = {
     return document.querySelector(selector);
   },
   // Filter Metrics based on the provided customer
-  filterCustomerMetrics: (metrics, clientProfile) => {
+  filterClientMetrics: (metrics) => {
     return new Promise((resolve, reject) => {
-      // Get client history data;
-      Histories.getHistories(clientProfile).then((result) => {
-        histories = result;
+      if (metrics && metrics.metrics && Object.keys(metrics).length > 0) {
+        // Get client history data;
         // Add the history data to each metric
         helpers.addHistoryToMetrics(metrics, histories);
 
         resolve(metrics.metrics);
-      });
+      } else {
+        resolve({});
+      }
     });
   },
   // Loop recursively on the metrics object and add the history value from histories object
@@ -125,34 +121,29 @@ const helpers = {
     }
   },
 
-  getLast7Days: () => {
+  getLast7Days: (empty) => {
     let result = [];
     let date = new Date();
-    result.push({ date: date.toLocaleDateString(), value: 0 });
+    let formattedDate = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
+    result.push({
+      keyDate: formattedDate,
+      value: empty ? "No value" : 0,
+      date,
+    });
 
     for (let i = 1; i <= 6; i++) {
       let copiedDate = new Date(date);
       copiedDate.setDate(date.getDate() - i);
       result.push({
-        date: copiedDate.toLocaleDateString(),
-        value: 0,
+        keyDate: `${copiedDate.getFullYear()}-${
+          copiedDate.getMonth() + 1
+        }-${copiedDate.getDate()}`,
+        value: empty ? "No value" : 0,
+        date: copiedDate,
       });
     }
     return result;
   },
-  getLast7DaysNoValue: () => {
-    let result = [];
-    let date = new Date();
-    result.push({ date: date.toLocaleDateString(), value: "No value" });
-
-    for (let i = 1; i <= 6; i++) {
-      let copiedDate = new Date(date);
-      copiedDate.setDate(date.getDate() - i);
-      result.push({
-        date: copiedDate.toLocaleDateString(),
-        value: "No value",
-      });
-    }
-    return result;
-  }
 };

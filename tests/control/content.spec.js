@@ -90,7 +90,7 @@ describe("Test The Control Side", () => {
       await expectAsync(
         Metrics.getMetrics().then(async (result) => {
           metrics = result;
-          await helpers.filterCustomerMetrics(metrics, clientProfile);
+          await helpers.filterClientMetrics(metrics, clientProfile);
         })
       ).toBeResolved();
     });
@@ -117,7 +117,7 @@ describe("Test The Control Side", () => {
     it("Should filter the metrics based on history correctly", async () => {
       await expectAsync(
         helpers
-          .filterCustomerMetrics(metrics, clientProfile)
+          .filterClientMetrics(metrics, clientProfile)
           .then((filteredMetrics) => {
             metrics.metrics = filteredMetrics;
           })
@@ -196,12 +196,6 @@ describe("Test The Control Side", () => {
       nodeSelector = "metrics";
       await expectAsync(
         Metrics.delete({ nodeSelector, metricsId: metrics.id }, metric3.id)
-        // .then(async () => {
-        //   Histories.delete(
-        //     { clientProfile, nodeSelector, historyId: histories.id },
-        //     metric3.id
-        //   );
-        // })
       ).toBeResolved();
       await Metrics.getMetrics().then((data) => {
         metrics = data;
@@ -234,18 +228,20 @@ describe("Test The Control Side", () => {
   // To delete everything (Big Object)
   const deleteEverything = () => {
     return new Promise((resolve, reject) => {
-      buildfire.datastore.save({}, "metrics", (err, result) => {
+      buildfire.datastore.save({}, "metrics", async (err, data) => {
         if (err) reject(err);
         else {
-          buildfire.datastore.save(
+          await buildfire.publicData.save(
             { metrics: {} },
             `history${clientProfile}`,
-            (err, result) => {
+            async (err, result) => {
               if (err) {
                 console.error(err);
                 return reject(err);
               }
-              resolve();
+              await Metrics.getMetrics().then((data) => {
+                resolve(data);
+              });
             }
           );
         }

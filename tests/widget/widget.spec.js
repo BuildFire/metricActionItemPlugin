@@ -38,8 +38,8 @@ describe("Test The Widget Side", () => {
       ).toBeResolved();
     });
 
-    xit("Should calculate the value of the big object correctly", async () => {
-      expect(Metrics.getHistoryValue(metrics, 1)).toBe(48.5);
+    it("Should calculate the value of the big object correctly", async () => {
+      expect(Metrics.getHistoryValues(metrics).historyData[6]).toBe(0);
     });
 
     it("Should update a metric history value without any errors", async () => {

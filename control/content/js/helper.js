@@ -3,8 +3,6 @@ const helpers = {
   // Create a GUID ID
   uuidv4: (m = Math, d = Date, h = 16, s = (s) => m.floor(s).toString(h)) =>
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
-  // Return absolute date
-  getAbsoluteDate: () => new Date(new Date().setHours(0, 0, 0, 0)),
   // Extract the children of a specific metric from the big object via the node selector
   nodeSplitter: (nodeSelector, metrics) => {
     let splittedNode = nodeSelector.split(".");
@@ -112,7 +110,7 @@ const helpers = {
     });
   },
   // Filter Metrics based on the provided customer
-  filterCustomerMetrics(metrics, clientProfile) {
+  filterClientMetrics(metrics, clientProfile) {
     return new Promise((resolve, reject) => {
       // Get client history data;
       Histories.getHistories(clientProfile).then((result) => {
