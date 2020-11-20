@@ -6,11 +6,13 @@ let histories = {};
 
 // Client profile (client query)
 let clientProfile = "";
+let isQeuryProvided = false;
 
 // Check if a query string was provided
 let queryString = buildfire.parseQueryString();
 if (queryString && queryString.clientProfile) {
   clientProfile = queryString.clientProfile;
+  isQeuryProvided = true;
 }
 
 // We used nodeSelector to determine where are we inside the big object
@@ -30,8 +32,6 @@ let metricChart = {};
 // A variable that is used to set how many times to pop the breadcrumb when the control side go back multiple levels at once
 let numberOfPops = 0;
 
-let snackbarMessages = {};
-
 // Get the app's theme to utilize its colors in design
 let appThemeObj = {};
 
@@ -41,20 +41,35 @@ buildfire.appearance.getAppTheme((err, appTheme) => {
 });
 
 // Get the logged in user
-const getCurrentUser = () => {
-  return authManager.getCurrentUser().then((user) => {
-    currentUser = user;
-  });
-};
-
-getCurrentUser();
+authManager.getCurrentUser().then((user) => {
+  currentUser = user;
+});
 
 // hide metric screen on init;
 helpers.hideElem("#metricsScreen");
 
 // Login and Logout listners
-buildfire.auth.onLogin(() => getCurrentUser());
-buildfire.auth.onLogout(() => (currentUser = null));
+buildfire.auth.onLogin(() => {
+  authManager.getCurrentUser().then((user) => {
+    currentUser = user;
+    loadApp();
+  });
+});
+buildfire.auth.onLogout(() => {
+  helpers.hideElem("#metricsScreen");
+
+  currentUser = null;
+
+  buildfire.components.toast.showToastMessage(
+    {
+      text: "Login is required",
+      action: {
+        title: "Login",
+      },
+    },
+    () => authManager.login()
+  );
+});
 
 let isDeeplink = false;
 buildfire.deeplink.getData((data) => {
@@ -101,14 +116,17 @@ const getBreadCrumps = () => {
 //   });
 // };
 
-// To sync betwwen the widget and the control when any change (in metrics) happened in the control side
+// To sync between the widget and the control when any change (in metrics) happened in the control side
 buildfire.datastore.onUpdate((event) => {
-  if (event.data && event.id) {
+  if (event.data && event.tag) {
     if (event.tag.includes("metrics")) {
       metrics = event.data;
       metrics.id = event.id;
     } else if (event.tag === "settings") {
       return Settings.load().then(() => {
+        if (!isQeuryProvided && Settings.dataPolicyType === "private") {
+          Settings.tags = [];
+        }
         renderInit();
       });
     }
@@ -116,22 +134,62 @@ buildfire.datastore.onUpdate((event) => {
   }
 });
 
-// To get all metrics and start rendering
-Metrics.getMetrics().then((result) => {
-  metrics = result;
-  // Initialize clinet history
-  Histories.getHistories(clientProfile).then((result) => {
-    histories = result;
+buildfire.publicData.onUpdate((event) => {
+  renderInit();
+});
 
-    initMaterialComponents();
+const loadMetrics = () => {
+  // To get all metrics and start rendering
+  Metrics.getMetrics().then((result) => {
+    metrics = result;
+    // Initialize clinet history
+    Histories.getHistories(clientProfile).then((result) => {
+      histories = result;
 
-    Settings.load().then(() => {
-      // To prevent Functional Tests from Applying these lines where it will cause some errors
-      // Check if the user have the permission to update metrics
+      initMaterialComponents();
       renderInit();
     });
   });
-});
+};
+
+const loadApp = () => {
+  Settings.load().then(() => {
+    if (isQeuryProvided) {
+      return loadMetrics();
+    }
+    if (Settings.dataPolicyType === "private") {
+      Settings.tags = [];
+      authManager.getCurrentUser().then((user) => {
+        if (!user) {
+          authManager
+            .login()
+            .then((user) => {
+              if (!user) {
+                buildfire.components.toast.showToastMessage(
+                  {
+                    text: "Login is required",
+                    action: {
+                      title: "Login",
+                    },
+                  },
+                  () => authManager.login()
+                );
+              }
+            })
+            .catch(console.error);
+        } else {
+          clientProfile = encodeURIComponent(`user${user.userToken}`);
+          loadMetrics();
+        }
+      });
+    } else {
+      // This means the data policy type is public and there is no clientProfile
+      return loadMetrics();
+    }
+  });
+};
+
+loadApp();
 
 // To initialize and prepare metrics to be rendered
 const renderInit = () => {
@@ -319,7 +377,7 @@ const metricAsItemInit = (newMetric) => {
 
         updateHistoryBtn.onclick = (event) => {
           const value = Math.round(bar.value() * 100); // the value of the progressbar
-
+          // debugger
           Histories.updateMetricHistory(
             { clientProfile, nodeSelector, historyId: histories.id },
             {
@@ -355,12 +413,6 @@ const initChart = (metric) => {
   }
 
   let title = !metric.title ? `Home History` : `${metric.title} History`;
-  // let historyValues = [];
-  // This for loop calculate and set all the values of all metrics for the last 7 days
-  // for (let i = 7; i > 0; i--) {
-  //   let value = Metrics.getHistoryValue(metric, i) || 0;
-  //   historyValues.push(isNaN(value) ? value : value.toPrecision(3));
-  // }
 
   let history = Metrics.getHistoryValues(metric);
 
@@ -538,9 +590,12 @@ const isUserAuthorized = () => {
     }
   }
   if (!authorized) {
-    let snackbar = helpers.getElem(".mdc-snackbar .mdc-snackbar__label");
-    snackbar.innerHTML = "You do not have access to update.";
-    snackbarMessages.open();
+    buildfire.components.toast.showToastMessage(
+      {
+        text: "You do not have access to update.",
+      },
+      () => {}
+    );
   }
   return authorized;
 };
@@ -553,10 +608,6 @@ const initMaterialComponents = () => {
   document.querySelectorAll(".mdc-fab").forEach((btn) => {
     mdc.ripple.MDCRipple.attachTo(btn);
   });
-
-  snackbarMessages = mdc.snackbar.MDCSnackbar.attachTo(
-    document.querySelector(".mdc-snackbar.no-access")
-  );
 };
 
 buildfire.history.onPop((breadcrumb) => {

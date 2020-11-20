@@ -9,12 +9,24 @@ Settings.load().then(() => {
   initMaterialComponents();
   // Use element id and assign the new data to it's value
   showSummary.checked = Settings.showSummary;
+  if (Settings.dataPolicyType === "public") {
+    document.getElementById("dataPublicType").checked = true;
+    document.getElementById("dataPrivateType").checked = false;
+  }
+  if (Settings.dataPolicyType === "private") {
+    document.getElementById("dataPrivateType").checked = true;
+    document.getElementById("dataPublicType").checked = false;
+  }
   renderTags();
 });
 
 const onFieldChange = (field) => {
   if (field === "showSummary") {
     Settings[field] = document.getElementById(field).checked;
+  } else if (field === "dataPolicyType") {
+    let publicRadio = document.getElementById("dataPublicType").checked;
+    if (publicRadio) Settings[field] = "public";
+    else Settings[field] = "private";
   }
   updateSettings();
 };

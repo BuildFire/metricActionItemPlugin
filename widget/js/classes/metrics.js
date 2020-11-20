@@ -17,8 +17,7 @@ class Metrics {
   }
 
   static updateMetricHistory({ nodeSelector, metricsId }, data) {
-    const absoluteDate = helpers.getAbsoluteDate();
-    const dateOnly = helpers.getAbsoluteDate().slice(0, 10);
+    const dateOnly = helpers.getAbsoluteDate();
 
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");
@@ -29,7 +28,7 @@ class Metrics {
       )
         return reject("nodeSelector is not right");
       buildfire.datastore.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]: { $regex: `.*${dateOnly}.*` } },
+        { [`${nodeSelector}.history.date`]: dateOnly },
         {
           $set: {
             [`${nodeSelector}.history.$.value`]: data.value,
@@ -79,55 +78,6 @@ class Metrics {
     });
   }
 
-  // static getHistoryValue(metric, inde) {
-  //   if (metric.type === "metric") {
-  //     let todayDate = new Date();
-  //     for (var i = 1; i <= 7; i++) {
-  //       if (metric.history[metric.history.length - i]) {
-  //         let metricHistoryDate = new Date(
-  //           metric.history[metric.history.length - i].date
-  //         );
-  //         const diffTime = Math.abs(todayDate - metricHistoryDate);
-  //         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  //         if (diffDays >= inde) {
-  //           let val = metric.history[metric.history.length - i].value;
-  //           if (inde === 1) {
-  //             metric.value = val || 0;
-  //           } else if (inde === 2) {
-  //             metric.previousValue = val || 0;
-  //           }
-  //           return val;
-  //         }
-  //       }
-  //     }
-  //     return "No value";
-  //   } else if (metric.type === "parent" || !metric.type) {
-  //     if (metric.metrics && Object.keys(metric.metrics).length === 0) {
-  //       return "No value";
-  //     }
-  //     if (metric.metrics) {
-  //       let sum = 0;
-  //       let numberChildren = 0;
-  //       for (let key in metric.metrics) {
-  //         let result = Metrics.getHistoryValue(metric.metrics[key], inde);
-  //         if (!isNaN(result)) {
-  //           numberChildren++;
-  //           sum += Metrics.getHistoryValue(metric.metrics[key], inde);
-  //         }
-  //       }
-  //       let avg = sum / numberChildren;
-  //       if (inde === 1) {
-  //         metric.value = parseFloat(avg.toPrecision(3)) || 0;
-  //       } else if (inde === 2) {
-  //         metric.previousValue = parseFloat(avg.toPrecision(3)) || 0;
-  //       }
-  //       return avg;
-  //     }
-  //     return 0;
-  //   }
-  // }
-
   static extractHistoryValues(metric) {
     if (metric.type === "metric") {
       // Get the metric history array
@@ -147,12 +97,10 @@ class Metrics {
           set.value = "No value";
         } else {
           // Convert the ISO date from the coming from the database to local date
-          let historyDate = new Date(
-            history[history.length - index].date
-          ).toLocaleDateString();
+          let historyDate = history[history.length - index].date;
 
           // If the saved date was one day ahead of the current date, don't take the current value, take the previous one;
-          if (set.date < historyDate) {
+          if (set.keyDate < historyDate) {
             index++;
             set.value = history[history.length - index].value || 0;
 
@@ -161,12 +109,10 @@ class Metrics {
               history[history.length - index] &&
               history[history.length - index].date
             ) {
-              let lastDate = new Date(
-                history[history.length - index].date
-              ).toLocaleDateString();
-              // If the previous value's date === the the current set.date we just used then we need to move on to the next value,
+              let lastDate = history[history.length - index].date;
+              // If the previous value's date === the the current set.keyDate we just used then we need to move on to the next value,
               // other wise we skip
-              if (set.date === lastDate) {
+              if (set.keyDate === lastDate) {
                 index++;
               }
             } else {
@@ -174,7 +120,7 @@ class Metrics {
                 ? history[history.length - index].value
                 : 0;
             }
-          } else if (set.date === historyDate) {
+          } else if (set.keyDate === historyDate) {
             set.value = history[history.length - index].value || 0;
             index++;
           } else {
@@ -193,10 +139,10 @@ class Metrics {
       return dataset;
     } else if (metric.type === "parent" || !metric.type) {
       if (metric.metrics && Object.keys(metric.metrics).length === 0) {
-        return helpers.getLast7DaysNoValue();
+        return helpers.getLast7Days(true);
       } else if (metric.metrics) {
         // Creates the set to be able to calculate the average in this format:
-        let historyDataset = helpers.getLast7DaysNoValue();
+        let historyDataset = helpers.getLast7Days(true);
         // [{"date":"11/14/2020","value":0},{"date":"11/13/2020","value":0}, .....]
         for (let key in metric.metrics) {
           let metricHistory = Metrics.extractHistoryValues(metric.metrics[key]);
@@ -230,7 +176,7 @@ class Metrics {
 
         return historyDataset;
       }
-    }
+    } return helpers.getLast7Days(true);
   }
 
   static getHistoryValues(metrics) {
@@ -244,9 +190,7 @@ class Metrics {
     });
     // Format the dates which will appear on the chart
     let historyDays = historyDataset.map((elem) => {
-      let date = elem.date.split("/");
-      date.pop();
-      return date.join("/");
+      return `${elem.date.getMonth() + 1}/${elem.date.getDate()}`;
     });
 
     return {

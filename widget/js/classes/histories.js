@@ -38,8 +38,7 @@ class Histories {
   }
 
   static updateMetricHistory({ clientProfile, nodeSelector, historyId }, data) {
-    const absoluteDate = helpers.getAbsoluteDate();
-    const dateOnly = helpers.getAbsoluteDate().slice(0, 10);
+    const dateOnly = helpers.getAbsoluteDate()
 
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");
@@ -53,7 +52,7 @@ class Histories {
       }
 
       buildfire.publicData.searchAndUpdate(
-        { [`${nodeSelector}.history.date`]: { $regex: `.*${dateOnly}.*` } },
+        { [`${nodeSelector}.history.date`]: dateOnly },
         {
           $set: {
             [`${nodeSelector}.history.$.value`]: data.value,
@@ -73,7 +72,7 @@ class Histories {
               {
                 $push: {
                   [`${nodeSelector}.history`]: {
-                    date: absoluteDate,
+                    date: dateOnly,
                     createdOn: new Date(),
                     createdBy: data.username,
                     lastUpdatedOn: new Date(),
