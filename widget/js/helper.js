@@ -2,7 +2,7 @@ const helpers = {
   uuidv4: (m = Math, d = Date, h = 16, s = (s) => m.floor(s).toString(h)) =>
     s(d.now() / 1000) + " ".repeat(h).replace(/./g, () => s(m.random() * h)),
   // Returns current date in ISO string
-  getAbsoluteDate: () => {
+  getCurrentDate: () => {
     let date = new Date();
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   },

@@ -8,8 +8,7 @@ class Histories {
         if (err) {
           console.error(err);
           return reject(err);
-        }
-        else {
+        } else {
           // Check if there is already objects in the database
           if (!result.data.metrics) {
             // If there is no object, then create the parent object
@@ -20,8 +19,7 @@ class Histories {
                 if (err) {
                   console.error(err);
                   return reject(err);
-                }
-                else {
+                } else {
                   this.getHistories(clientProfile).then((result) => {
                     resolve(result);
                   });
@@ -38,7 +36,7 @@ class Histories {
   }
 
   static updateMetricHistory({ clientProfile, nodeSelector, historyId }, data) {
-    const dateOnly = helpers.getAbsoluteDate()
+    const dateOnly = helpers.getCurrentDate();
 
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");
@@ -98,10 +96,6 @@ class Histories {
           updatedMetricId = updatedMetricId[updatedMetricId.length - 1];
           // Track action
           Analytics.trackAction(`METRIC_${updatedMetricId}_HISTORY_UPDATE`);
-
-          Metrics.getMetrics().then((result) => {
-            resolve(result);
-          });
         }
       );
     });

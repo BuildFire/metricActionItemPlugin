@@ -17,7 +17,7 @@ class Metrics {
   }
 
   static updateMetricHistory({ nodeSelector, metricsId }, data) {
-    const dateOnly = helpers.getAbsoluteDate();
+    const dateOnly = helpers.getCurrentDate();
 
     return new Promise((resolve, reject) => {
       if (!nodeSelector) return reject("nodeSelector not provided");

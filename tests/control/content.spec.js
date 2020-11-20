@@ -231,7 +231,7 @@ describe("Test The Control Side", () => {
       buildfire.datastore.save({}, "metrics", async (err, data) => {
         if (err) reject(err);
         else {
-          await buildfire.datastore.save(
+          await buildfire.publicData.save(
             { metrics: {} },
             `history${clientProfile}`,
             async (err, result) => {

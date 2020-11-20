@@ -170,6 +170,7 @@ const initIconComponent = (imageUrl = "") => {
     imageUrl: imageUrl,
     title: "Icon",
     dimensionsLabel: "400x400",
+    multiSelection: false
   });
 
   let thumbElement = document

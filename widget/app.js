@@ -124,12 +124,7 @@ buildfire.datastore.onUpdate((event) => {
       metrics.id = event.id;
       renderInit();
     } else if (event.tag === "settings") {
-      return Settings.load().then(() => {
-        if (!isQeuryProvided && Settings.dataPolicyType === "private") {
-          Settings.tags = [];
-        }
-        loadApp();
-      });
+      loadApp();
     }
   }
 });
@@ -139,12 +134,13 @@ buildfire.publicData.onUpdate((event) => {
   if (event.status && event.nModified) {
     Histories.getHistories(clientProfile).then((result) => {
       histories = result;
-      loadApp();
+      renderInit();
     });
-  } else if (event.data && event.id && event.tag.includes("history")) {
-    histories = event.data;
-    histories = event.id;
-    loadApp();
+  } else if (event.tag && event.tag.indexOf("history") > -1) {
+    Histories.getHistories(clientProfile).then((result) => {
+      histories = result;
+      renderInit();
+    });
   }
 });
 
@@ -627,10 +623,10 @@ buildfire.history.onPop((breadcrumb) => {
     helpers.showElem("#metricsScreen");
     helpers.hideElem("#updateHistoryContainer, #updateHistoryButton");
 
-    renderInit();
-
     if (numberOfPops) {
       buildfire.history.pop();
+    } else {
+      renderInit();
     }
   } else {
     //  This condition is for preventing the control side from going back (when clicking back in widget)
