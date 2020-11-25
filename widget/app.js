@@ -40,35 +40,17 @@ buildfire.appearance.getAppTheme((err, appTheme) => {
   appThemeObj = appTheme;
 });
 
-// Get the logged in user
-authManager.getCurrentUser().then((user) => {
-  currentUser = user;
-});
-
 // hide metric screen on init;
 helpers.hideElem("#metricsScreen");
 
 // Login and Logout listners
 buildfire.auth.onLogin(() => {
-  authManager.getCurrentUser().then((user) => {
-    currentUser = user;
     loadApp();
-  });
 });
+
 buildfire.auth.onLogout(() => {
-  helpers.hideElem("#metricsScreen");
-
   currentUser = null;
-
-  buildfire.components.toast.showToastMessage(
-    {
-      text: "Login is required",
-      action: {
-        title: "Login",
-      },
-    },
-    () => authManager.login()
-  );
+  loadApp();
 });
 
 let isDeeplink = false;
@@ -150,7 +132,15 @@ const loadMetrics = () => {
     metrics = result;
     // Initialize clinet history
     Histories.getHistories(clientProfile).then((result) => {
-      histories = result;
+      if (
+        !currentUser &&
+        !isQeuryProvided &&
+        Settings.dataPolicyType === "private"
+      ) {
+        histories = { metrics: {} };
+      } else {
+        histories = result;
+      }
 
       initMaterialComponents();
       renderInit();
@@ -159,40 +149,24 @@ const loadMetrics = () => {
 };
 
 const loadApp = () => {
-  Settings.load().then(() => {
-    if (isQeuryProvided) {
-      return loadMetrics();
-    } else if (Settings.dataPolicyType === "private") {
-      Settings.tags = [];
-      authManager.getCurrentUser().then((user) => {
-        if (!user) {
-          authManager
-            .login()
-            .then((user) => {
-              if (!user) {
-                buildfire.components.toast.showToastMessage(
-                  {
-                    text: "Login is required",
-                    action: {
-                      title: "Login",
-                    },
-                  },
-                  () => authManager.login()
-                );
-              }
-            })
-            .catch(console.error);
-        } else {
+  authManager.getCurrentUser().then((user) => {
+    Settings.load().then(() => {
+      if (isQeuryProvided) {
+        return loadMetrics();
+      } else if (Settings.dataPolicyType === "private") {
+        Settings.tags = [];
+        if (user) {
+          currentUser = user;
           // This means that the user is logged in and the dataPolicy is private
           clientProfile = encodeURIComponent(`user${user.userToken}`);
-          loadMetrics();
         }
-      });
-    } else {
-      // This means the data policy type is public and clientProfile should be empty
-      clientProfile = "";
-      return loadMetrics();
-    }
+        return loadMetrics();
+      } else {
+        // This means the data policy type is public and clientProfile should be empty
+        clientProfile = "";
+        return loadMetrics();
+      }
+    });
   });
 };
 
@@ -573,11 +547,34 @@ const changeProgressbarValue = (direction, newMetric) => {
 const isUserAuthorized = () => {
   let authorized = false;
   let currentTags = {};
-  if (Settings.tags.length === 0) {
+  if (
+    !currentUser &&
+    !isQeuryProvided &&
+    Settings.dataPolicyType === "private"
+  ) {
+    buildfire.components.toast.showToastMessage(
+      {
+        text: "Login is required.",
+        action: {
+          title: "Login",
+        },
+      },
+      () => authManager.login()
+    );
+    return false;
+  } else if (Settings.tags.length === 0) {
     authorized = true;
   } else {
     if (!currentUser) {
-      authManager.login();
+      buildfire.components.toast.showToastMessage(
+        {
+          text: "Login is required.",
+          action: {
+            title: "Login",
+          },
+        },
+        () => authManager.login()
+      );
       return false;
     }
 

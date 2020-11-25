@@ -178,7 +178,15 @@ class ListViewItem {
       }
       this.viewdValue = this.value;
 
-      if (
+      // Solve time difference issue
+      let date = new Date();
+      let formattedDate = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
+
+      if (this.history.length === 1 && formattedDate < this.history[0].date) {
+        this.viewdValue = "- ";
+      } else if (
         (this.history.length === 0 && this.type === "metric") ||
         (this.type === "parent" && Object.keys(this.metrics).length === 0) ||
         (this.value === 0 && Object.keys(this.metrics).length > 0)

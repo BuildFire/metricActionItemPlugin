@@ -81,7 +81,7 @@ class Metrics {
   static extractHistoryValues(metric) {
     if (metric.type === "metric") {
       // Get the metric history array
-      let history = metric.history;
+      let history = metric.history.sort((a, b) => {return new Date(a.date) - new Date(b.date)});
 
       // Creates the set to be able to calculate the average in this format:
       // [{"date":"11/14/2020","value":0},{"date":"11/13/2020","value":0}, .....]
@@ -95,6 +95,12 @@ class Metrics {
         if (!history[history.length - index]) {
           // This means that this has no value change at this date
           set.value = "No value";
+        } else if (
+          history.length === 1 &&
+          history[history.length - index].date > set.keyDate
+        ) {
+          index++;
+          set.value = "No value";
         } else {
           // Convert the ISO date from the coming from the database to local date
           let historyDate = history[history.length - index].date;
@@ -102,31 +108,26 @@ class Metrics {
           // If the saved date was one day ahead of the current date, don't take the current value, take the previous one;
           if (set.keyDate < historyDate) {
             index++;
-            set.value = history[history.length - index].value || 0;
 
-            // Check if there is another element in the history
-            if (
-              history[history.length - index] &&
-              history[history.length - index].date
-            ) {
-              let lastDate = history[history.length - index].date;
+            if (history[history.length - index]) {
+              set.value = history[history.length - index].value || 0;
+
               // If the previous value's date === the the current set.keyDate we just used then we need to move on to the next value,
               // other wise we skip
+              let lastDate = history[history.length - index].date;
               if (set.keyDate === lastDate) {
                 index++;
               }
-            } else {
-              set.value = history[history.length - index].value
-                ? history[history.length - index].value
-                : 0;
             }
           } else if (set.keyDate === historyDate) {
             set.value = history[history.length - index].value || 0;
             index++;
           } else {
-            set.value = history[history.length - index].value
-              ? history[history.length - index].value
-              : 0;
+            set.value =
+              history[history.length - index] &&
+              history[history.length - index].value
+                ? history[history.length - index].value
+                : 0;
           }
         }
       });
@@ -176,7 +177,8 @@ class Metrics {
 
         return historyDataset;
       }
-    } return helpers.getLast7Days(true);
+    }
+    return helpers.getLast7Days(true);
   }
 
   static getHistoryValues(metrics) {
