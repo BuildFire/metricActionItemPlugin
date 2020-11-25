@@ -44,8 +44,9 @@ buildfire.appearance.getAppTheme((err, appTheme) => {
 helpers.hideElem("#metricsScreen");
 
 // Login and Logout listners
-buildfire.auth.onLogin(() => {
-    loadApp();
+buildfire.auth.onLogin((user) => {
+  currentUser = user;
+  loadApp();
 });
 
 buildfire.auth.onLogout(() => {
@@ -63,13 +64,13 @@ buildfire.deeplink.getData((data) => {
   }
 });
 
-buildfire.navigation.onAppLauncherActive(() => {
-  if (nodeSelector !== "metrics") {
-    nodeSelector = "metrics";
-    buildfire.messaging.sendMessageToControl({ nodeSelector });
-    loadApp();
-  }
-}, false);
+// buildfire.navigation.onAppLauncherActive(() => {
+//   if (nodeSelector !== "metrics") {
+//     nodeSelector = "metrics";
+//     buildfire.messaging.sendMessageToControl({ nodeSelector });
+//     loadApp();
+//   }
+// }, false);
 
 const getBreadCrumps = () => {
   return new Promise((resolve, reject) => {
@@ -150,13 +151,13 @@ const loadMetrics = () => {
 
 const loadApp = () => {
   authManager.getCurrentUser().then((user) => {
+    currentUser = user;
     Settings.load().then(() => {
       if (isQeuryProvided) {
         return loadMetrics();
       } else if (Settings.dataPolicyType === "private") {
         Settings.tags = [];
         if (user) {
-          currentUser = user;
           // This means that the user is logged in and the dataPolicy is private
           clientProfile = encodeURIComponent(`user${user.userToken}`);
         }
