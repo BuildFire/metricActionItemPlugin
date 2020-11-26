@@ -15,10 +15,8 @@ html {
 }
 
 html[safe-area="true"] body {
+  padding-top: env(safe-area-inset-top);
   padding-bottom: 0px !important;
-  -webkit-overflow-scrolling: auto;
-}
-html[buildfire][safe-area="true"] body {
   -webkit-overflow-scrolling: auto !important;
 }
 
