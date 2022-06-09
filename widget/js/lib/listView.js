@@ -119,6 +119,8 @@ class ListViewItem {
         });
       // local
       else img.src = this.icon;
+      let data_title = this.title || "Metric"
+      img.setAttribute("alt",data_title);
 
       ui.create("i", imgContainer, null, ["listViewItemIcon"]);
     }
@@ -200,6 +202,7 @@ class ListViewItem {
       ]);
 
       listViewItemToolbar.onclick = (e) => {
+        Analytics.trackAction(AnalyticsKey.eventType[0].key);
         t.onToolbarClicked("btnBadge", t, e);
         e.preventDefault();
         e.stopPropagation();
