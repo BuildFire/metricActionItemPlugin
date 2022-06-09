@@ -260,6 +260,8 @@ const checkIncreaseOrDecrease = (metrics) => {
 
   percentage = percentage.toPrecision(3);
 
+  (percentage === "100") ? Analytics.trackAction(AnalyticsKey.eventType[1].key) : false;
+
   summaryPreviousValueContainer.innerHTML = `
       <i
       class="material-icons mdc-button__icon ${situationClass} trending-icon">${situation}</i >
