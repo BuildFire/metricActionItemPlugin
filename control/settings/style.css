@@ -1,3 +1,7 @@
+*:not(i):not(.material-icons):not(.mdc-icon):not(.mdc-button__icon):not(.mdc-icon-button__icon):not(.icon) {
+  font-family: 'Inter_Regular', 'Helvetica', 'Sans-Serif', 'Arial' !important
+}
+
 .show-summary-lable {
   display: block;
   padding-left: 15px;
@@ -40,7 +44,6 @@
 p.info {
   width: auto !important;
   background-color: #f9f9f9;
-  font-family: "Conv_apercu_regular";
   line-height: 1.33;
   text-align: left;
   color: #9e9e9e;
